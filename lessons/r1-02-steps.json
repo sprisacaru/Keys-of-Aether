@@ -30,6 +30,13 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     60,
+     62,
+     64
+    ]
+   },
    "q": "Step",
    "a": "Moving to the very next note: line to the next space, or space to the next line. On the keys it is the next white key."
   }

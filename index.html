@@ -11,7 +11,15 @@
   .sunCss{width:210px;height:210px;border-radius:50%;background:linear-gradient(#fff27a,#ff9a3c 45%,#ff2fa8);-webkit-mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 62%,transparent 62% 66%,#000 66% 72%,transparent 72% 77%,#000 77% 82%,transparent 82% 88%,#000 88% 92%,transparent 92%);mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 62%,transparent 62% 66%,#000 66% 72%,transparent 72% 77%,#000 77% 82%,transparent 82% 88%,#000 88% 92%,transparent 92%);filter:drop-shadow(0 0 30px rgba(255,63,210,.6));margin-bottom:-70px}
   .gridCss{position:absolute;left:-50%;right:-50%;bottom:0;height:42%;background:linear-gradient(#ff3fd2,#ff3fd2) top/100% 2px no-repeat,repeating-linear-gradient(90deg,rgba(46,242,255,.55) 0 2px,transparent 2px 60px),repeating-linear-gradient(0deg,rgba(46,242,255,.55) 0 2px,transparent 2px 46px);transform:perspective(260px) rotateX(62deg);transform-origin:top;opacity:.7}
   :root{--bg:#07060f;--panel:#120f24;--line:#2a2450;--ink:#ece9ff;--quiet:#9a93c9;--cyan:#2ef2ff;--pink:#ff3fd2;--violet:#8b5cff;--good:#3dff9a;--bad:#ff4d6d;--gold:#ffd24a}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+  textarea{-webkit-user-select:text;user-select:text} body{touch-action:manipulation}
+  @media (orientation:landscape) and (max-height:540px){
+    #map.on{display:grid;grid-template-columns:250px 1fr;grid-template-rows:auto 1fr;height:100vh;height:100dvh;max-width:none;overflow:hidden}
+    #map .mapHud{grid-column:1;grid-row:1;position:static;padding:8px 10px 4px} #map .mapFoot{grid-column:1;grid-row:2;overflow:auto;padding:6px 10px 10px} #map .mapFoot button{font-size:11px;padding:8px 10px}
+    #sceneWrap{grid-column:2;grid-row:1 / span 2;overflow:auto;min-width:0} #m3{height:100vh!important;height:100dvh!important;min-height:0!important;border-radius:0!important}
+    #title{flex-direction:row;flex-wrap:wrap;gap:10px 24px} #title .sunCss{width:130px;height:130px;margin:0} #title h1{font-size:30px} #title p{max-width:260px;font-size:12px}
+    #intro,#shrine{max-width:760px} #sv{height:110px} #skb{height:100px}
+  }
   html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;overscroll-behavior:none}
   h1,h2,.disp,button{font-family:Orbitron,"Avenir Next Condensed","Arial Narrow",-apple-system,sans-serif;letter-spacing:2px;text-transform:uppercase}
   .screen{display:none;min-height:100%;flex-direction:column}
@@ -50,7 +58,7 @@
   .hud .ttl{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .hud .mid{font-size:13px;color:var(--cyan);font-weight:800;min-width:74px;text-align:center}
   .hud button{padding:6px 10px;font-size:12px}
-  #cv{flex:1;width:100%;display:block;touch-action:none}
+  #cv{flex:1 1 0;min-height:0;height:0;width:100%;display:block;touch-action:none} #play{overflow:hidden}
   #shrine{padding:14px 14px 30px;max-width:560px;margin:0 auto;width:100%;gap:10px}
   #sv,#skb{width:100%;display:block;border-radius:12px;background:#0a0818} #sv{height:150px} #skb{height:130px;touch-action:none}
   @keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1)}}
@@ -92,6 +100,7 @@
   <h1 class="glow" id="inTitle"></h1>
   <div class="card"><h2 class="disp">The idea</h2><p id="inIdea"></p></div>
   <div class="card"><h2 class="disp">Find it on your piano</h2><div id="inFind"></div><p id="inFindT" style="margin-top:8px"></p></div>
+  <div class="card" id="inStaffCard"><h2 class="disp">Find it on the staff</h2><div id="inStaff"></div></div>
   <div class="card"><h2 class="disp">Technique card</h2><div class="t" id="inTechT"></div><p id="inTech"></p></div>
   <div class="card" id="inTheory"></div>
   <div class="rowb">
@@ -476,6 +485,21 @@
   const nm = (m, L) => (FLAT_KEYS.includes(L.key) ? NAMESF : NAMES)[m % 12];
   const whiteSteps = m => [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6][(m - 60) % 12] + 7 * Math.floor((m - 60) / 12);
 
+  // ---------------- Staff pictures ----------------
+  function staffSVG(o) {
+    const notes = o.notes, bass = o.clef === 'bass', base = bass ? 18 : 30, sp = 9, bottom = 74, x0 = 84, dx = 46, W = Math.max(210, x0 + dx * notes.length + 10), flats = FLAT_KEYS.includes(o.key); let s = '';
+    for (let i = 0; i < 5; i++) s += `<line x1="8" x2="${W - 8}" y1="${bottom - i * sp}" y2="${bottom - i * sp}" stroke="#8a84b5" stroke-width="1"/>`;
+    s += bass ? `<text x="12" y="${bottom - sp * .9}" font-size="${sp * 3.6}" fill="#c9c3ee" font-family="serif">𝄢</text>` : `<text x="10" y="${bottom + sp * .9}" font-size="${sp * 5.2}" fill="#c9c3ee" font-family="serif">𝄞</text>`;
+    notes.forEach((m, i) => { const x = x0 + i * dx, info = dia(m, flats), y = bottom - (info.d - base) * sp / 2, len = (o.lens || [])[i] || 1, name = (flats ? NAMESF : NAMES)[m % 12] + (m === 60 ? ' (Middle C)' : '');
+      for (let d = base - 2; d >= info.d; d -= 2) s += `<line x1="${x - sp * 1.1}" x2="${x + sp * 1.1}" y1="${bottom - (d - base) * sp / 2}" y2="${bottom - (d - base) * sp / 2}" stroke="#8a84b5" stroke-width="1.4"/>`;
+      for (let d = base + 10; d <= info.d; d += 2) s += `<line x1="${x - sp * 1.1}" x2="${x + sp * 1.1}" y1="${bottom - (d - base) * sp / 2}" y2="${bottom - (d - base) * sp / 2}" stroke="#8a84b5" stroke-width="1.4"/>`;
+      s += `<ellipse cx="${x}" cy="${y}" rx="${sp * .64}" ry="${sp * .47}" transform="rotate(-20 ${x} ${y})" fill="${len >= 2 ? 'none' : '#ffd24a'}" stroke="#ffd24a" stroke-width="1.8"/>`;
+      if (len < 4) { const up = info.d < base + 4; s += up ? `<line x1="${x + sp * .58}" x2="${x + sp * .58}" y1="${y}" y2="${y - sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>` : `<line x1="${x - sp * .58}" x2="${x - sp * .58}" y1="${y}" y2="${y + sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>`; }
+      if (info.acc) s += `<text x="${x - sp * .9}" y="${y + sp * .6}" text-anchor="end" font-size="${sp * 1.9}" fill="#ffd24a" font-family="serif">${info.acc}</text>`;
+      s += `<text x="${x}" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd24a">${o.lens ? (len === 1 ? '1 beat' : len + ' beats') : name}</text>`; });
+    return `<svg viewBox="0 0 ${W} 124" style="display:block;width:${W}px;max-width:100%;margin:6px 0 4px;background:#0a0818;border-radius:10px">${s}</svg>`;
+  }
+
   // ---------------- Intro ----------------
   let current = null;
   function openIntro(id) {
@@ -486,7 +510,9 @@
     $('inFindT').innerHTML = (firstR ? `The blue zone is the only part of the piano this lesson uses. <b>Middle C</b> is the white key just left of the pair of two black keys nearest the centre of your keyboard, usually right under the brand name. Right hand starts with finger ${firstR.finger} on <b>${nm(firstR.pitch, L)}</b>${firstR.pitch === 60 ? ' (Middle C)' : firstR.pitch > 60 ? `, ${whiteSteps(firstR.pitch)} white key${whiteSteps(firstR.pitch) === 1 ? '' : 's'} above Middle C` : ''}.` : 'This is a rhythm drill: any key works. Use Middle C, the white key just left of the pair of two black keys nearest the centre.')
       + (firstL ? ` Left hand starts with finger ${firstL.finger} on <b>${nm(firstL.pitch, L)}</b>, the next ${nm(firstL.pitch, L)} below Middle C.` : '');
     $('inTechT').textContent = L.technique.title; $('inTech').textContent = L.technique.feel;
-    $('inTheory').innerHTML = '<h2 class="disp">Theory rune' + (L.theory.length > 1 ? 's' : '') + '</h2>' + L.theory.map(t => `<div class="t">${t.q}</div><p style="margin-bottom:8px">${t.a}</p>`).join('');
+    $('inTheory').innerHTML = '<h2 class="disp">Theory rune' + (L.theory.length > 1 ? 's' : '') + '</h2>' + L.theory.map(t => `<div class="t">${t.q}</div><p>${t.a}</p>${t.staff ? staffSVG(t.staff) : ''}<div style="height:10px"></div>`).join('');
+    const uniq = h => [...new Set(L.notes.filter(n => n.hand === h && n.pitch !== 'any').map(n => n.pitch))].sort((a, b) => a - b), rs = uniq('R'), ls = uniq('L');
+    $('inStaff').innerHTML = (rs.length ? `<p class="small">Every note in this lesson, low to high${ls.length ? ' (right hand)' : ''}:</p>` + staffSVG({ notes: rs, key: L.key }) : '') + (ls.length ? '<p class="small">Left hand:</p>' + staffSVG({ notes: ls, key: L.key, clef: 'bass' }) : ''); $('inStaffCard').style.display = rs.length || ls.length ? 'block' : 'none';
     const can = (r.stars || 0) >= 2; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
     $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Earn two stars in Perform to unlock harder runs of this lesson.';
     show('intro');
@@ -538,7 +564,7 @@
   window.addEventListener('resize', () => { if (game) resize(); });
 
   function layout() {
-    const G = game, W = cv._w, H = cv._h, free = G.mode === 'free', staffH = free ? 0 : G.two ? Math.min(190, H * .3) : Math.min(120, H * .2), stripH = 30, kbH = Math.min(170, H * .27), hitY = H - kbH, topY = staffH + stripH + 4;
+    const G = game, W = cv._w, H = cv._h, free = G.mode === 'free', staffH = free ? 0 : G.two ? Math.min(190, H * (W > H ? .27 : .3)) : Math.min(120, H * .2), wide = W > H, stripH = wide ? 24 : 30, kbH = Math.max(Math.min(170, H * .27), Math.min(112, H * .34)), hitY = H - kbH, topY = staffH + stripH + 4;
     const whites = []; for (let m = G.lo; m <= G.hi; m++) if (!isBlack(m)) whites.push(m);
     const ww = W / whites.length, keyX = m => !isBlack(m) ? (whites.indexOf(m) + .5) * ww : whites.indexOf(m - 1) * ww + ww;
     return { W, H, staffH, stripH, kbH, hitY, topY, whites, ww, keyX, bw: ww * .6 };
@@ -567,7 +593,7 @@
     g2.clearRect(0, 0, W, H);
     const bg = g2.createLinearGradient(0, topY, 0, hitY); bg.addColorStop(0, '#0c0626'); bg.addColorStop(.5, '#1a0a45'); bg.addColorStop(1, '#3a1070'); g2.fillStyle = bg; g2.fillRect(0, topY, W, hitY - topY);
     for (const [a, b, c] of starsBg) { g2.globalAlpha = .25 + .5 * Math.abs(Math.sin(now / 900 + c * 9)); g2.fillStyle = '#fff'; g2.fillRect(a * W, topY + b * (hitY - topY) * .7, 1.4 + c, 1.4 + c); } g2.globalAlpha = 1;
-    { const r = W * .2, cy = topY + r * .9, sg = g2.createLinearGradient(0, cy - r, 0, cy + r); sg.addColorStop(0, '#fff27a'); sg.addColorStop(.5, '#ff9a3c'); sg.addColorStop(1, '#ff2fa8'); g2.save(); g2.globalAlpha = .8; g2.shadowColor = '#ff3fd2'; g2.shadowBlur = 40; g2.fillStyle = sg; g2.beginPath(); g2.arc(W / 2, cy, r, 0, 2 * Math.PI); g2.fill(); g2.shadowBlur = 0; g2.globalAlpha = 1; g2.beginPath(); g2.arc(W / 2, cy, r + 1, 0, 2 * Math.PI); g2.clip(); g2.fillStyle = '#150a38'; for (let i = 0; i < 6; i++) g2.fillRect(W / 2 - r - 2, cy + i * r * .16, 2 * r + 4, 2 + i * 1.4); g2.restore(); }
+    { const r = Math.max(4, Math.min(W * .2, (hitY - topY) * .42)), cy = topY + r * .9, sg = g2.createLinearGradient(0, cy - r, 0, cy + r); sg.addColorStop(0, '#fff27a'); sg.addColorStop(.5, '#ff9a3c'); sg.addColorStop(1, '#ff2fa8'); g2.save(); g2.globalAlpha = .8; g2.shadowColor = '#ff3fd2'; g2.shadowBlur = 40; g2.fillStyle = sg; g2.beginPath(); g2.arc(W / 2, cy, r, 0, 2 * Math.PI); g2.fill(); g2.shadowBlur = 0; g2.globalAlpha = 1; g2.beginPath(); g2.arc(W / 2, cy, r + 1, 0, 2 * Math.PI); g2.clip(); g2.fillStyle = '#150a38'; for (let i = 0; i < 6; i++) g2.fillRect(W / 2 - r - 2, cy + i * r * .16, 2 * r + 4, 2 + i * 1.4); g2.restore(); }
     const heat = Math.min(1, G.combo / 24); if (heat > .1) { for (const side of [0, 1]) { const gr = g2.createLinearGradient(side ? W : 0, 0, side ? W - 70 : 70, 0); gr.addColorStop(0, `rgba(46,242,255,${.45 * heat})`); gr.addColorStop(1, 'rgba(46,242,255,0)'); g2.fillStyle = gr; g2.fillRect(side ? W - 70 : 0, topY, 70, hitY - topY); } }
     g2.lineWidth = 1; for (let i = 0; i <= lay.whites.length; i++) { const a = proj(lay, i * ww, 0), b = proj(lay, i * ww, LOOK); g2.strokeStyle = 'rgba(46,242,255,.18)'; g2.beginPath(); g2.moveTo(a.x, a.y); g2.lineTo(b.x, b.y); g2.stroke(); }
     const scroll = G.beat, barN = G.bar;
@@ -605,10 +631,10 @@
   function drawStrip(lay) {
     const G = game, y = lay.staffH, W = lay.W, w = W / 52; let wi = 0, mc = 0;
     g2.fillStyle = '#0a0818'; g2.fillRect(0, y, W, lay.stripH);
-    for (let m = 21; m <= 108; m++) { if (isBlack(m)) continue; const on = m >= G.lo && m <= G.hi; if (m === 60) mc = wi * w + w / 2; g2.fillStyle = held[m] ? '#3dff9a' : on ? '#2ef2ff' : '#3a3560'; g2.fillRect(wi * w + .5, y + 3, w - 1, 13); wi++; }
-    wi = 0; for (let m = 21; m <= 108; m++) { if (isBlack(m)) { g2.fillStyle = '#0a0818'; g2.fillRect(wi * w - w * .28, y + 3, w * .56, 7); } else wi++; }
-    g2.fillStyle = '#ffd24a'; g2.beginPath(); g2.moveTo(mc, y + 17); g2.lineTo(mc - 4, y + 23); g2.lineTo(mc + 4, y + 23); g2.fill();
-    g2.font = '700 9px sans-serif'; g2.textAlign = 'left'; g2.fillText('Middle C', mc + 7, y + 26); g2.fillStyle = '#6d66a3'; g2.fillText('your 88 keys', 4, y + 26);
+    for (let m = 21; m <= 108; m++) { if (isBlack(m)) continue; const on = m >= G.lo && m <= G.hi; if (m === 60) mc = wi * w + w / 2; g2.fillStyle = held[m] ? '#3dff9a' : on ? '#2ef2ff' : '#3a3560'; g2.fillRect(wi * w + .5, y + 3, w - 1, lay.stripH - 17); wi++; }
+    wi = 0; for (let m = 21; m <= 108; m++) { if (isBlack(m)) { g2.fillStyle = '#0a0818'; g2.fillRect(wi * w - w * .28, y + 3, w * .56, (lay.stripH - 17) * .55); } else wi++; }
+    g2.fillStyle = '#ffd24a'; g2.beginPath(); g2.moveTo(mc, y + 16); g2.lineTo(mc - 4, y + lay.stripH - 3); g2.lineTo(mc + 4, y + lay.stripH - 3); g2.fill();
+    g2.font = '700 9px sans-serif'; g2.textAlign = 'left'; g2.fillText('Middle C', mc + 7, y + lay.stripH - 3); g2.fillStyle = '#6d66a3'; g2.fillText('your 88 keys', 4, y + lay.stripH - 3);
   }
 
   const LET = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
@@ -671,6 +697,9 @@
   $('btnAgain').onclick = () => openIntro(current.id);
   $('btnMap').onclick = () => renderMap(true);
 
+  ['cv', 'skb'].forEach(id => { const c = $(id); c.addEventListener('touchstart', e => e.preventDefault(), { passive: false }); c.addEventListener('contextmenu', e => e.preventDefault()); });
+  document.addEventListener('contextmenu', e => { if (e.target.tagName !== 'TEXTAREA') e.preventDefault(); }); document.addEventListener('selectstart', e => { if (e.target.tagName !== 'TEXTAREA') e.preventDefault(); });
+  window.addEventListener('orientationchange', () => setTimeout(() => { if (game) resize(); }, 250));
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
   window.__koa = { get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };

@@ -29,6 +29,13 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     60,
+     64,
+     67
+    ]
+   },
    "q": "Skip",
    "a": "Jumping over one note: line to line, or space to space. On the keys you skip one white key."
   }

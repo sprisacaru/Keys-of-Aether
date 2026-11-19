@@ -32,6 +32,15 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     67,
+     69,
+     71,
+     72,
+     74
+    ]
+   },
    "q": "Five-finger pattern",
    "a": "Five neighbouring notes under five fingers. The same pattern can start on any key."
   }

@@ -29,6 +29,13 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     69,
+     70
+    ],
+    "key": "F"
+   },
    "q": "Flat (♭)",
    "a": "A flat lowers a note to the very next key on the left. B-flat is the black key just left of B."
   }

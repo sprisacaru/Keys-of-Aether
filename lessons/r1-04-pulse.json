@@ -26,6 +26,16 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     71,
+     71
+    ],
+    "lens": [
+     1,
+     2
+    ]
+   },
    "q": "Quarter note and half note",
    "a": "A quarter note lasts one beat (filled notehead). A half note lasts two beats (hollow notehead)."
   }

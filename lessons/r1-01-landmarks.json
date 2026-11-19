@@ -33,10 +33,20 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     60
+    ]
+   },
    "q": "Middle C",
    "a": "The C nearest the middle of the piano. On the staff it sits on its own short line just below the five lines."
   },
   {
+   "staff": {
+    "notes": [
+     67
+    ]
+   },
    "q": "Treble G",
    "a": "The second line from the bottom of the treble staff. The curl of the treble clef wraps around it."
   }

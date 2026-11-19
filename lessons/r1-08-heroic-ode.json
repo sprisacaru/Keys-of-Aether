@@ -34,10 +34,25 @@
  },
  "theory": [
   {
+   "staff": {
+    "notes": [
+     72
+    ],
+    "lens": [
+     4
+    ]
+   },
    "q": "Whole note",
    "a": "Lasts four beats, a whole bar in 4/4. An open notehead with no stem."
   },
   {
+   "staff": {
+    "clef": "bass",
+    "notes": [
+     48,
+     55
+    ]
+   },
    "q": "Bass clef",
    "a": "The lower staff, for the left hand. Its two dots sit around the F line. The C you play here is the second space from the bottom."
   }
