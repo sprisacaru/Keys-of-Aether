@@ -120,6 +120,7 @@
   <div class="rowb" style="justify-content:center"><button id="btnAgain" class="ghost">Again</button><button id="btnMap">Walk on ▶</button></div>
 </div>
 
+<script src="vendor/three.min.js"></script>
 <script>
 (() => {
   'use strict';
@@ -194,6 +195,7 @@
     const px = i => 195 + 105 * Math.sin(i * 1.25 + .4), py = i => Hh - 190 - i * STEP;
     const pathX = y => px((Hh - 190 - y) / STEP);
     const cur = frontier(), ci = o.indexOf(cur);
+    if (map3D(walk, o, cur, ci)) { chipIn(); show('map'); window.scrollTo(0, 0); return; }
     const litY = py(Math.max(ci, 0)) - 40; // everything below this line has woken up
     const R = rng(7); let s = '';
     s += `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0820"/><stop offset=".55" stop-color="#10162e"/><stop offset="1" stop-color="#0c2a26"/></linearGradient>
@@ -252,6 +254,96 @@
   $('btnRestore').onclick = () => { try { const s = JSON.parse($('saveText').value); if (!s.stats) throw 0; save = Object.assign(blank(), s); persist(); renderMap(); } catch (e) { $('btnRestore').textContent = 'Not a valid save'; } };
   $('btnTest').onclick = () => { location.href = 'test.html'; };
   $('btnFree').onclick = () => startFree();
+
+  // ---------------- 3D forest path (Three.js), with the flat map as fallback ----------------
+  let M3 = null;
+  function map3D(walk, o, cur, ci) {
+    const T = window.THREE; if (!T) return false;
+    try {
+      if (!M3) {
+        $('sceneWrap').innerHTML = '<div id="m3" style="position:relative;height:calc(100vh - 215px);min-height:360px;overflow:hidden;touch-action:none;border-radius:18px"><div id="m3labels" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div><div style="position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:11px;color:#9a93c9;pointer-events:none;text-shadow:0 0 6px #000">drag to walk the path · tap a stop</div></div>';
+        const host = $('m3'), renderer = new T.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block'; host.prepend(renderer.domElement);
+        const gc = document.createElement('canvas'); gc.width = gc.height = 64; const gx = gc.getContext('2d'), gr = gx.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.3, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 64, 64);
+        const ac = document.createElement('canvas'); ac.width = 8; ac.height = 64; const ax = ac.getContext('2d'), ag = ax.createLinearGradient(0, 0, 0, 64); ag.addColorStop(0, 'rgba(255,255,255,0)'); ag.addColorStop(.6, 'rgba(255,255,255,.9)'); ag.addColorStop(1, 'rgba(255,255,255,0)'); ax.fillStyle = ag; ax.fillRect(0, 0, 8, 64);
+        M3 = { host, renderer, glow: new T.CanvasTexture(gc), aur: new T.CanvasTexture(ac), cam: new T.PerspectiveCamera(60, 1, .1, 400), camT: ci, bardT: ci, running: false, drag: null, picks: [] };
+        const el = renderer.domElement;
+        el.addEventListener('pointerdown', e => { M3.drag = { y: e.clientY, x: e.clientX, t: M3.camT, moved: 0 }; M3.auto = null; el.setPointerCapture && el.setPointerCapture(e.pointerId); });
+        el.addEventListener('pointermove', e => { const d = M3.drag; if (!d) return; d.moved = Math.max(d.moved, Math.abs(e.clientY - d.y) + Math.abs(e.clientX - d.x)); M3.camT = Math.max(-.6, Math.min(M3.n - .4, d.t + (e.clientY - d.y) * .013)); });
+        el.addEventListener('pointerup', e => { const d = M3.drag; M3.drag = null; if (!d || d.moved > 10) return; const r = el.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; let best = null, bd = 60; for (const p of M3.picks) { if (!p.vis) continue; const dd = Math.hypot(p.sx - x, p.sy - y); if (dd < bd) { bd = dd; best = p; } } if (best && best.open) best.go(); });
+        el.addEventListener('wheel', e => { e.preventDefault(); M3.auto = null; M3.camT = Math.max(-.6, Math.min(M3.n - .4, M3.camT - e.deltaY * .003)); }, { passive: false });
+      }
+      const m = M3, n = o.length, STEP = 13, R = rng(11); m.n = n;
+      const PX = t => 6.5 * Math.sin(t * .95 + .4), PZ = t => -t * STEP, P = (t, y) => new T.Vector3(PX(t), y || 0, PZ(t)), pathXatZ = z => PX(-z / STEP);
+      const sc = new T.Scene(), NIGHT = 0x0a0822; sc.background = new T.Color(NIGHT); sc.fog = new T.Fog(NIGHT, 26, 120); m.scene = sc; m.spin = []; m.picks = [];
+      sc.add(new T.HemisphereLight(0x8fa8ff, 0x0a1a14, .85)); const moonL = new T.DirectionalLight(0xfff0c8, .7); moonL.position.set(30, 50, -20); sc.add(moonL);
+      const litZ = PZ(Math.max(ci, 0)) - 5, isLit = z => z > litZ;
+      const basic = (c, extra) => new T.MeshBasicMaterial(Object.assign({ color: c }, extra)), lam = (c, extra) => new T.MeshPhongMaterial(Object.assign({ color: c, flatShading: true, shininess: 0 }, extra));
+      const glowAt = (v, col, size, parent) => { const s = new T.Sprite(new T.SpriteMaterial({ map: m.glow, color: col, blending: T.AdditiveBlending, depthWrite: false, transparent: true })); s.position.copy(v); s.scale.set(size, size, 1); (parent || sc).add(s); return s; };
+      // ground: woken half and silent half, plus low mounds
+      const far = PZ(n) - 80, gnd = (z0, z1, c) => { const g = new T.Mesh(new T.PlaneGeometry(260, Math.abs(z1 - z0)), lam(c)); g.rotation.x = -Math.PI / 2; g.position.set(0, 0, (z0 + z1) / 2); sc.add(g); };
+      gnd(60, litZ, 0x10463a); gnd(litZ, far, 0x14162c);
+      for (let i = 0; i < 46; i++) { const z = 40 + R() * (far - 40), side = R() < .5 ? -1 : 1, x = pathXatZ(z) + side * (9 + R() * 40), r = 3 + R() * 7; const mo = new T.Mesh(new T.SphereGeometry(r, 7, 5), lam(isLit(z) ? 0x14574a : 0x191b33)); mo.scale.y = .28; mo.position.set(x, -.2, z); sc.add(mo); }
+      // path ribbon
+      { const pos = [], col = [], cL = new T.Color(0x49e6f2), cD = new T.Color(0x2b2946), cE = new T.Color(0x1d7f8f); for (let t = -1.4; t <= n - .35; t += .05) { const a = P(t), b = P(t + .05), dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz), nx = -dz / l * 1.25, nz = dx / l * 1.25, c = t <= ci ? cL : cD, e = t <= ci ? cE : cD; pos.push(a.x - nx, .06, a.z - nz, a.x, .09, a.z, a.x + nx, .06, a.z + nz); col.push(e.r, e.g, e.b, c.r, c.g, c.b, e.r, e.g, e.b); }
+        const rows = pos.length / 9, idx = []; for (let i = 0; i < rows - 1; i++) { const a = i * 3; idx.push(a, a + 3, a + 1, a + 1, a + 3, a + 4, a + 1, a + 4, a + 2, a + 2, a + 4, a + 5); }
+        const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); g.setIndex(idx); sc.add(new T.Mesh(g, new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide }))); }
+      // lanterns along the woken path
+      for (let t = -1; t <= ci + .01; t += .5) { const a = P(t), side = Math.round(t * 2) % 2 ? 1 : -1, v = new T.Vector3(a.x + side * 2.1, 1.5, a.z); const post = new T.Mesh(new T.CylinderGeometry(.06, .08, 1.5, 5), lam(0x3a2f4a)); post.position.set(v.x, .75, v.z); sc.add(post); const bulb = new T.Mesh(new T.SphereGeometry(.2, 8, 6), basic(0xffe9a0)); bulb.position.copy(v); sc.add(bulb); glowAt(v, 0xffc860, 2); }
+      // trees (instanced)
+      { const N = 420, trunk = new T.InstancedMesh(new T.CylinderGeometry(.16, .22, 1, 5), lam(0x33263a), N), c1 = new T.InstancedMesh(new T.ConeGeometry(1.15, 2.2, 6), lam(0xffffff), N), c2 = new T.InstancedMesh(new T.ConeGeometry(.85, 1.9, 6), lam(0xffffff), N), d = new T.Object3D(), col = new T.Color(); let k = 0;
+        for (let i = 0; i < N * 2 && k < N; i++) { const z = 34 + R() * (far + 30 - 34), x = (R() - .5) * 110, s = .8 + R() * 1.5; if (Math.abs(x - pathXatZ(z)) < 6.5) continue; const lit = isLit(z), h = R();
+          d.rotation.set(0, R() * 6, 0); d.scale.set(s, s, s); d.position.set(x, .5 * s, z); d.updateMatrix(); trunk.setMatrixAt(k, d.matrix); d.position.y = 1.9 * s; d.updateMatrix(); c1.setMatrixAt(k, d.matrix); d.position.y = 3.1 * s; d.updateMatrix(); c2.setMatrixAt(k, d.matrix);
+          col.set(lit ? (h < .45 ? 0x1fa877 : h < .8 ? 0x17a6a6 : 0x58c26a) : 0x23233c); c1.setColorAt(k, col); col.set(lit ? (h < .45 ? 0x3dff9a : h < .8 ? 0x2ef2ff : 0x9af27a) : 0x2c2c48); c2.setColorAt(k, col); k++; }
+        trunk.count = c1.count = c2.count = k; sc.add(trunk, c1, c2); }
+      // village behind the start
+      for (const [dx, dz, w] of [[-5, 9, 2.2], [4.5, 11, 2.6], [-1, 15, 2], [8, 6, 1.8], [-8.5, 4, 2]]) { const a = P(-.9), g = new T.Group(); const b = new T.Mesh(new T.BoxGeometry(w, w * .8, w), lam(0x2a3a5c)); b.position.y = w * .4; const rf = new T.Mesh(new T.ConeGeometry(w * .85, w * .7, 4), lam(0x8b5cff)); rf.position.y = w * 1.15; rf.rotation.y = Math.PI / 4; const win = new T.Mesh(new T.PlaneGeometry(w * .3, w * .3), basic(0xffd24a)); win.position.set(0, w * .42, -w / 2 - .01); win.rotation.y = Math.PI; g.add(b, rf, win); g.position.set(a.x + dx, 0, a.z + dz); sc.add(g); glowAt(new T.Vector3(a.x + dx, w * .45, a.z + dz - w / 2 - .2), 0xffc860, 2.2); }
+      // stops
+      o.forEach((id, i) => { const l = lessons[id], st = starsOf(id), open = unlocked(id), v = P(i), colH = !open ? 0x4a4670 : l.boss ? 0xff3fd2 : l.heroic ? 0xffd24a : st >= 2 ? 0x3dff9a : 0x2ef2ff, r = rec(id);
+        const base = new T.Mesh(new T.CylinderGeometry(1.5, 1.8, .5, 8), lam(0x2a2648)); base.position.set(v.x, .25, v.z); sc.add(base);
+        const top = new T.Mesh(new T.CylinderGeometry(1.2, 1.2, .14, 8), basic(colH)); top.position.set(v.x, .57, v.z); sc.add(top);
+        if (open) glowAt(new T.Vector3(v.x, 1, v.z), colH, id === cur ? 5.5 : 4);
+        if (l.boss) { const g = new T.Group(), down = st >= 2, tw = new T.Mesh(new T.CylinderGeometry(1.5, 2, 8, 6), lam(down ? 0x2b5d57 : 0x1c1233)), cap = new T.Mesh(new T.ConeGeometry(2.1, 3, 6), lam(down ? 0x3dff9a : 0x8a1f73)); tw.position.y = 4; cap.position.y = 9.5; g.add(tw, cap); g.position.set(v.x + (v.x > 0 ? -6 : 6), 0, v.z - 3); sc.add(g); glowAt(new T.Vector3(g.position.x, 6, g.position.z + 1.6), down ? 0xffd24a : 0xff3fd2, 5); }
+        if (l.heroic) { const cr = new T.Mesh(new T.OctahedronGeometry(1), basic(open ? 0xffd24a : 0x4a4670, { wireframe: !open })); cr.position.set(v.x, 2.4, v.z); sc.add(cr); m.spin.push(cr); }
+        if (id === cur) { const ring = new T.Mesh(new T.TorusGeometry(2.1, .09, 6, 28), basic(colH)); ring.rotation.x = Math.PI / 2; ring.position.set(v.x, .7, v.z); sc.add(ring); m.ring = ring; }
+        const title = l.title.replace(/^(BOSS|HEROIC) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : 'Stop ' + (i + 1), hex = '#' + colH.toString(16).padStart(6, '0');
+        m.picks.push({ v: new T.Vector3(v.x, l.boss ? 2.6 : 2.2, v.z), open, go: () => openIntro(id), html: `<div style="font-size:9px;letter-spacing:1.5px;color:${hex}">${open ? '' : '🔒 '}${tag.toUpperCase()}</div><div style="font-weight:800;font-size:14px">${title}</div><div style="color:#ffd24a;font-size:13px;letter-spacing:2px">${'★'.repeat(st)}${'☆'.repeat(3 - st)}${r.fast ? ' ⚡' : ''}${r.blind ? ' 👁' : ''}</div>` }); });
+      // rune shrines beside the path
+      SHRINES.forEach(S => { const t = o.indexOf(S.after) + .5, a = P(t), side = PX(t) > 0 ? -1 : 1, open = shrineOpen(S), done = !!save.shrines[S.id], colH = !open ? 0x4a4670 : done ? 0x3dff9a : 0xffd24a, v = new T.Vector3(a.x + side * 4.2, 0, a.z);
+        const ped = new T.Mesh(new T.CylinderGeometry(.5, .8, 1, 5), lam(0x3a3658)); ped.position.set(v.x, .5, v.z); sc.add(ped); const gem = new T.Mesh(new T.OctahedronGeometry(.62), basic(colH, { wireframe: !open })); gem.position.set(v.x, 1.9, v.z); sc.add(gem); m.spin.push(gem); if (open) glowAt(new T.Vector3(v.x, 1.9, v.z), colH, done ? 3 : 5);
+        m.picks.push({ v: new T.Vector3(v.x, 2.9, v.z), open, small: true, go: () => openShrine(S.id), html: `<div style="font-size:8.5px;letter-spacing:1.5px;color:#${colH.toString(16).padStart(6, '0')}">${done ? '✓ ' : open ? '✦ ' : '🔒 '}RUNE SHRINE</div><div style="font-weight:700;font-size:11.5px">${S.short}</div>` }); });
+      // the bard
+      { const g = new T.Group(), body = new T.Mesh(new T.ConeGeometry(.55, 1.4, 7), lam(0x8b5cff)), head = new T.Mesh(new T.SphereGeometry(.3, 8, 6), lam(0xffd9b0)), hat = new T.Mesh(new T.ConeGeometry(.36, .55, 7), lam(0xff3fd2)), lute = new T.Mesh(new T.SphereGeometry(.22, 7, 5), lam(0xffd24a)); body.position.y = .7; head.position.y = 1.6; hat.position.y = 2; lute.position.set(.4, .8, .25); lute.scale.z = .5; g.add(body, head, hat, lute); sc.add(g); m.bard = g; glowAt(new T.Vector3(0, 1, 0), 0xc9b6ff, 3, g); }
+      // sky: stars, moon, aurora follow the camera so they never get closer
+      { const sky = new T.Group(), pts = []; for (let i = 0; i < 500; i++) { const a = R() * Math.PI * 2, e = .08 + R() * 1.2, r = 180; pts.push(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r); } const sg = new T.BufferGeometry(); sg.setAttribute('position', new T.Float32BufferAttribute(pts, 3)); sky.add(new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 1.3, sizeAttenuation: false, fog: false, transparent: true, opacity: .85 })));
+        const moon = new T.Mesh(new T.SphereGeometry(9, 16, 12), basic(0xfff3c4, { fog: false })); moon.position.set(48, 62, -150); sky.add(moon); const halo = glowAt(moon.position, 0xffe9a0, 70, sky); halo.material.fog = false;
+        m.aurs = [[0x3dff9a, 46, -30], [0x2ef2ff, 58, 20], [0x8b5cff, 70, -10]].map(([c, y, x], i) => { const p = new T.Mesh(new T.PlaneGeometry(190, 34), new T.MeshBasicMaterial({ map: m.aur, color: c, transparent: true, opacity: .3, blending: T.AdditiveBlending, depthWrite: false, fog: false, side: T.DoubleSide })); p.position.set(x, y, -165 + i * 4); p.rotation.z = (i - 1) * .12; sky.add(p); return p; });
+        for (let i = 0; i < 9; i++) { const pk = new T.Mesh(new T.ConeGeometry(26 + R() * 18, 30 + R() * 26, 5), basic(0x0e1030, { fog: false })); pk.position.set(-130 + i * 32 + R() * 10, 8, -170); sky.add(pk); }
+        sc.add(sky); m.sky = sky; }
+      // fireflies in the woken forest
+      { const pts = []; for (let i = 0; i < 130; i++) { const z = 30 + R() * (litZ - 30); pts.push(pathXatZ(z) + (R() - .5) * 34, .6 + R() * 3.2, z); } const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pts, 3)); m.flies = new T.Points(g, new T.PointsMaterial({ map: m.glow, color: 0xffe98a, size: .7, transparent: true, blending: T.AdditiveBlending, depthWrite: false })); sc.add(m.flies); }
+      // labels
+      const L = $('m3labels'); L.innerHTML = ''; m.picks.forEach(p => { const d = document.createElement('div'); d.style.cssText = 'position:absolute;left:0;top:0;text-align:center;white-space:nowrap;color:#ece9ff;text-shadow:0 0 4px #07060f,0 0 8px #07060f,0 1px 2px #000;will-change:transform'; d.innerHTML = p.html; L.appendChild(d); p.el = d; });
+      // camera target and walking
+      if (walk && Math.abs(m.bardT - ci) > .01) m.auto = { from: m.bardT, to: ci, t0: performance.now() }; else { m.bardT = ci; m.camT = ci; m.auto = null; }
+      m.PX = PX; m.PZ = PZ;
+      if (!m.running) { m.running = true; requestAnimationFrame(loop3D); }
+      return true;
+    } catch (e) { console.warn('3D map unavailable, using flat map', e); M3 = null; $('sceneWrap').innerHTML = ''; window.THREE = null; return false; }
+  }
+  function loop3D(now) {
+    const m = M3; if (!m || !$('map').classList.contains('on')) { if (m) m.running = false; return; }
+    const w = m.host.clientWidth, h = m.host.clientHeight; if (m.w !== w || m.h !== h) { m.w = w; m.h = h; m.renderer.setSize(w, h, false); m.cam.aspect = w / h; m.cam.updateProjectionMatrix(); }
+    if (m.auto) { const k = Math.min(1, (now - m.auto.t0) / 1900), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; m.bardT = m.auto.from + (m.auto.to - m.auto.from) * e; m.camT = m.bardT; if (k >= 1) m.auto = null; }
+    const t = m.camT, cam = m.cam; cam.position.set(m.PX(t - .9) * .5, 10.5, m.PZ(t) + 17); cam.lookAt(m.PX(t + 1.2) * .8, 1, m.PZ(t + 1.3));
+    const moving = !!m.auto; m.bard.position.set(m.PX(m.bardT) + 1.9, Math.abs(Math.sin(now / (moving ? 110 : 420))) * (moving ? .45 : .12), m.PZ(m.bardT) + 1.2); m.bard.rotation.y = Math.PI + (moving ? Math.sin(now / 150) * .2 : 0);
+    m.spin.forEach((g, i) => { g.rotation.y = now / 900 + i; g.position.y += Math.sin(now / 500 + i) * .003; });
+    if (m.ring) { const s = 1 + .12 * Math.sin(now / 300); m.ring.scale.set(s, s, 1); }
+    m.sky.position.set(cam.position.x * .9, 0, cam.position.z); m.aurs.forEach((p, i) => { p.material.opacity = .16 + .16 * (1 + Math.sin(now / 1700 + i * 2)); p.position.x += Math.sin(now / 2600 + i) * .02; });
+    m.flies.position.y = Math.sin(now / 900) * .25; m.flies.material.opacity = .55 + .4 * Math.sin(now / 400);
+    m.renderer.render(m.scene, cam);
+    const v = new THREE.Vector3(); for (const p of m.picks) { v.copy(p.v).project(cam); const dz = cam.position.z - p.v.z; p.vis = v.z < 1 && dz > 4 && dz < (p.small ? 40 : 58); if (!p.vis) { p.el.style.display = 'none'; continue; } p.sx = (v.x + 1) / 2 * w; p.sy = (1 - v.y) / 2 * h; const s = Math.max(.6, Math.min(1.1, 24 / dz)); p.el.style.display = 'block'; p.el.style.opacity = Math.min(1, (dz - 4) / 5) * Math.min(1, ((p.small ? 40 : 58) - dz) / 12); p.el.style.transform = `translate(${p.sx.toFixed(1)}px,${p.sy.toFixed(1)}px) translate(-50%,-100%) scale(${s.toFixed(2)})`; }
+    requestAnimationFrame(loop3D);
+  }
 
   // ---------------- Rune shrines: the why behind the music ----------------
   const RATIO = { 12: '2 : 1', 7: '3 : 2', 5: '4 : 3', 4: '5 : 4', 3: '6 : 5', 6: '45 : 32', 1: '16 : 15' };
@@ -564,7 +656,7 @@
 
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  window.__koa = { get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>
