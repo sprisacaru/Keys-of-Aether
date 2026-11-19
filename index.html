@@ -35,7 +35,7 @@
   .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .top h1{font-size:19px;margin:0}
   .chip{font-size:12px;color:var(--quiet);border:1px solid var(--line);border-radius:20px;padding:5px 10px;white-space:nowrap;background:rgba(7,6,15,.7)}
-  .chip.ok{color:var(--good);border-color:var(--good)} .chip b{color:var(--ink)}
+  .chip.ok{color:var(--good);border-color:var(--good)} #chipIn{max-width:46%;overflow:hidden;text-overflow:ellipsis} .chip b{color:var(--ink)}
   .xpbar{height:8px;border-radius:6px;background:#1d1838;overflow:hidden;margin-top:8px}
   .xpfill{height:100%;background:linear-gradient(90deg,var(--violet),var(--pink));box-shadow:0 0 10px var(--pink);transition:width .8s}
   .stats{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
@@ -299,8 +299,9 @@
         el.addEventListener('pointerup', e => { const d = M3.drag; M3.drag = null; if (!d || d.moved > 10) return; const r = el.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; let best = null, bd = 60; for (const p of M3.picks) { if (!p.vis) continue; const dd = Math.hypot(p.sx - x, p.sy - y); if (dd < bd) { bd = dd; best = p; } } if (best && best.open) best.go(); });
         el.addEventListener('wheel', e => { e.preventDefault(); M3.auto = null; M3.camT = Math.max(-.6, Math.min(M3.n - .4, M3.camT - e.deltaY * .003)); }, { passive: false });
       }
-      const m = M3, n = o.length, STEP = 13, R = rng(11); m.n = n;
+      const m = M3, n = o.length, STEP = 13, R = rng(11); m.n = n; m.ring = null;
       const PX = t => 6.5 * Math.sin(t * .95 + .4), PZ = t => -t * STEP, P = (t, y) => new T.Vector3(PX(t), y || 0, PZ(t)), pathXatZ = z => PX(-z / STEP);
+      if (m.scene) m.scene.traverse(ob => { if (ob.geometry) ob.geometry.dispose(); const mt = ob.material; if (mt) (Array.isArray(mt) ? mt : [mt]).forEach(x => { if (x.map && x.map._own) x.map.dispose(); x.dispose(); }); });
       const sc = new T.Scene(), NIGHT = 0x12003a; sc.background = new T.Color(0x02000a); sc.fog = new T.Fog(NIGHT, 30, 150); m.scene = sc; m.spin = []; m.picks = []; if (m.rpass) m.rpass.scene = sc;
       sc.add(new T.HemisphereLight(0xb9a0ff, 0x1a0540, 1)); const sunL = new T.DirectionalLight(0xff7ad0, .8); sunL.position.set(0, 20, -60); sc.add(sunL);
       const litZ = PZ(Math.max(ci, 0)) - 5, isLit = z => z > litZ;
@@ -308,7 +309,7 @@
       const glowAt = (v, col, size, parent) => { const s = new T.Sprite(new T.SpriteMaterial({ map: m.glow, color: col, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: .7 })); s.position.copy(v); s.scale.set(size, size, 1); (parent || sc).add(s); return s; };
       const edged = (geo, fill, line, parent, fogOff) => { const g = new T.Group(); g.add(new T.Mesh(geo, basic(fill, fogOff ? { fog: false } : {}))); g.add(new T.LineSegments(new T.EdgesGeometry(geo), new T.LineBasicMaterial({ color: line, fog: !fogOff }))); (parent || sc).add(g); return g; };
       // neon grid floor: woken half glows cyan, silent half is dim violet
-      const far = PZ(n) - 110, gnd = (z0, z1, tex) => { const len = Math.abs(z1 - z0), t = tex.clone(); t.needsUpdate = true; t.repeat.set(300 / 5, len / 5); const g = new T.Mesh(new T.PlaneGeometry(300, len), new T.MeshBasicMaterial({ map: t })); g.rotation.x = -Math.PI / 2; g.position.set(0, 0, (z0 + z1) / 2); sc.add(g); };
+      const far = PZ(n) - 110, gnd = (z0, z1, tex) => { const len = Math.abs(z1 - z0), t = tex.clone(); t._own = true; t.needsUpdate = true; t.repeat.set(300 / 5, len / 5); const g = new T.Mesh(new T.PlaneGeometry(300, len), new T.MeshBasicMaterial({ map: t })); g.rotation.x = -Math.PI / 2; g.position.set(0, 0, (z0 + z1) / 2); sc.add(g); };
       gnd(60, litZ, m.gLit); gnd(litZ, far, m.gDark);
       // path ribbon
       { const pos = [], col = [], cL = new T.Color(0xfff0ff), eL = new T.Color(0xc42aa0), cD = new T.Color(0x2a1a55); for (let t = -1.4; t <= n - .35; t += .05) { const a = P(t), b = P(t + .05), dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz), nx = -dz / l * 1.25, nz = dx / l * 1.25, lit = t <= ci, c = lit ? cL : cD, e = lit ? eL : cD; pos.push(a.x - nx, .06, a.z - nz, a.x, .08, a.z, a.x + nx, .06, a.z + nz); col.push(e.r, e.g, e.b, c.r * (lit ? .35 : 1), c.g * (lit ? .1 : 1), c.b * (lit ? .4 : 1), e.r, e.g, e.b); }
@@ -331,10 +332,9 @@
         if (open) glowAt(new T.Vector3(v.x, 1, v.z), colH, id === cur ? 4.5 : 3);
         if (l.boss) { const down = st >= 2, c = down ? 0x3dff9a : 0xff3fd2, bxp = v.x + (v.x > 0 ? -6.5 : 6.5), tw = edged(new T.CylinderGeometry(1.6, 2.2, 9, 6), 0x0a0420, c), cap = edged(new T.ConeGeometry(2.3, 3.4, 6), 0x1a0633, c); tw.position.set(bxp, 4.5, v.z - 3); cap.position.set(bxp, 10.7, v.z - 3); glowAt(new T.Vector3(bxp, 6, v.z - 1.2), down ? 0xffd24a : 0xff3fd2, 4); }
         if (l.heroic) { const cr = new T.Mesh(new T.OctahedronGeometry(1), basic(open ? 0xffd24a : 0x4a3a80, { wireframe: !open })); cr.position.set(v.x, 2.4, v.z); sc.add(cr); m.spin.push(cr); }
-        if (id === cur) { const ring = new T.Mesh(new T.TorusGeometry(2.1, .09, 6, 28), basic(colH)); ring.rotation.x = Math.PI / 2; ring.position.set(v.x, .7, v.z); sc.add(ring); m.ring = ring; } else if (i === 0 || id) { if (id === cur) m.ring = null; }
+        if (id === cur) { const ring = new T.Mesh(new T.TorusGeometry(2.1, .09, 6, 28), basic(colH)); ring.rotation.x = Math.PI / 2; ring.position.set(v.x, .7, v.z); sc.add(ring); m.ring = ring; }
         const title = l.title.replace(/^(BOSS|HEROIC) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : 'Stop ' + (i + 1), hex = '#' + colH.toString(16).padStart(6, '0');
         m.picks.push({ v: new T.Vector3(v.x, l.boss ? 2.6 : 2.2, v.z), open, go: () => openIntro(id), html: `<div style="font-size:9px;letter-spacing:1.5px;color:${hex}">${open ? '' : '🔒 '}${tag.toUpperCase()}</div><div style="font-weight:800;font-size:14px">${title}</div><div style="color:#ffd24a;font-size:13px;letter-spacing:2px">${'★'.repeat(st)}${'☆'.repeat(3 - st)}${r.fast ? ' ⚡' : ''}${r.blind ? ' 👁' : ''}</div>` }); });
-      if (!o.includes(cur)) m.ring = null;
       // rune shrines beside the path
       SHRINES.forEach(S => { const t = o.indexOf(S.after) + .5, a = P(t), side = PX(t) > 0 ? -1 : 1, open = shrineOpen(S), done = !!save.shrines[S.id], colH = !open ? 0x4a3a80 : done ? 0x3dff9a : 0xffd24a, v = new T.Vector3(a.x + side * 4.2, 0, a.z);
         const ped = edged(new T.CylinderGeometry(.5, .8, 1, 5), 0x0d0628, colH); ped.position.set(v.x, .5, v.z); const gem = new T.Mesh(new T.OctahedronGeometry(.62), basic(colH, { wireframe: !open })); gem.position.set(v.x, 1.9, v.z); sc.add(gem); m.spin.push(gem); if (open) glowAt(new T.Vector3(v.x, 1.9, v.z), colH, done ? 2 : 3.2);
@@ -448,7 +448,7 @@
     if (!ok) { $('shFb').innerHTML = '<span style="color:#ff4d6d">Not quite.</span> ' + it.hint; return; }
     sh.lock = true; $('shFb').innerHTML = '<span style="color:#3dff9a">Correct.</span> ' + (it.why || ''); [79, 84].forEach((m, i) => setTimeout(() => tone(m, .4, .4), i * 90));
     setTimeout(() => { if (shrine !== sh) return; if (sh.q < sh.S.quiz.length - 1) { sh.q++; renderShrine(); } else {
-      const firstTime = !save.shrines[sh.S.id]; sh.gain = firstTime ? 60 : 10; save.shrines[sh.S.id] = true; save.xp += sh.gain; save.stats.theory += firstTime ? 6 : 1; save.stats.ear += firstTime ? 2 : 0; persist(); sh.done = true; chime(true); renderShrine(); } }, 1500);
+      const firstTime = !save.shrines[sh.S.id]; sh.gain = firstTime ? 60 : 10; save.shrines[sh.S.id] = true; save.xp += sh.gain; save.stats.theory += firstTime ? 6 : 1; save.stats.ear += firstTime ? 2 : 0; touchStreak(); persist(); sh.done = true; chime(true); renderShrine(); } }, 1500);
   }
   function shLoop(now) {
     if (!shrine) return; const sh = shrine;
@@ -583,7 +583,7 @@
         if (G.mode === 'listen' && G.beat >= n.start) { n.state = 1; const m = n.pitch === 'any' ? 72 : n.pitch; tone(m, n.hand === 'L' ? .45 : .6, n.len * G.spb * 1.1); G.hit(n, m, 'perfect'); }
         else if (G.mode === 'perform' && (G.beat - n.start) * G.spb * 1000 > GOOD) { n.state = 3; G.combo = 0; } }
       const count = G.beat < 0 ? Math.ceil(-G.beat) : 0; $('hudMid').textContent = count ? 'Ready… ' + count : (G.combo > 1 ? '×' + G.combo + ' combo' : '');
-      if (!G.done && G.notes.every(n => n.state) && G.beat > G.end + (G.mode === 'wait' ? 0 : .5)) { G.done = true; setTimeout(finish, 600); }
+      if (!G.done && G.notes.every(n => n.state) && G.beat > G.end + (G.mode === 'wait' ? 0 : .5)) { G.done = true; setTimeout(() => { if (game === G) finish(); }, 600); }
     } else { G.beat += dt * 112 / 60; if (save.beat) drums(G, G.beat, 4); }
     draw(now); raf = requestAnimationFrame(frame);
   }
@@ -672,6 +672,7 @@
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('pointerleave', up);
 
   // ---------------- Results ----------------
+  function touchStreak() { const today = new Date().toLocaleDateString('en-CA'), y = new Date(Date.now() - 864e5).toLocaleDateString('en-CA'); if (save.streak.last !== today) { save.streak.count = save.streak.last === y ? save.streak.count + 1 : 1; save.streak.last = today; } }
   function finish() {
     const G = game; if (!G) return; cancelAnimationFrame(raf); game = null;
     if (G.mode === 'listen') { openIntro(G.L.id); return; }
@@ -684,8 +685,7 @@
     if (!G.tier) { r.stars = Math.max(r.stars, stars); r.best = Math.max(r.best, Math.round(acc * 100)); } if (passedTier) r[G.tier] = true;
     save.lessons[G.L.id] = r; save.xp += gain;
     G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + Math.max(1, Math.round(gain / 20)); }); if (G.tier === 'blind' && passedTier) save.stats.reading += 3;
-    const today = new Date().toLocaleDateString('en-CA'), y = new Date(Date.now() - 864e5).toLocaleDateString('en-CA');
-    if (save.streak.last !== today) { save.streak.count = save.streak.last === y ? save.streak.count + 1 : 1; save.streak.last = today; }
+    touchStreak();
     persist(); chime(stars >= 2 || G.mode === 'wait');
     $('resStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars) + (passedTier ? (G.tier === 'fast' ? ' ⚡' : ' 👁') : '');
     $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : 'The forest wakes a little') : 'Not yet. Again, a little calmer';
@@ -700,6 +700,8 @@
   ['cv', 'skb'].forEach(id => { const c = $(id); c.addEventListener('touchstart', e => e.preventDefault(), { passive: false }); c.addEventListener('contextmenu', e => e.preventDefault()); });
   document.addEventListener('contextmenu', e => { if (e.target.tagName !== 'TEXTAREA') e.preventDefault(); }); document.addEventListener('selectstart', e => { if (e.target.tagName !== 'TEXTAREA') e.preventDefault(); });
   window.addEventListener('orientationchange', () => setTimeout(() => { if (game) resize(); }, 250));
+  document.addEventListener('pointerdown', () => { if (ctx && ctx.state !== 'running') ctx.resume(); }, true);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
   window.__koa = { get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };

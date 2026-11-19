@@ -1,3 +1,4 @@
+if (window.THREE) {
 ( function () {
 
 	/**
@@ -903,3 +904,5 @@
 	THREE.UnrealBloomPass = UnrealBloomPass;
 
 } )();
+
+}
