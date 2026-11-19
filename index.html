@@ -47,8 +47,14 @@
   .hud .mid{font-size:13px;color:var(--cyan);font-weight:800;min-width:74px;text-align:center}
   .hud button{padding:6px 10px;font-size:12px}
   #cv{flex:1;width:100%;display:block;touch-action:none}
+  #shrine{padding:14px 14px 30px;max-width:560px;margin:0 auto;width:100%;gap:10px}
+  #sv,#skb{width:100%;display:block;border-radius:12px;background:#0a0818} #sv{height:150px} #skb{height:130px;touch-action:none}
+  @keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+  @keyframes aur{from{opacity:.12;transform:translateX(-14px)}to{opacity:.5;transform:translateX(14px)}} .aur{animation:aur 7s ease-in-out infinite alternate}
+  @keyframes shoot{0%,84%{opacity:0;transform:translate(0,0)}86%{opacity:1}100%{opacity:0;transform:translate(-170px,95px)}} .shoot{animation:shoot 9s linear infinite}
+  .shG{cursor:pointer} .rune{transform-box:fill-box;transform-origin:center;animation:bob 2.2s ease-in-out infinite}
   #results{align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px}
-  #results .stars{font-size:54px;color:var(--gold);letter-spacing:6px;text-shadow:0 0 20px var(--gold)}
+  #results .stars{animation:pop .7s;font-size:54px;color:var(--gold);letter-spacing:6px;text-shadow:0 0 20px var(--gold)}
   #results .big2{font-size:22px;font-weight:800} #results p{color:var(--quiet);margin:0;max-width:330px;line-height:1.5}
 </style>
 </head>
@@ -91,6 +97,17 @@
   <p class="small">Practice earns 1 star. Perform earns up to 3. Two stars open the next stop on the path. Stop if your hand or forearm feels tense or sore.</p>
 </div>
 
+<div class="screen" id="shrine">
+  <div class="top"><button class="ghost" id="shBack">◀ Path</button><span class="chip" id="shDots"></span></div>
+  <h1 class="glow" id="shTitle" style="font-size:22px;margin:0"></h1>
+  <div class="card"><div class="t" id="shH" style="font-size:17px"></div><p id="shT"></p></div>
+  <canvas id="sv"></canvas>
+  <div class="rowb" id="shDemo"></div>
+  <canvas id="skb"></canvas>
+  <p class="small" id="shFb" style="font-size:14px;min-height:20px"></p>
+  <div class="rowb" id="shNav"></div>
+</div>
+
 <div class="screen" id="play">
   <div class="hud"><button class="ghost" id="btnQuit">✕</button><div class="ttl" id="hudTitle"></div><div class="mid" id="hudMid"></div></div>
   <canvas id="cv"></canvas>
@@ -115,7 +132,7 @@
 
   // ---------------- Save ----------------
   const KEY = 'koa_save_v1';
-  const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, streak: { last: '', count: 0 }, echo: 'auto' });
+  const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, shrines: {}, streak: { last: '', count: 0 }, echo: 'auto' });
   let save = blank();
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.stats) save = Object.assign(blank(), s); } catch (e) {}
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} };
@@ -140,7 +157,7 @@
   // ---------------- Input ----------------
   let midiName = ''; const held = {};
   const echoOn = src => save.echo === 'on' || (save.echo === 'auto' && src !== 'midi');
-  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; game && game.onPress(m, performance.now()); }
+  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; game && game.onPress(m, performance.now()); shrine && shrine.onPress(m); }
   function release(m) { delete held[m]; stopTone(m); }
   async function initMidi() {
     if (!navigator.requestMIDIAccess) return;
@@ -181,10 +198,12 @@
     const R = rng(7); let s = '';
     s += `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0820"/><stop offset=".55" stop-color="#10162e"/><stop offset="1" stop-color="#0c2a26"/></linearGradient>
       <radialGradient id="moon"><stop offset="0" stop-color="#fff7d6"/><stop offset=".6" stop-color="#ffe9a0"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></radialGradient>
-      <filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+      <filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="gl2" x="-20%" y="-200%" width="140%" height="500%"><feGaussianBlur stdDeviation="12"/></filter></defs>`;
     s += `<rect width="${W}" height="${Hh}" fill="url(#sky)"/>`;
     for (let i = 0; i < 90; i++) { const x = R() * W, y = R() * Hh * .8, r = R() * 1.3 + .3; s += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="#fff" opacity="${(.25 + R() * .6).toFixed(2)}"/>`; }
     s += `<circle cx="318" cy="92" r="60" fill="url(#moon)" opacity=".5"/><circle cx="318" cy="92" r="24" fill="#fff3c4"/>`;
+    [['#3dff9a', 150], ['#2ef2ff', 210], ['#8b5cff', 270]].forEach(([c, y0], i) => { let dd = `M-20 ${y0}`; for (let x = 0; x <= W + 20; x += 40) dd += ` Q${x + 20} ${y0 - 34 + 26 * Math.sin(x / 70 + i * 2)} ${x + 40} ${y0 + 12 * Math.sin(x / 50 + i)}`; s += `<path class="aur" style="animation-delay:-${i * 2.3}s" d="${dd}" fill="none" stroke="${c}" stroke-width="26" stroke-linecap="round" opacity=".3" filter="url(#gl2)"/>`; });
+    s += `<g class="shoot"><path d="M250 60l34-19" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g><g class="shoot" style="animation-delay:-4.5s"><path d="M150 ${(Hh * .4).toFixed(0)}l34-19" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>`;
     for (let k = 0; k < 4; k++) { const y0 = 240 + k * (Hh - 300) / 4; let d = `M0 ${y0}`; for (let x = 0; x <= W; x += 30) d += ` L${x} ${(y0 - 26 - 22 * Math.sin(x / 55 + k * 2)).toFixed(0)}`; s += `<path d="${d} L${W} ${y0 + 200} L0 ${y0 + 200}Z" fill="${y0 > litY ? '#123a33' : '#161a30'}" opacity=".55"/>`; }
     const bi = o.indexOf(bossId()), bx = px(bi), by = py(bi), bossDown = starsOf(bossId()) >= 2, keepX = bx > 195 ? bx - 120 : bx + 120;
     s += `<g transform="translate(${keepX.toFixed(0)},${(by - 86).toFixed(0)})"><path d="M-34 40V-8l8-8v-14h8v10h8v-22l10-12l10 12v22h8v-10h8v14l8 8v48z" fill="${bossDown ? '#2b5d57' : '#1a1030'}" stroke="${bossDown ? '#3dff9a' : '#ff3fd2'}" stroke-width="1.5"/><rect x="-6" y="14" width="12" height="26" rx="6" fill="${bossDown ? '#ffd24a' : '#ff3fd2'}" opacity=".8"/></g>`;
@@ -212,11 +231,16 @@
       s += `<text x="${tx.toFixed(0)}" y="${(ty + 5).toFixed(0)}" text-anchor="${anchor}" fill="#ece9ff" font-size="14" font-weight="700" paint-order="stroke" stroke="#07060f" stroke-width="3">${title}</text>`;
       s += `<text x="${tx.toFixed(0)}" y="${(ty + 22).toFixed(0)}" text-anchor="${anchor}" fill="#ffd24a" font-size="13" letter-spacing="2" paint-order="stroke" stroke="#07060f" stroke-width="3">${'★'.repeat(st)}${'☆'.repeat(3 - st)}${r.fast ? ' ⚡' : ''}${r.blind ? ' 👁' : ''}</text></g>`;
     });
+    SHRINES.forEach(S => { const t = o.indexOf(S.after) + .5, x = px(t), y = py(t), open = shrineOpen(S), done = !!save.shrines[S.id], col = !open ? '#3a3658' : done ? '#3dff9a' : '#ffd24a', left = x > 195, tw = S.short.length * 6.6, side = left ? x - 24 - tw > 4 : x + 24 + tw < W - 4;
+      const tx = side ? (left ? x - 24 : x + 24) : Math.max(tw / 2 + 6, Math.min(W - tw / 2 - 6, x)), anchor = side ? (left ? 'end' : 'start') : 'middle', ty = side ? y : y + 34;
+      s += `<g class="shG" data-sh="${S.id}" opacity="${open ? 1 : .45}"><g class="${open && !done ? 'rune' : ''}"><path d="M${x.toFixed(0)} ${(y - 17).toFixed(0)}l13 17l-13 17l-13-17z" fill="#120f24" stroke="${col}" stroke-width="2.5" ${open ? 'filter="url(#gl)"' : ''}/><text x="${x.toFixed(0)}" y="${(y + 5).toFixed(0)}" text-anchor="middle" fill="${col}" font-size="13" font-weight="800">${done ? '✓' : '✦'}</text></g>
+        <text x="${tx.toFixed(0)}" y="${(ty - 3).toFixed(0)}" text-anchor="${anchor}" fill="${col}" font-size="9" letter-spacing="1.5" paint-order="stroke" stroke="#07060f" stroke-width="3">RUNE SHRINE</text><text x="${tx.toFixed(0)}" y="${(ty + 11).toFixed(0)}" text-anchor="${anchor}" fill="#ece9ff" font-size="12" font-weight="600" paint-order="stroke" stroke="#07060f" stroke-width="3">${S.short}</text></g>`; });
     s += `<text x="195" y="34" text-anchor="middle" fill="#6d66a3" font-size="11" letter-spacing="3">BASS WOODS LIE BEYOND · SILENT</text>`;
     const bxy = [px(ci), py(ci) + 44];
     s += `<g id="bard" style="transform:translate(${(lastBard || bxy)[0].toFixed(0)}px,${(lastBard || bxy)[1].toFixed(0)}px)"><g class="in"><ellipse cx="0" cy="20" rx="12" ry="3.5" fill="#000" opacity=".4"/><path d="M-11 18Q-13-2 0-8Q13-2 11 18Z" fill="#8b5cff" stroke="#c9b6ff"/><circle cx="0" cy="-13" r="7" fill="#ffd9b0"/><path d="M-8-15Q0-27 8-15Q0-19-8-15Z" fill="#ff3fd2"/><ellipse cx="9" cy="6" rx="5" ry="6.5" fill="#ffd24a" stroke="#7a5a00"/><rect x="11" y="-8" width="2" height="12" fill="#7a5a00" transform="rotate(25 12 -2)"/></g></g>`;
     $('sceneWrap').innerHTML = `<svg id="scene" viewBox="0 0 ${W} ${Hh}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
     document.querySelectorAll('#scene .nodeG').forEach(g => { g.onclick = () => { if (unlocked(g.dataset.id)) openIntro(g.dataset.id); }; });
+    document.querySelectorAll('#scene .shG').forEach(g => { g.onclick = () => { const S = SHRINES.find(x => x.id === g.dataset.sh); if (shrineOpen(S)) openShrine(S.id); }; });
     chipIn(); show('map');
     const svg = $('scene'), scale = svg.getBoundingClientRect().width / W, target = svg.getBoundingClientRect().top + window.scrollY + bxy[1] * scale - window.innerHeight * .6;
     window.scrollTo(0, Math.max(0, target));
@@ -228,6 +252,107 @@
   $('btnRestore').onclick = () => { try { const s = JSON.parse($('saveText').value); if (!s.stats) throw 0; save = Object.assign(blank(), s); persist(); renderMap(); } catch (e) { $('btnRestore').textContent = 'Not a valid save'; } };
   $('btnTest').onclick = () => { location.href = 'test.html'; };
   $('btnFree').onclick = () => startFree();
+
+  // ---------------- Rune shrines: the why behind the music ----------------
+  const RATIO = { 12: '2 : 1', 7: '3 : 2', 5: '4 : 3', 4: '5 : 4', 3: '6 : 5', 6: '45 : 32', 1: '16 : 15' };
+  const BLEND = { 12: 'waves line up every time: the same note, higher', 7: 'waves line up often: open and stable', 4: 'bright and sweet', 3: 'a shade darker', 1: 'waves rarely line up: rough, tense', 6: 'restless' };
+  const SHRINES = [
+    { id: 'sh-sound', after: 'r1-01-landmarks', title: 'Why sound has notes', short: 'Why sound has notes', takeaway: 'Pitch is speed of vibration. Doubling the speed gives the octave, and the octave is split into 12 half steps.',
+      pages: [
+        { h: 'Sound is air shaking', t: 'A piano string pushes the air back and forth. Fast shaking sounds high, slow shaking sounds low. Middle C shakes about 262 times every second. Tap keys below and watch the wave: higher keys squeeze the wave tighter.', viz: [60], follow: true },
+        { h: 'The octave: same note, higher', t: 'Double the speed of any note and you get a note that sounds like the same note, only higher. That is why both of these are called C. Nearly every musical culture on Earth treats this doubling as special. It is called an octave.', viz: [60, 72], demos: [{ label: '▶ Low C', notes: [60] }, { label: '▶ High C', notes: [72] }, { label: '▶ Together', notes: [60, 72], mode: 'together' }] },
+        { h: 'Twelve steps to the octave', t: 'Western music cuts each octave into 12 equal steps called half steps: 7 white keys and 5 black keys. After 12 steps you are back at C and the pattern repeats all the way up the piano. That is the whole alphabet of music: 12 notes, recycled.', hl: { 60: '1', 61: '2', 62: '3', 63: '4', 64: '5', 65: '6', 66: '7', 67: '8', 68: '9', 69: '10', 70: '11', 71: '12', 72: 'C' }, demos: [{ label: '▶ Climb all 12', notes: [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72], gap: 170 }] }],
+      quiz: [
+        { type: 'key', q: 'Play any C.', pcs: [0], hint: 'C is the white key just left of a pair of two black keys.', why: 'Every C on the piano is the same note at a different octave.' },
+        { type: 'choice', q: 'Listen to both pairs. Which pair is an octave: the same note, higher?', sounds: [{ label: '▶ First pair', notes: [60, 67], gap: 420 }, { label: '▶ Second pair', notes: [60, 72], gap: 420 }], opts: ['First pair', 'Second pair'], a: 1, hint: 'The octave sounds like one note copying the other, higher up.', why: 'The second pair was C to the next C. The first was C to G.' },
+        { type: 'choice', q: 'How many half steps are there from one C to the next C?', opts: ['7', '8', '12'], a: 2, hint: 'Count white and black keys together.', why: '7 white + 5 black = 12.' }] },
+    { id: 'sh-keys', after: 'r1-03-five', title: 'Why black and white keys', short: 'Why black + white keys', takeaway: 'The white keys are the major-scale recipe starting on C. Black keys let the same recipe start anywhere.',
+      pages: [
+        { h: 'The black keys are a map', t: 'If all 12 keys looked alike you would be lost. The black keys come in groups of two and three, and that pattern is your map. C is always just left of the two. F is always just left of the three.', hl: { 60: 'C', 65: 'F', 72: 'C', 77: 'F' } },
+        { h: 'A scale is a recipe of steps', t: 'Play the white keys from C to C: do, re, mi. It sounds complete. But the gaps are not equal. A whole step (W) skips one key. A half step (H) is the very next key. The recipe is W W H W W W H. Look at E to F and B to C: no black key between them. Those are the two half steps.', hl: { 60: 'C', 62: 'W', 64: 'W', 65: 'H', 67: 'W', 69: 'W', 71: 'W', 72: 'H' }, demos: [{ label: '▶ C major scale', notes: [60, 62, 64, 65, 67, 69, 71, 72], gap: 300 }] },
+        { h: 'So why do black keys exist?', t: 'Use the same recipe starting on G and the seventh note must be a black key, F sharp, or the pattern breaks. Start on F and you need B flat, which you will play at Stop 6. The white keys are simply the recipe when it starts on C. The black keys let it start anywhere.', hl: { 67: 'G', 69: 'W', 71: 'W', 72: 'H', 74: 'W', 76: 'W', 78: 'W', 79: 'H' }, demos: [{ label: '▶ G major (one black key)', notes: [67, 69, 71, 72, 74, 76, 78, 79], gap: 300 }, { label: '▶ Same thing, whites only (wrong)', notes: [67, 69, 71, 72, 74, 76, 77, 79], gap: 300 }] }],
+      quiz: [
+        { type: 'key', q: 'Play the key a half step above E.', pcs: [5], hint: 'A half step is the very next key. Is there a black key right after E?', why: 'E to F is a half step: no black key between them.' },
+        { type: 'key', q: 'Play the key a whole step above C.', pcs: [2], hint: 'A whole step skips one key. Skip the black key after C.', why: 'C to D is a whole step: it skips C sharp.' },
+        { type: 'choice', q: 'Which pairs of white keys have no black key between them?', opts: ['C–D and F–G', 'E–F and B–C', 'A–B and D–E'], a: 1, hint: 'Look at the keyboard below for the gaps in the black keys.', why: 'Those are the two half steps built into the white keys.' }] },
+    { id: 'sh-pulse', after: 'r1-04-pulse', title: 'Why music has a pulse', short: 'Why music has a pulse', takeaway: 'Beats are grouped into bars with a strong first beat. Note names are fractions of a four-beat bar.',
+      pages: [
+        { h: 'The pulse', t: 'Under almost all music is a steady beat, like walking or a heartbeat. Tempo is how fast it goes, counted in beats per minute. 60 is one beat a second. Your lessons so far ran between 60 and 76.', pulse: 4, plain: true },
+        { h: 'Beats come in groups', t: 'We hear beats in groups, with the first one strongest: ONE two three four. Each group is a bar. The sign 4/4 at the start of a piece means four beats in a bar, and the quarter note gets one beat. A waltz groups in three: ONE two three.', pulse: 4, demos: [{ label: 'Group in 4', pulse: 4 }, { label: 'Group in 3', pulse: 3 }] },
+        { h: 'Note names are fractions', t: 'A whole note fills a whole four-beat bar. A half note is half of that: two beats. A quarter note is a quarter: one beat. An eighth note is half a beat. The names are just arithmetic on a four-beat bar.', pulse: 4 }],
+      quiz: [
+        { type: 'choice', q: 'In 4/4, how many beats does a half note last?', opts: ['1', '2', '4'], a: 1, hint: 'Half of a four-beat bar.', why: 'Half of four is two.' },
+        { type: 'choice', q: 'Listen. Are these beats grouped in 3 or in 4?', sounds: [{ label: '▶ Hear the beat', pulse: 3 }], opts: ['In 3', 'In 4'], a: 0, hint: 'Count from each loud click to the next loud click.', why: 'ONE two three, ONE two three: a waltz feel.' }] },
+    { id: 'sh-blend', after: 'r1-06-f-home', title: 'Why some notes sound good together', short: 'Why notes blend', takeaway: 'Simple speed ratios blend, complex ones clash, and music moves between the two. One half step turns major into minor.',
+      pages: [
+        { h: 'Two notes at once', t: 'Play two notes together and their waves overlap. When the waves line up often, your ear hears one smooth blend. The octave lines up perfectly: two waves of the top note for every one of the bottom. Watch the white line, the two added together.', viz: [60, 72], demos: [{ label: '▶ Octave', notes: [60, 72], mode: 'together' }] },
+        { h: 'The fifth: three against two', t: 'C and G, your two landmarks, thumb and pinky. G shakes three times for every two of C. After the octave it is the most stable sound in music, the backbone of nearly every chord. (A piano tunes these ratios very slightly off so that all 12 keys work in every key.)', viz: [60, 67], demos: [{ label: '▶ Fifth', notes: [60, 67], mode: 'together' }] },
+        { h: 'Clash is not a mistake', t: 'C and the black key next to it almost never line up. You hear a rough wobble. That roughness is called dissonance, and it is not bad: it is tension. Music works by building tension and then releasing it into a smooth sound.', viz: [60, 61], demos: [{ label: '▶ Clash', notes: [60, 61], mode: 'together' }, { label: '▶ Then release', notes: [60, 67], mode: 'together' }] },
+        { h: 'Major and minor: one half step', t: 'Stack C, E and G and you get a chord, C major: bright. Lower just the middle note one half step, to E flat, and it becomes C minor: darker. That single half step is most of the difference between a happy song and a sad one.', viz: [60, 64], hl: { 60: 'C', 64: 'E', 67: 'G' }, demos: [{ label: '▶ C major', notes: [60, 64, 67], mode: 'together', viz: [60, 64] }, { label: '▶ C minor', notes: [60, 63, 67], mode: 'together', viz: [60, 63] }] }],
+      quiz: [
+        { type: 'choice', q: 'Which sound is the fifth, the smooth one?', sounds: [{ label: '▶ First', notes: [60, 61], mode: 'together' }, { label: '▶ Second', notes: [60, 67], mode: 'together' }], opts: ['First', 'Second'], a: 1, hint: 'One wobbles and grinds. One sounds open and steady.', why: 'The first was a half step clash.' },
+        { type: 'choice', q: 'Major or minor?', sounds: [{ label: '▶ Hear the chord', notes: [65, 69, 72], mode: 'together' }], opts: ['Major (bright)', 'Minor (dark)'], a: 0, hint: 'Listen for bright versus shadowed.', why: 'That was F major.' },
+        { type: 'choice', q: 'And this one?', sounds: [{ label: '▶ Hear the chord', notes: [69, 72, 76], mode: 'together' }], opts: ['Major (bright)', 'Minor (dark)'], a: 1, hint: 'Compare it in your head with the last chord.', why: 'That was A minor.' },
+        { type: 'key', q: 'C major is C, E, G. Play the one note you would lower to make it minor.', pcs: [4], hint: 'It is the middle note of the chord.', why: 'E drops a half step to E flat.' }] }
+  ];
+  const shrineOpen = S => starsOf(S.after) >= 1 || starsOf(bossId()) >= 2;
+  let shrine = null; const SKLO = 60, SKHI = 79;
+  function sizeCv(c) { const r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2); c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, r.width, r.height]; }
+  function playSound(snd) {
+    if (snd.pulse) { shrine.pulseN = snd.pulse; shrine.pulseT0 = performance.now(); shrine.pulseLeft = snd.pulse * 3; return; }
+    if (snd.viz) shrine.viz = snd.viz; else if (shrine.viz && snd.notes.length <= 2 && !shrine.quiz) shrine.viz = snd.notes;
+    snd.notes.forEach((m, i) => setTimeout(() => { if (!shrine) return; tone(m, .6, snd.mode === 'together' ? 1.6 : .7); shrine.flash[m] = performance.now(); }, snd.mode === 'together' ? 0 : i * (snd.gap || 300)));
+  }
+  function openShrine(id) {
+    const S = SHRINES.find(x => x.id === id); shrine = { S, step: 0, quiz: false, q: 0, viz: null, hl: {}, flash: {}, pulseN: 0, pulseT0: 0, pulseLast: -1, pulseLeft: 0, lock: false,
+      onPress(m) { this.flash[m] = performance.now(); const pg = !this.quiz && !this.done && S.pages[this.step]; if (pg && pg.follow) this.viz = [m];
+        if (this.quiz && !this.lock) { const it = S.quiz[this.q]; if (it.type === 'key') answer(it.pcs.includes(m % 12)); } } };
+    show('shrine'); renderShrine(); requestAnimationFrame(shLoop);
+  }
+  function renderShrine() {
+    const sh = shrine, S = sh.S; $('shTitle').textContent = S.title; $('shFb').textContent = ''; sh.lock = false; sh.pulseN = 0; sh.pulseLeft = 0;
+    const btn = (label, cls, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = cls; b.onclick = fn; return b; };
+    const demo = $('shDemo'), nav = $('shNav'); demo.innerHTML = ''; nav.innerHTML = '';
+    if (sh.done) { $('shDots').textContent = 'Rune learned'; $('shH').textContent = '✦ Rune learned'; $('shT').textContent = S.takeaway + (sh.gain ? ` +${sh.gain} XP.` : ''); sh.viz = null; sh.hl = {}; nav.appendChild(btn('Walk on ▶', '', () => { shrine = null; renderMap(true); })); }
+    else if (!sh.quiz) { const p = S.pages[sh.step]; $('shDots').textContent = `Page ${sh.step + 1} of ${S.pages.length}`; $('shH').textContent = p.h; $('shT').textContent = p.t; sh.viz = p.viz || null; sh.hl = p.hl || {};
+      if (p.pulse) { sh.pulseN = p.pulse; sh.pulseT0 = performance.now(); sh.pulseLeft = 1e9; sh.plain = !!p.plain; }
+      (p.demos || []).forEach(d => demo.appendChild(btn(d.label, 'gold', () => { if (d.pulse) { sh.pulseN = d.pulse; sh.pulseT0 = performance.now(); sh.pulseLast = -1; sh.plain = false; } else playSound(d); })));
+      if (sh.step > 0) nav.appendChild(btn('◀ Back', 'ghost', () => { sh.step--; renderShrine(); }));
+      nav.appendChild(sh.step < S.pages.length - 1 ? btn('Next ▶', '', () => { sh.step++; renderShrine(); }) : btn('Take the rune test ▶', 'pink', () => { sh.quiz = true; sh.q = 0; renderShrine(); })); }
+    else { const it = S.quiz[sh.q]; $('shDots').textContent = `Rune test ${sh.q + 1} of ${S.quiz.length}`; $('shH').textContent = it.type === 'key' ? 'Answer on the keys' : 'Choose'; $('shT').textContent = it.q; sh.viz = null; sh.hl = {};
+      (it.sounds || []).forEach(d => demo.appendChild(btn(d.label, 'gold', () => playSound(d))));
+      if (it.type === 'choice') it.opts.forEach((o, i) => nav.appendChild(btn(o, '', () => { if (!sh.lock) answer(i === it.a); }))); else $('shFb').textContent = 'Tap a key below, or play it on your piano.'; }
+    $('sv').style.display = (sh.viz || sh.pulseN) ? 'block' : 'none';
+  }
+  function answer(ok) {
+    const sh = shrine, it = sh.S.quiz[sh.q];
+    if (!ok) { $('shFb').innerHTML = '<span style="color:#ff4d6d">Not quite.</span> ' + it.hint; return; }
+    sh.lock = true; $('shFb').innerHTML = '<span style="color:#3dff9a">Correct.</span> ' + (it.why || ''); [79, 84].forEach((m, i) => setTimeout(() => tone(m, .4, .4), i * 90));
+    setTimeout(() => { if (shrine !== sh) return; if (sh.q < sh.S.quiz.length - 1) { sh.q++; renderShrine(); } else {
+      const firstTime = !save.shrines[sh.S.id]; sh.gain = firstTime ? 60 : 10; save.shrines[sh.S.id] = true; save.xp += sh.gain; save.stats.theory += firstTime ? 6 : 1; save.stats.ear += firstTime ? 2 : 0; persist(); sh.done = true; chime(true); renderShrine(); } }, 1500);
+  }
+  function shLoop(now) {
+    if (!shrine) return; const sh = shrine;
+    // viz
+    const sv = $('sv'); if (sv.style.display !== 'none') { const [x, W, H] = sizeCv(sv); x.clearRect(0, 0, W, H);
+      if (sh.pulseN) { const period = 60000 / 84, k = Math.floor((now - sh.pulseT0) / period), n = sh.pulseN, running = sh.pulseLeft > 0;
+        if (running && k !== sh.pulseLast) { sh.pulseLast = k; sh.pulseLeft--; click(!sh.plain && k % n === 0); }
+        for (let i = 0; i < n; i++) { const cx = W * (i + .5) / n, on = running && k % n === i, strong = i === 0 && !sh.plain; x.beginPath(); x.arc(cx, H * .45, (strong ? 22 : 15) + (on ? 8 : 0), 0, 2 * Math.PI); x.fillStyle = on ? (strong ? '#ff3fd2' : '#2ef2ff') : '#1d1838'; x.shadowColor = x.fillStyle; x.shadowBlur = on ? 22 : 0; x.fill(); x.shadowBlur = 0; x.fillStyle = '#9a93c9'; x.font = `${strong ? 800 : 600} ${strong ? 15 : 12}px sans-serif`; x.textAlign = 'center'; x.fillText(strong ? 'ONE' : ['one', 'two', 'three', 'four'][i], cx, H - 14); } }
+      else if (sh.viz) { const ns = sh.viz, base = Math.min(...ns), cols = ['#2ef2ff', '#ff3fd2'], rows = ns.length + (ns.length > 1 ? 1 : 0), band = H / rows, ph = now / 500;
+        const wave = (f, yc, col, amp, lw) => { x.strokeStyle = col; x.lineWidth = lw; x.shadowColor = col; x.shadowBlur = 8; x.beginPath(); for (let px = 0; px <= W; px += 2) { const y = yc - f(px / W) * amp; px ? x.lineTo(px, y) : x.moveTo(px, y); } x.stroke(); x.shadowBlur = 0; };
+        const fr = ns.map(n => Math.pow(2, (n - base) / 12)), cyc = ns.length === 1 ? 3 * Math.pow(2, (ns[0] - 60) / 12) : 3;
+        ns.forEach((n, i) => { wave(t => Math.sin(2 * Math.PI * cyc * fr[i] * t - ph * fr[i]), band * (i + .64), cols[i % 2], band * .24, 2); x.fillStyle = cols[i % 2]; x.font = '700 11px sans-serif'; x.textAlign = 'left'; x.fillText(`${NAMESF[n % 12]} · about ${Math.round(440 * Math.pow(2, (n - 69) / 12))} shakes a second`, 8, band * i + 13); });
+        if (ns.length > 1) { wave(t => fr.reduce((a, f) => a + Math.sin(2 * Math.PI * cyc * f * t - ph * f), 0) / ns.length, band * (rows - .36), '#fff', band * .26, 2.4); const d = Math.abs(ns[1] - ns[0]); x.fillStyle = '#ece9ff'; x.font = '700 11px sans-serif'; x.fillText(`Together${RATIO[d] ? ' · ratio ' + RATIO[d] : ''}${BLEND[d] ? ' · ' + BLEND[d] : ''}`, 8, band * (rows - 1) + 13); } } }
+    // keyboard
+    const [k, W, H] = sizeCv($('skb')), whites = []; for (let m = SKLO; m <= SKHI; m++) if (!isBlack(m)) whites.push(m); const ww = W / whites.length, bw = ww * .6, kx = m => !isBlack(m) ? (whites.indexOf(m) + .5) * ww : whites.indexOf(m - 1) * ww + ww;
+    const lit = m => sh.flash[m] && now - sh.flash[m] < 320;
+    whites.forEach((m, i) => { k.fillStyle = lit(m) || held[m] ? '#2ef2ff' : sh.hl[m] ? '#ffe9a0' : '#ece9ff'; k.fillRect(i * ww + 1, 0, ww - 2, H - 2); k.fillStyle = sh.hl[m] ? '#7a5a00' : '#8a84b5'; k.font = '700 11px sans-serif'; k.textAlign = 'center'; k.fillText(sh.hl[m] || (m % 12 === 0 ? 'C' : ''), (i + .5) * ww, H - 10); });
+    for (let m = SKLO; m <= SKHI; m++) if (isBlack(m)) { k.fillStyle = lit(m) || held[m] ? '#ff3fd2' : sh.hl[m] ? '#c79a00' : '#15122a'; k.fillRect(kx(m) - bw / 2, 0, bw, H * .6); if (sh.hl[m]) { k.fillStyle = '#fff'; k.font = '700 10px sans-serif'; k.fillText(sh.hl[m], kx(m), H * .5); } }
+    requestAnimationFrame(shLoop);
+  }
+  { const c = $('skb'), sp = {}; const at = e => { const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, whites = []; for (let m = SKLO; m <= SKHI; m++) if (!isBlack(m)) whites.push(m); const ww = r.width / whites.length; if (y < r.height * .6) for (let m = SKLO; m <= SKHI; m++) if (isBlack(m) && Math.abs(x - (whites.indexOf(m - 1) * ww + ww)) < ww * .3) return m; return whites[Math.max(0, Math.min(whites.length - 1, Math.floor(x / ww)))]; };
+    c.addEventListener('pointerdown', e => { e.preventDefault(); const m = at(e); sp[e.pointerId] = m; press(m, .7, 'touch'); }); const upk = e => { if (sp[e.pointerId] != null) { release(sp[e.pointerId]); delete sp[e.pointerId]; } }; c.addEventListener('pointerup', upk); c.addEventListener('pointercancel', upk); c.addEventListener('pointerleave', upk); }
+  $('shBack').onclick = () => { shrine = null; renderMap(); };
 
   // ---------------- 88-key finder ----------------
   function finderSVG(lo, hi) {
@@ -439,7 +564,7 @@
 
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  window.__koa = { openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>

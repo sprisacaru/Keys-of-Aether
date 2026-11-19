@@ -41,7 +41,7 @@ const lessons = [
     theory: [{ q: 'Five-finger pattern', a: 'Five neighbouring notes under five fingers. The same pattern can start on any key.' }],
     intro: 'The same five-finger shape, with your thumb on Treble G. The staff notes sit higher; read them as steps up from your landmark G.' },
     'G4:1:1 A4:1:2 B4:1:3 C5:1:4 | D5:1:5 C5:1:4 B4:1:3 A4:1:2 | G4:1:1 B4:1:3 D5:1:5 B4:1:3 | G4:2:1 G4:2:1'),
-  L({ id: 'r1-06-f-home', title: 'New home: F, and a black key', key: 'F', tempo: 66, skills: ['technique', 'theory'], introduces: { pitches: ['Bb4'], lengths: [] },
+  L({ id: 'r1-06-f-home', title: 'New home: F + black key', key: 'F', tempo: 66, skills: ['technique', 'theory'], introduces: { pitches: ['Bb4'], lengths: [] },
     technique: { title: 'Reach in for black keys', feel: 'Finger 4 plays the black key. Move your hand slightly toward the back of the keys instead of twisting the wrist.' },
     theory: [{ q: 'Flat (♭)', a: 'A flat lowers a note to the very next key on the left. B-flat is the black key just left of B.' }],
     intro: 'Thumb on F. To keep the same sound-shape, finger 4 plays B-flat, the black key in the group of three. Your first black key.' },
