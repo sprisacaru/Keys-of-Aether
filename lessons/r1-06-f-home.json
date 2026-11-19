@@ -1,0 +1,151 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "F",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-06-f-home",
+ "title": "New home: F, and a black key",
+ "tempo": 66,
+ "skills": [
+  "technique",
+  "theory"
+ ],
+ "introduces": {
+  "pitches": [
+   "Bb4"
+  ],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Reach in for black keys",
+  "feel": "Finger 4 plays the black key. Move your hand slightly toward the back of the keys instead of twisting the wrist."
+ },
+ "theory": [
+  {
+   "q": "Flat (♭)",
+   "a": "A flat lowers a note to the very next key on the left. B-flat is the black key just left of B."
+  }
+ ],
+ "intro": "Thumb on F. To keep the same sound-shape, finger 4 plays B-flat, the black key in the group of three. Your first black key.",
+ "notes": [
+  {
+   "pitch": 65,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 2,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 70,
+   "start": 3,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 4,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 70,
+   "start": 5,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 6,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 7,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 10,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 12,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  }
+ ]
+}

@@ -1,0 +1,143 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-01-landmarks",
+ "title": "Two landmarks",
+ "tempo": 60,
+ "skills": [
+  "reading",
+  "technique"
+ ],
+ "introduces": {
+  "pitches": [
+   "C4",
+   "G4"
+  ],
+  "lengths": [
+   1,
+   2
+  ]
+ },
+ "technique": {
+  "title": "Sit and shape",
+  "feel": "Sit so your forearms are level with the keys. Let your hand hang, then set it on the keys: the fingers stay curved, like holding a small ball."
+ },
+ "theory": [
+  {
+   "q": "Middle C",
+   "a": "The C nearest the middle of the piano. On the staff it sits on its own short line just below the five lines."
+  },
+  {
+   "q": "Treble G",
+   "a": "The second line from the bottom of the treble staff. The curl of the treble clef wraps around it."
+  }
+ ],
+ "intro": "Reading starts with landmarks, not memorized letter rhymes. Middle C is thumb (finger 1). Treble G is five keys up, pinky (finger 5).",
+ "notes": [
+  {
+   "pitch": 60,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 2,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 4,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 5,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 6,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 10,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 12,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  }
+ ]
+}

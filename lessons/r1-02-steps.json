@@ -1,0 +1,136 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-02-steps",
+ "title": "Steps: C D E",
+ "tempo": 66,
+ "skills": [
+  "reading",
+  "technique"
+ ],
+ "introduces": {
+  "pitches": [
+   "D4",
+   "E4"
+  ],
+  "lengths": []
+ },
+ "technique": {
+  "title": "One finger per key",
+  "feel": "Fingers 1, 2, 3 rest on C, D, E. Press with the fingertip and keep the other fingers resting on their keys, not lifted."
+ },
+ "theory": [
+  {
+   "q": "Step",
+   "a": "Moving to the very next note: line to the next space, or space to the next line. On the keys it is the next white key."
+  }
+ ],
+ "intro": "A step on the staff is line to space or space to line. Read the direction: up, down, or same.",
+ "notes": [
+  {
+   "pitch": 60,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 2,
+   "len": 2,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 4,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 5,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 6,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 10,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 12,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  }
+ ]
+}

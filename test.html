@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Keys of Aether — Connection Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07060f; --panel:#120f24; --line:#2a2450; --ink:#ece9ff; --quiet:#9a93c9;
+    --cyan:#2ef2ff; --pink:#ff3fd2; --violet:#8b5cff; --good:#3dff9a; --bad:#ff4d6d; --gold:#ffd24a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;overscroll-behavior:none}
+  body{min-height:100vh;overflow-x:hidden}
+  .wrap{max-width:900px;margin:0 auto;padding:16px 14px 40px}
+  header{position:relative;padding:18px 4px 8px;overflow:hidden}
+  h1{font-family:Orbitron,sans-serif;font-weight:800;font-size:26px;letter-spacing:1px;margin:0;
+     background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;
+     text-shadow:0 0 18px rgba(46,242,255,.25)}
+  .sub{color:var(--quiet);font-size:13px;margin-top:4px}
+  .grid-bg{position:absolute;inset:0;z-index:-1;opacity:.35;
+     background:linear-gradient(transparent 0 70%,rgba(139,92,255,.25)),
+     repeating-linear-gradient(90deg,rgba(255,63,210,.18) 0 1px,transparent 1px 40px);
+     transform:perspective(300px) rotateX(55deg);transform-origin:bottom}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+  .panel h2{font-family:Orbitron,sans-serif;font-size:13px;letter-spacing:2px;color:var(--quiet);margin:0 0 10px;text-transform:uppercase}
+  .checks{list-style:none;margin:0;padding:0}
+  .checks li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid #1d1838;font-size:14px}
+  .checks li:first-child{border-top:none}
+  .dot{flex:0 0 12px;height:12px;border-radius:50%;margin-top:3px;background:#3a345e}
+  .dot.ok{background:var(--good);box-shadow:0 0 10px var(--good)}
+  .dot.bad{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+  .dot.wait{background:var(--gold);box-shadow:0 0 10px var(--gold)}
+  .checks .t{font-weight:600}
+  .checks .d{color:var(--quiet);font-size:12.5px;margin-top:2px}
+  button{font-family:Orbitron,sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;border:1px solid var(--cyan);
+     color:var(--ink);background:rgba(46,242,255,.08);border-radius:10px;padding:10px 14px;cursor:pointer}
+  button:active{transform:scale(.97)}
+  button.pink{border-color:var(--pink);background:rgba(255,63,210,.08)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  #start{position:fixed;inset:0;z-index:50;background:rgba(7,6,15,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+  #start h1{font-size:30px}
+  #start button{font-size:16px;padding:16px 28px;box-shadow:0 0 24px rgba(46,242,255,.35)}
+  #start p{color:var(--quiet);max-width:340px;font-size:14px;line-height:1.5;margin:0}
+  /* stage */
+  .stage{position:relative;height:190px;border-radius:12px;overflow:hidden;
+     background:radial-gradient(120% 90% at 50% 100%,rgba(139,92,255,.28),transparent 60%),#0a0818;border:1px solid var(--line)}
+  .lanes{position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(46,242,255,.07) 0 1px,transparent 1px calc(100%/15))}
+  .bigNote{position:absolute;left:0;right:0;top:22px;text-align:center;pointer-events:none}
+  .bigNote .n{font-family:Orbitron,sans-serif;font-weight:800;font-size:56px;line-height:1;color:var(--ink);text-shadow:0 0 22px var(--cyan)}
+  .bigNote .m{color:var(--quiet);font-size:13px;margin-top:6px;min-height:16px}
+  .spark{position:absolute;bottom:0;width:10px;height:60px;margin-left:-5px;border-radius:6px;pointer-events:none;
+     background:linear-gradient(to top,var(--cyan),transparent);filter:drop-shadow(0 0 8px var(--cyan));animation:rise .9s ease-out forwards}
+  .spark.p{background:linear-gradient(to top,var(--pink),transparent);filter:drop-shadow(0 0 8px var(--pink))}
+  .spark.g{background:linear-gradient(to top,var(--good),transparent);filter:drop-shadow(0 0 10px var(--good));width:16px;margin-left:-8px}
+  @keyframes rise{from{transform:translateY(0);opacity:1}to{transform:translateY(-180px);opacity:0}}
+  /* keyboard */
+  .kbd{position:relative;height:150px;margin-top:8px;touch-action:none;user-select:none;-webkit-user-select:none}
+  .key{position:absolute;top:0;border-radius:0 0 7px 7px;transition:background .06s, box-shadow .06s}
+  .key.w{height:100%;background:linear-gradient(#f4f2ff,#d8d3f3);border:1px solid #1b1636;z-index:1}
+  .key.b{height:62%;background:linear-gradient(#2a2546,#0d0b1a);border:1px solid #000;z-index:2}
+  .key.w.on{background:linear-gradient(#bffaff,var(--cyan));box-shadow:0 0 18px var(--cyan)}
+  .key.b.on{background:linear-gradient(#ff9de9,var(--pink));box-shadow:0 0 18px var(--pink)}
+  .key.target.w{background:linear-gradient(#fff6c9,var(--gold));animation:pulse 1s infinite}
+  .key.target.b{background:linear-gradient(#fff2a0,#c79a00);animation:pulse 1s infinite}
+  .key.wrong{background:var(--bad)!important;box-shadow:0 0 18px var(--bad)!important}
+  @keyframes pulse{50%{box-shadow:0 0 22px var(--gold)}}
+  .lbl{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:#4b437a;font-weight:600;pointer-events:none}
+  .key.b .lbl{display:none}
+  .mini{position:relative;height:22px;margin-top:10px;border-radius:4px;overflow:hidden;background:#d8d3f3}
+  .mk{position:absolute;top:0}
+  .mk.w{height:100%;border-right:1px solid #8f88b8;background:#efecff}
+  .mk.b{height:60%;background:#1a1630;z-index:2}
+  .mk.on{background:var(--cyan)!important;box-shadow:0 0 8px var(--cyan)}
+  .mk.view{background:#cfc6ff}
+  .kbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+  .kbar .range{font-family:Orbitron,sans-serif;font-size:12px;color:var(--quiet)}
+  .pedal{font-size:12px;color:var(--quiet)} .pedal.on{color:var(--good)}
+  /* quest */
+  .quest{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .qtext{font-size:15px} .qtext b{color:var(--gold);font-family:Orbitron,sans-serif}
+  .xp{flex:1 1 160px}
+  .xpbar{height:10px;border-radius:6px;background:#1d1838;overflow:hidden;margin-top:6px}
+  .xpfill{height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--pink));box-shadow:0 0 10px var(--pink);transition:width .3s}
+  .stat{font-family:Orbitron,sans-serif;font-size:12px;color:var(--quiet)}
+  .combo{font-family:Orbitron,sans-serif;color:var(--cyan)}
+  pre{white-space:pre-wrap;font-size:11.5px;color:var(--quiet);background:#0a0818;border-radius:8px;padding:10px;margin:8px 0 0;max-height:180px;overflow:auto}
+  .copied{color:var(--good);font-size:12px}
+  .hint{color:var(--quiet);font-size:12.5px;line-height:1.45;margin:8px 0 0}
+</style>
+</head>
+<body>
+<div id="start">
+  <h1>KEYS OF AETHER</h1>
+  <p>Connection test. Turn your ringer switch off silent so you can hear the piano, then tap start.</p>
+  <button id="startBtn">▶ START</button>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="grid-bg"></div>
+    <h1>KEYS OF AETHER</h1>
+    <div class="sub">M0 · Connection test: can the game hear you?</div>
+  </header>
+
+  <div class="panel">
+    <h2>System check</h2>
+    <ul class="checks">
+      <li><span class="dot" id="c-sound"></span><div><div class="t">Sound</div><div class="d" id="d-sound">Waiting for start.</div></div></li>
+      <li><span class="dot" id="c-api"></span><div><div class="t">MIDI support in this browser</div><div class="d" id="d-api">Checking…</div></div></li>
+      <li><span class="dot" id="c-dev"></span><div><div class="t">Keyboard found</div><div class="d" id="d-dev">—</div></div></li>
+      <li><span class="dot" id="c-note"></span><div><div class="t">First note from the keyboard</div><div class="d" id="d-note">Press any key on the Alesis.</div></div></li>
+      <li><span class="dot" id="c-mic"></span><div><div class="t">Microphone (backup)</div><div class="d" id="d-mic">Not tested yet.</div></div></li>
+    </ul>
+    <div class="row" style="margin-top:10px">
+      <button id="rescan">Rescan MIDI</button>
+      <button id="micBtn" class="pink">Test mic</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Play</h2>
+    <div class="stage" id="stage">
+      <div class="lanes"></div>
+      <div class="bigNote"><div class="n" id="bigN">—</div><div class="m" id="bigM">Play a key, or tap the keys below</div></div>
+    </div>
+    <div class="kbd" id="kbd"></div>
+    <div class="kbar">
+      <button id="down">◀ Oct</button>
+      <span class="range" id="range"></span>
+      <span class="pedal" id="pedal">Pedal</span>
+      <button id="up">Oct ▶</button>
+    </div>
+    <div class="mini" id="mini"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Quick quest · Find the glowing key</h2>
+    <div class="quest">
+      <div class="qtext">Play <b id="qNote">—</b> <span class="combo" id="combo"></span></div>
+      <div class="xp"><div class="stat">LV <span id="lv">1</span> · <span id="xp">0</span> XP</div><div class="xpbar"><div class="xpfill" id="xpfill"></div></div></div>
+    </div>
+    <p class="hint">Middle C is the C closest to the middle of your 88 keys, usually right under the Alesis logo. The gold key shows where to go.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Report for Claude</h2>
+    <div class="row"><button id="copyBtn">Copy report</button><span class="copied" id="copied"></span></div>
+    <pre id="log"></pre>
+  </div>
+</div>
+
+<script>
+(() => {
+  const NAMES = ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+  const isBlack = m => [1,3,6,8,10].includes(m % 12);
+  const nameOf = m => NAMES[m % 12] + (Math.floor(m / 12) - 1);
+  const $ = id => document.getElementById(id);
+  const logLines = [];
+  const log = s => { const t = new Date().toLocaleTimeString(); logLines.push(t + '  ' + s); if (logLines.length > 80) logLines.shift(); $('log').textContent = logLines.join('\n'); };
+  const setCheck = (k, state, text) => { const d = $('c-' + k); d.className = 'dot ' + (state || ''); if (text != null) $('d-' + k).textContent = text; };
+
+  let inFrame = false; try { inFrame = window.self !== window.top; } catch (e) { inFrame = true; }
+  log('Browser: ' + navigator.userAgent);
+  log('Inside a frame: ' + inFrame);
+
+  // ---------- Audio: a light synthesized piano ----------
+  let ctx = null, master = null; const voices = {};
+  function initAudio() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      ctx = new AC();
+      const comp = ctx.createDynamicsCompressor();
+      master = ctx.createGain(); master.gain.value = 0.55;
+      master.connect(comp); comp.connect(ctx.destination);
+      ctx.resume();
+      setTimeout(() => setCheck('sound', ctx.state === 'running' ? 'ok' : 'bad', ctx.state === 'running' ? 'On. Tap a key below to hear it.' : 'Audio did not start (' + ctx.state + '). Check the silent switch.'), 150);
+      log('Audio state: ' + ctx.state + ' · base delay ' + Math.round((ctx.baseLatency||0)*1000) + ' ms · output delay ' + (ctx.outputLatency!=null ? Math.round(ctx.outputLatency*1000) + ' ms' : 'not reported'));
+    } catch (e) { setCheck('sound', 'bad', 'No audio: ' + e.message); log('Audio error: ' + e.message); }
+  }
+  function playNote(m, vel) {
+    if (!ctx) return;
+    stopNote(m, true);
+    const f = 440 * Math.pow(2, (m - 69) / 12), now = ctx.currentTime, v = 0.15 + 0.5 * vel;
+    const g = ctx.createGain(); const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * (4 + 8 * vel));
+    const parts = [[1, 'triangle', 1], [2, 'sine', 0.35], [3, 'sine', 0.12], [4, 'sine', 0.06]];
+    const oscs = parts.map(([mult, type, amp]) => { const o = ctx.createOscillator(); const og = ctx.createGain(); o.type = type; o.frequency.value = f * mult; og.gain.value = amp; o.connect(og); og.connect(lp); o.start(now); return o; });
+    lp.connect(g); g.connect(master);
+    const decay = Math.max(0.8, 3.2 - (m - 40) * 0.03);
+    g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(v, now + 0.006);
+    g.gain.exponentialRampToValueAtTime(v * 0.35, now + 0.25); g.gain.exponentialRampToValueAtTime(0.0008, now + decay);
+    oscs.forEach(o => o.stop(now + decay + 0.05));
+    voices[m] = { g, oscs };
+  }
+  function stopNote(m, hard) {
+    const vc = voices[m]; if (!vc || !ctx) return; delete voices[m];
+    const now = ctx.currentTime, rel = hard ? 0.03 : 0.25;
+    try { vc.g.gain.cancelScheduledValues(now); vc.g.gain.setValueAtTime(Math.max(vc.g.gain.value, 0.0008), now); vc.g.gain.exponentialRampToValueAtTime(0.0005, now + rel); vc.oscs.forEach(o => o.stop(now + rel + 0.02)); } catch (e) {}
+  }
+
+  // ---------- Keyboards ----------
+  let base = 48; // C3
+  const SPAN = 24; // two octaves + top C
+  let bigKeys = {}, miniKeys = {};
+  function build(el, lo, hi, cls) {
+    el.innerHTML = ''; const map = {};
+    let whites = 0; for (let m = lo; m <= hi; m++) if (!isBlack(m)) whites++;
+    const W = 100 / whites, BW = W * 0.62; let wi = 0;
+    for (let m = lo; m <= hi; m++) {
+      const k = document.createElement('div'); k.dataset.m = m;
+      if (isBlack(m)) { k.className = cls + ' b'; k.style.left = (wi * W - BW / 2) + '%'; k.style.width = BW + '%'; }
+      else { k.className = cls + ' w'; k.style.left = (wi * W) + '%'; k.style.width = W + '%'; wi++;
+        if (cls === 'key' && m % 12 === 0) { const l = document.createElement('div'); l.className = 'lbl'; l.textContent = nameOf(m); k.appendChild(l); } }
+      el.appendChild(k); map[m] = k;
+    }
+    return map;
+  }
+  function renderBig() {
+    bigKeys = build($('kbd'), base, base + SPAN, 'key');
+    $('range').textContent = nameOf(base) + ' – ' + nameOf(base + SPAN);
+    Object.values(miniKeys).forEach(k => k.classList.remove('view'));
+    for (let m = base; m <= base + SPAN; m++) if (miniKeys[m] && !isBlack(m)) miniKeys[m].classList.add('view');
+    Object.keys(held).forEach(m => bigKeys[m] && bigKeys[m].classList.add('on'));
+    markTarget();
+  }
+  miniKeys = build($('mini'), 21, 108, 'mk');
+  $('down').onclick = () => { if (base > 24) { base -= 12; renderBig(); } };
+  $('up').onclick = () => { if (base + SPAN < 108) { base += 12; renderBig(); } };
+
+  // ---------- Note handling ----------
+  const held = {}; let gotMidiNote = false;
+  function sparkAt(m, kind) {
+    const stage = $('stage'); if (m < base || m > base + SPAN) return;
+    const k = bigKeys[m]; if (!k) return;
+    const left = parseFloat(k.style.left) + parseFloat(k.style.width) / 2;
+    const s = document.createElement('div'); s.className = 'spark' + (kind ? ' ' + kind : ''); s.style.left = left + '%';
+    stage.appendChild(s); setTimeout(() => s.remove(), 950);
+  }
+  function noteOn(m, vel, src) {
+    held[m] = true; playNote(m, vel);
+    if (m < base || m > base + SPAN) { base = Math.max(24, Math.min(84, Math.floor(m / 12) * 12 - 12)); renderBig(); }
+    bigKeys[m] && bigKeys[m].classList.add('on'); miniKeys[m] && miniKeys[m].classList.add('on');
+    $('bigN').textContent = nameOf(m);
+    $('bigM').textContent = (m === 60 ? 'Middle C · ' : '') + (src === 'midi' ? 'from keyboard · velocity ' + Math.round(vel * 127) : src === 'mic' ? 'heard by the mic' : 'tapped on screen');
+    sparkAt(m, isBlack(m) ? 'p' : '');
+    if (src === 'midi' && !gotMidiNote) { gotMidiNote = true; setCheck('note', 'ok', 'Got ' + nameOf(m) + '. The game can hear your keyboard!'); log('First MIDI note: ' + nameOf(m) + ' vel ' + Math.round(vel * 127)); }
+    quest(m);
+  }
+  function noteOff(m) {
+    delete held[m]; stopNote(m);
+    bigKeys[m] && bigKeys[m].classList.remove('on'); miniKeys[m] && miniKeys[m].classList.remove('on');
+  }
+
+  // touch / mouse on the big keyboard
+  const kbd = $('kbd'); const pointerNote = {};
+  kbd.addEventListener('pointerdown', e => { const k = e.target.closest('.key'); if (!k) return; e.preventDefault(); const m = +k.dataset.m; pointerNote[e.pointerId] = m; noteOn(m, 0.7, 'touch'); });
+  const release = e => { const m = pointerNote[e.pointerId]; if (m != null) { noteOff(m); delete pointerNote[e.pointerId]; } };
+  kbd.addEventListener('pointerup', release); kbd.addEventListener('pointercancel', release); kbd.addEventListener('pointerleave', release);
+
+  // ---------- MIDI ----------
+  let midiAccess = null;
+  function onMidi(ev) {
+    const [st, d1, d2] = ev.data; const cmd = st & 0xf0;
+    if (cmd === 0x90 && d2 > 0) noteOn(d1, d2 / 127, 'midi');
+    else if (cmd === 0x80 || (cmd === 0x90 && d2 === 0)) noteOff(d1);
+    else if (cmd === 0xb0 && d1 === 64) { $('pedal').className = 'pedal' + (d2 >= 64 ? ' on' : ''); $('pedal').textContent = d2 >= 64 ? 'Pedal ●' : 'Pedal'; }
+  }
+  function listInputs() {
+    if (!midiAccess) return;
+    const names = [];
+    midiAccess.inputs.forEach(inp => { inp.onmidimessage = onMidi; names.push(inp.name || 'Unnamed device'); });
+    if (names.length) { setCheck('dev', 'ok', names.join(', ')); log('MIDI inputs: ' + names.join(', ')); }
+    else { setCheck('dev', 'wait', 'None yet. Plug the cable into the keyboard and phone, turn the keyboard on, then tap Rescan.'); log('MIDI inputs: none'); }
+  }
+  async function initMidi() {
+    if (!navigator.requestMIDIAccess) {
+      setCheck('api', 'bad', 'Not here. iPhone Safari and Chrome cannot read MIDI. Open this page in the MIDIWeb Browser app.');
+      setCheck('dev', 'bad', 'Needs MIDI support first.'); log('navigator.requestMIDIAccess: missing'); return;
+    }
+    try {
+      midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+      setCheck('api', 'ok', 'Yes, MIDI works in this browser.'); log('MIDI access: granted');
+      midiAccess.onstatechange = e => { log('MIDI change: ' + (e.port && e.port.name) + ' ' + (e.port && e.port.state)); listInputs(); };
+      listInputs();
+    } catch (e) {
+      setCheck('api', 'bad', 'MIDI exists but was blocked (' + e.name + '). The page frame may not allow it.');
+      setCheck('dev', 'bad', 'Blocked.'); log('MIDI access error: ' + e.name + ' ' + e.message);
+    }
+  }
+  $('rescan').onclick = () => { if (midiAccess) listInputs(); else initMidi(); };
+
+  // ---------- Mic (backup, single notes) ----------
+  let micOn = false;
+  $('micBtn').onclick = async () => {
+    if (micOn) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setCheck('mic', 'bad', 'No microphone access in this browser.'); log('getUserMedia missing'); return; }
+    setCheck('mic', 'wait', 'Asking for permission…');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+      micOn = true; setCheck('mic', 'ok', 'Listening. Play single notes slowly on the keyboard speakers.'); log('Mic: granted');
+      const src = ctx.createMediaStreamSource(stream); const an = ctx.createAnalyser(); an.fftSize = 2048; src.connect(an);
+      const buf = new Float32Array(an.fftSize); let last = -1, stable = 0, lastOn = -1;
+      const tick = () => {
+        an.getFloatTimeDomainData(buf); const m = detect(buf, ctx.sampleRate);
+        if (m > 0 && m === last) stable++; else stable = 0; last = m;
+        if (stable === 3 && m !== lastOn) { if (lastOn > 0) noteOff(lastOn); lastOn = m; noteOn(m, 0.6, 'mic'); setTimeout(() => { if (lastOn === m) { noteOff(m); lastOn = -1; } }, 350); }
+        requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) { setCheck('mic', 'bad', 'Blocked (' + e.name + '). This page frame may not allow the mic.'); log('Mic error: ' + e.name + ' ' + e.message); }
+  };
+  function detect(b, sr) { // autocorrelation pitch → MIDI note, or -1
+    let rms = 0; for (let i = 0; i < b.length; i++) rms += b[i] * b[i]; rms = Math.sqrt(rms / b.length); if (rms < 0.02) return -1;
+    const n = b.length; let best = -1, bestC = 0; const minL = Math.floor(sr / 1200), maxL = Math.floor(sr / 60);
+    for (let lag = minL; lag < maxL; lag++) { let c = 0; for (let i = 0; i < n - lag; i++) c += b[i] * b[i + lag]; if (c > bestC) { bestC = c; best = lag; } }
+    if (best < 0) return -1; const f = sr / best; return Math.round(69 + 12 * Math.log2(f / 440));
+  }
+
+  // ---------- Quick quest ----------
+  const POOL = [60, 62, 64, 65, 67]; let target = 60, combo = 0, xp = 0;
+  try { xp = +(localStorage.getItem('koa_xp') || 0); } catch (e) {}
+  function markTarget() { Object.values(bigKeys).forEach(k => k.classList.remove('target')); bigKeys[target] && bigKeys[target].classList.add('target'); miniKeys[target] && miniKeys[target].classList.add('view'); }
+  function newTarget() { let t; do { t = POOL[Math.floor(Math.random() * POOL.length)]; } while (t === target && POOL.length > 1); target = t; $('qNote').textContent = nameOf(t) + (t === 60 ? ' (Middle C)' : ''); markTarget(); }
+  function showXp() { const lv = 1 + Math.floor(xp / 100); $('lv').textContent = lv; $('xp').textContent = xp; $('xpfill').style.width = (xp % 100) + '%'; try { localStorage.setItem('koa_xp', xp); } catch (e) {} }
+  function quest(m) {
+    if (m === target) { combo++; xp += 10 + Math.min(combo, 10); sparkAt(m, 'g'); $('combo').textContent = combo > 1 ? '×' + combo + ' combo' : ''; showXp(); setTimeout(newTarget, 250); }
+    else { combo = 0; $('combo').textContent = ''; const k = bigKeys[m]; if (k) { k.classList.add('wrong'); setTimeout(() => k.classList.remove('wrong'), 200); } }
+  }
+
+  // ---------- Report ----------
+  $('copyBtn').onclick = async () => {
+    const lines = ['Keys of Aether M0 report'];
+    ['sound', 'api', 'dev', 'note', 'mic'].forEach(k => lines.push(k + ': ' + $('c-' + k).className.replace('dot', '').trim() + ' — ' + $('d-' + k).textContent));
+    const text = lines.concat(['', ...logLines]).join('\n');
+    try { await navigator.clipboard.writeText(text); $('copied').textContent = 'Copied. Paste it to Claude.'; }
+    catch (e) { $('copied').textContent = 'Copy blocked: press and hold the text below to copy.'; }
+  };
+
+  // ---------- Start ----------
+  $('startBtn').onclick = () => { $('start').style.display = 'none'; initAudio(); initMidi(); };
+  renderBig(); newTarget(); showXp();
+  setCheck('api', '', 'Tap start to check.');
+})();
+</script>
+</body>
+</html>

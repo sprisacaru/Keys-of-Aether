@@ -1,0 +1,151 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-03-five",
+ "title": "Five fingers, C to G",
+ "tempo": 69,
+ "skills": [
+  "technique",
+  "reading"
+ ],
+ "introduces": {
+  "pitches": [
+   "F4"
+  ],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Loose wrist",
+  "feel": "Your wrist floats level with your hand. If the forearm tightens, stop, shake the hand out and start slower."
+ },
+ "theory": [
+  {
+   "q": "Skip",
+   "a": "Jumping over one note: line to line, or space to space. On the keys you skip one white key."
+  }
+ ],
+ "intro": "All five fingers now, C up to G. Bar 3 uses skips: line to line on the staff.",
+ "notes": [
+  {
+   "pitch": 60,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 2,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 3,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 4,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 5,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 6,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 7,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 10,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 12,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  }
+ ]
+}

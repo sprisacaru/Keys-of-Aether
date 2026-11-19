@@ -1,0 +1,279 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-07-boss-ode",
+ "title": "BOSS · Ode to Joy",
+ "boss": true,
+ "tempo": 76,
+ "skills": [
+  "technique",
+  "reading",
+  "rhythm"
+ ],
+ "introduces": {
+  "pitches": [],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Breathe and look ahead",
+  "feel": "Keep your eyes one note ahead on the staff. If your hand tenses, drop the shoulders and exhale."
+ },
+ "theory": [
+  {
+   "q": "Phrase",
+   "a": "A musical sentence. Ode to Joy has two four-bar phrases: a question that ends on D, and an answer that ends on C."
+  }
+ ],
+ "intro": "Beethoven, 1824. Hand in C position, starting on finger 3 (E). Two phrases; the second one lands home on C.",
+ "notes": [
+  {
+   "pitch": 64,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 2,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 3,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 4,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 5,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 6,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 7,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 10,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 12,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 13,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 17,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 18,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 19,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 20,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 21,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 22,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 23,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 24,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 25,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 28,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 29,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 30,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  }
+ ]
+}

@@ -1,0 +1,172 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-04-pulse",
+ "title": "Pulse drill",
+ "tempo": 72,
+ "skills": [
+  "rhythm"
+ ],
+ "introduces": {
+  "pitches": [],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Count out loud",
+  "feel": "Say \"1, 2, 3, 4\" with the click. A long note gets \"1-2\". Counting aloud feels silly and works."
+ },
+ "theory": [
+  {
+   "q": "Quarter note and half note",
+   "a": "A quarter note lasts one beat (filled notehead). A half note lasts two beats (hollow notehead)."
+  }
+ ],
+ "intro": "Rhythm only. Tap ANY key in time with the notes. Filled notes last one beat, hollow notes two.",
+ "notes": [
+  {
+   "pitch": "any",
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 2,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 3,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 4,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 6,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 10,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 12,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 14,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 15,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 17,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 19,
+   "len": 1,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 20,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  },
+  {
+   "pitch": "any",
+   "start": 22,
+   "len": 2,
+   "hand": "R",
+   "finger": 0,
+   "vel": 0.7
+  }
+ ]
+}
