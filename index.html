@@ -158,6 +158,7 @@
   // ---------------- Lessons ----------------
   let index = null; const lessons = {};
   async function loadLessons() {
+    if (window.KOA_BUNDLE) { index = window.KOA_BUNDLE.index; Object.assign(lessons, window.KOA_BUNDLE.lessons); $('btnTest').style.display = 'none'; return; }
     index = await (await fetch('lessons/index.json')).json();
     await Promise.all(index.regions.flatMap(r => r.lessons).map(async id => { lessons[id] = await (await fetch('lessons/' + id + '.json')).json(); }));
   }
