@@ -8,12 +8,13 @@ function notes(str, hand = 'R', vel = 0.7) {
   for (const tok of str.trim().split(/\s+/)) {
     if (tok === '|') continue;
     const [p, len, finger] = tok.split(':');
-    if (p !== 'r') out.push(p === 'x' ? { pitch: 'any', start: t, len: +len, hand, finger: 0, vel } : { pitch: midi(p), start: t, len: +len, hand, finger: +finger, vel });
+    if (p === 'x') out.push({ pitch: 'any', start: t, len: +len, hand, finger: 0, vel });
+    else if (p !== 'r') { const ps = p.split('+'), fs = finger.split('+'); ps.forEach((q, i) => out.push({ pitch: midi(q), start: t, len: +len, hand, finger: +fs[i], vel })); }
     t += +len;
   }
   return out;
 }
-const L = (o, str) => ({ region: 1, timeSig: [4, 4], key: 'C', hand: 'R', pass: { stars2: 0.7, stars3: 0.9 }, ...o, notes: notes(str) });
+const L = (o, str, left) => ({ region: 1, timeSig: [4, 4], key: 'C', hand: left ? 'both' : 'R', pass: { stars2: 0.7, stars3: 0.9 }, ...o, notes: notes(str).concat(left ? notes(left, 'L', 0.55) : []).sort((a, b) => a.start - b.start) });
 const lessons = [
   L({ id: 'r1-01-landmarks', title: 'Two landmarks', tempo: 60, skills: ['reading', 'technique'], introduces: { pitches: ['C4', 'G4'], lengths: [1, 2] },
     technique: { title: 'Sit and shape', feel: 'Sit so your forearms are level with the keys. Let your hand hang, then set it on the keys: the fingers stay curved, like holding a small ball.' },
@@ -50,6 +51,12 @@ const lessons = [
     theory: [{ q: 'Phrase', a: 'A musical sentence. Ode to Joy has two four-bar phrases: a question that ends on D, and an answer that ends on C.' }],
     intro: 'Beethoven, 1824. Hand in C position, starting on finger 3 (E). Two phrases; the second one lands home on C.' },
     'E4:1:3 E4:1:3 F4:1:4 G4:1:5 | G4:1:5 F4:1:4 E4:1:3 D4:1:2 | C4:1:1 C4:1:1 D4:1:2 E4:1:3 | E4:1:3 D4:1:2 D4:2:2 | E4:1:3 E4:1:3 F4:1:4 G4:1:5 | G4:1:5 F4:1:4 E4:1:3 D4:1:2 | C4:1:1 C4:1:1 D4:1:2 E4:1:3 | D4:1:2 C4:1:1 C4:2:1'),
+  L({ id: 'r1-08-heroic-ode', title: 'HEROIC · Ode to Joy, two hands', heroic: true, tempo: 66, skills: ['technique', 'reading', 'rhythm'], introduces: { pitches: ['C3', 'G3'], lengths: [4] },
+    technique: { title: 'Two hands, one pulse', feel: 'Left pinky (5) on the C below Middle C, left thumb (1) on G. The left hand holds long notes while the right hand moves. Run Practice with each hand before both.' },
+    theory: [{ q: 'Whole note', a: 'Lasts four beats, a whole bar in 4/4. An open notehead with no stem.' }, { q: 'Bass clef', a: 'The lower staff, for the left hand. Its two dots sit around the F line. The C you play here is the second space from the bottom.' }],
+    intro: 'A real challenge, early: the boss tune again, with your left hand holding one long bass note per bar. C under the home bars, G under the bars that lean away.' },
+    'E4:1:3 E4:1:3 F4:1:4 G4:1:5 | G4:1:5 F4:1:4 E4:1:3 D4:1:2 | C4:1:1 C4:1:1 D4:1:2 E4:1:3 | E4:1:3 D4:1:2 D4:2:2 | E4:1:3 E4:1:3 F4:1:4 G4:1:5 | G4:1:5 F4:1:4 E4:1:3 D4:1:2 | C4:1:1 C4:1:1 D4:1:2 E4:1:3 | D4:1:2 C4:1:1 C4:2:1',
+    'C3:4:5 | G3:4:1 | C3:4:5 | G3:4:1 | C3:4:5 | G3:4:1 | C3:4:5 | G3:2:1 C3:2:5'),
 ];
 for (const l of lessons) writeFileSync(`lessons/${l.id}.json`, JSON.stringify(l, null, 1));
 writeFileSync('lessons/index.json', JSON.stringify({ version: 1, regions: [{ id: 1, name: 'Middle C Village', lessons: lessons.map(l => l.id) }] }, null, 1));
