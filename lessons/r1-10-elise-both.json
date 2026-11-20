@@ -1,0 +1,478 @@
+{
+ "region": 1,
+ "timeSig": [
+  3,
+  4
+ ],
+ "key": "C",
+ "hand": "both",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-10-elise-both",
+ "title": "SONG · Für Elise, two hands",
+ "quest": true,
+ "advanced": true,
+ "tempo": 50,
+ "skills": [
+  "technique",
+  "reading",
+  "rhythm"
+ ],
+ "introduces": {
+  "pitches": [
+   "A2",
+   "E3",
+   "A3",
+   "E2",
+   "G#3"
+  ],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Hand to hand",
+  "feel": "The left hand rolls three notes upward and hands the line to the right hand, like passing a ball. In the E bar the left second finger crosses over the thumb for G sharp. Learn the left hand alone in Practice first."
+ },
+ "theory": [
+  {
+   "staff": {
+    "clef": "bass",
+    "notes": [
+     45,
+     52,
+     57
+    ]
+   },
+   "q": "Broken chord",
+   "a": "A chord played one note at a time. A, E, A outlines A minor, home. E, E, G sharp outlines E major, the chord that most wants to return to A. The whole opening is just home, away, home."
+  }
+ ],
+ "intro": "Both hands. The left hand only plays when the right hand lands, rolling a broken chord up to meet it. Slow is fine: the beat waits for nobody in Perform, so use Practice until the hand-offs feel easy.",
+ "notes": [
+  {
+   "pitch": 76,
+   "start": 2,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 75,
+   "start": 2.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 76,
+   "start": 3,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 75,
+   "start": 3.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 76,
+   "start": 4,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 4.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 74,
+   "start": 5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 5.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 6,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 45,
+   "start": 6,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 52,
+   "start": 6.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.55
+  },
+  {
+   "pitch": 57,
+   "start": 7,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 60,
+   "start": 7.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 8,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 8.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 40,
+   "start": 9,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 52,
+   "start": 9.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 56,
+   "start": 10,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.55
+  },
+  {
+   "pitch": 64,
+   "start": 10.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 68,
+   "start": 11,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 11.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 12,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 45,
+   "start": 12,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 52,
+   "start": 12.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.55
+  },
+  {
+   "pitch": 57,
+   "start": 13,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 64,
+   "start": 13.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 76,
+   "start": 14,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 75,
+   "start": 14.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 76,
+   "start": 15,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 75,
+   "start": 15.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 76,
+   "start": 16,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 16.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 74,
+   "start": 17,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 17.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 18,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 45,
+   "start": 18,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 52,
+   "start": 18.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.55
+  },
+  {
+   "pitch": 57,
+   "start": 19,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 60,
+   "start": 19.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 20,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 20.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 21,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 40,
+   "start": 21,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 52,
+   "start": 21.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 56,
+   "start": 22,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.55
+  },
+  {
+   "pitch": 64,
+   "start": 22.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 23,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 23.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 24,
+   "len": 3,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 45,
+   "start": 24,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 52,
+   "start": 24.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.55
+  },
+  {
+   "pitch": 57,
+   "start": 25,
+   "len": 2,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  }
+ ]
+}

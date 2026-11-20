@@ -243,7 +243,7 @@
     o.forEach((id, i) => {
       const l = lessons[id], st = starsOf(id), open = unlocked(id), x = px(i), y = py(i), r = rec(id);
       const col = !open ? '#3a3658' : l.boss ? '#ff3fd2' : l.heroic ? '#ffd24a' : st >= 2 ? '#3dff9a' : '#2ef2ff', left = x > 195; let tx = left ? x - 34 : x + 34, anchor = left ? 'end' : 'start';
-      const title = l.title.replace(/^(BOSS|HEROIC) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : 'Stop ' + (i + 1);
+      const title = l.title.replace(/^(BOSS|HEROIC|SONG) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : l.quest ? 'SONG QUEST' : 'Stop ' + (i + 1);
       const tw = Math.max(title.length * 7.7, tag.length * 7.2), fits = left ? tx - tw > 4 : tx + tw < W - 4; let ty = y;
       if (!fits) { anchor = 'middle'; tx = Math.max(tw / 2 + 6, Math.min(W - tw / 2 - 6, x)); ty = y - 54; }
       s += `<g class="nodeG" data-id="${id}" opacity="${open ? 1 : .5}">`;
@@ -333,7 +333,7 @@
         if (l.boss) { const down = st >= 2, c = down ? 0x3dff9a : 0xff3fd2, bxp = v.x + (v.x > 0 ? -6.5 : 6.5), tw = edged(new T.CylinderGeometry(1.6, 2.2, 9, 6), 0x0a0420, c), cap = edged(new T.ConeGeometry(2.3, 3.4, 6), 0x1a0633, c); tw.position.set(bxp, 4.5, v.z - 3); cap.position.set(bxp, 10.7, v.z - 3); glowAt(new T.Vector3(bxp, 6, v.z - 1.2), down ? 0xffd24a : 0xff3fd2, 4); }
         if (l.heroic) { const cr = new T.Mesh(new T.OctahedronGeometry(1), basic(open ? 0xffd24a : 0x4a3a80, { wireframe: !open })); cr.position.set(v.x, 2.4, v.z); sc.add(cr); m.spin.push(cr); }
         if (id === cur) { const ring = new T.Mesh(new T.TorusGeometry(2.1, .09, 6, 28), basic(colH)); ring.rotation.x = Math.PI / 2; ring.position.set(v.x, .7, v.z); sc.add(ring); m.ring = ring; }
-        const title = l.title.replace(/^(BOSS|HEROIC) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : 'Stop ' + (i + 1), hex = '#' + colH.toString(16).padStart(6, '0');
+        const title = l.title.replace(/^(BOSS|HEROIC|SONG) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : l.quest ? 'SONG QUEST' : 'Stop ' + (i + 1), hex = '#' + colH.toString(16).padStart(6, '0');
         m.picks.push({ v: new T.Vector3(v.x, l.boss ? 2.6 : 2.2, v.z), open, go: () => openIntro(id), html: `<div style="font-size:9px;letter-spacing:1.5px;color:${hex}">${open ? '' : '🔒 '}${tag.toUpperCase()}</div><div style="font-weight:800;font-size:14px">${title}</div><div style="color:#ffd24a;font-size:13px;letter-spacing:2px">${'★'.repeat(st)}${'☆'.repeat(3 - st)}${r.fast ? ' ⚡' : ''}${r.blind ? ' 👁' : ''}</div>` }); });
       // rune shrines beside the path
       SHRINES.forEach(S => { const t = o.indexOf(S.after) + .5, a = P(t), side = PX(t) > 0 ? -1 : 1, open = shrineOpen(S), done = !!save.shrines[S.id], colH = !open ? 0x4a3a80 : done ? 0x3dff9a : 0xffd24a, v = new T.Vector3(a.x + side * 4.2, 0, a.z);
@@ -494,9 +494,9 @@
       for (let d = base - 2; d >= info.d; d -= 2) s += `<line x1="${x - sp * 1.1}" x2="${x + sp * 1.1}" y1="${bottom - (d - base) * sp / 2}" y2="${bottom - (d - base) * sp / 2}" stroke="#8a84b5" stroke-width="1.4"/>`;
       for (let d = base + 10; d <= info.d; d += 2) s += `<line x1="${x - sp * 1.1}" x2="${x + sp * 1.1}" y1="${bottom - (d - base) * sp / 2}" y2="${bottom - (d - base) * sp / 2}" stroke="#8a84b5" stroke-width="1.4"/>`;
       s += `<ellipse cx="${x}" cy="${y}" rx="${sp * .64}" ry="${sp * .47}" transform="rotate(-20 ${x} ${y})" fill="${len >= 2 ? 'none' : '#ffd24a'}" stroke="#ffd24a" stroke-width="1.8"/>`;
-      if (len < 4) { const up = info.d < base + 4; s += up ? `<line x1="${x + sp * .58}" x2="${x + sp * .58}" y1="${y}" y2="${y - sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>` : `<line x1="${x - sp * .58}" x2="${x - sp * .58}" y1="${y}" y2="${y + sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>`; }
+      const up = info.d < base + 4; if (len < 4) { s += up ? `<line x1="${x + sp * .58}" x2="${x + sp * .58}" y1="${y}" y2="${y - sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>` : `<line x1="${x - sp * .58}" x2="${x - sp * .58}" y1="${y}" y2="${y + sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>`; if (len < 1) s += up ? `<line x1="${x + sp * .58}" x2="${x + sp * 1.45}" y1="${y - sp * 3}" y2="${y - sp * 1.7}" stroke="#ffd24a" stroke-width="1.6"/>` : `<line x1="${x - sp * .58}" x2="${x + sp * .3}" y1="${y + sp * 3}" y2="${y + sp * 1.7}" stroke="#ffd24a" stroke-width="1.6"/>`; }
       if (info.acc) s += `<text x="${x - sp * .9}" y="${y + sp * .6}" text-anchor="end" font-size="${sp * 1.9}" fill="#ffd24a" font-family="serif">${info.acc}</text>`;
-      s += `<text x="${x}" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd24a">${o.lens ? (len === 1 ? '1 beat' : len + ' beats') : name}</text>`; });
+      s += `<text x="${x}" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd24a">${o.lens ? (len === 1 ? '1 beat' : len === .5 ? '½ beat' : len + ' beats') : name}</text>`; });
     return `<svg viewBox="0 0 ${W} 124" style="display:block;width:${W}px;max-width:100%;margin:6px 0 4px;background:#0a0818;border-radius:10px">${s}</svg>`;
   }
 
@@ -508,7 +508,7 @@
     $('inFind').innerHTML = finderSVG(lo, hi);
     const firstR = L.notes.find(n => n.hand === 'R' && n.pitch !== 'any'), firstL = L.notes.find(n => n.hand === 'L');
     $('inFindT').innerHTML = (firstR ? `The blue zone is the only part of the piano this lesson uses. <b>Middle C</b> is the white key just left of the pair of two black keys nearest the centre of your keyboard, usually right under the brand name. Right hand starts with finger ${firstR.finger} on <b>${nm(firstR.pitch, L)}</b>${firstR.pitch === 60 ? ' (Middle C)' : firstR.pitch > 60 ? `, ${whiteSteps(firstR.pitch)} white key${whiteSteps(firstR.pitch) === 1 ? '' : 's'} above Middle C` : ''}.` : 'This is a rhythm drill: any key works. Use Middle C, the white key just left of the pair of two black keys nearest the centre.')
-      + (firstL ? ` Left hand starts with finger ${firstL.finger} on <b>${nm(firstL.pitch, L)}</b>, the next ${nm(firstL.pitch, L)} below Middle C.` : '');
+      + (firstL ? ` Left hand starts with finger ${firstL.finger} on <b>${nm(firstL.pitch, L)}</b>, the ${['next', 'second', 'third'][Math.ceil((60 - firstL.pitch) / 12) - 1] || 'low'} ${nm(firstL.pitch, L)} below Middle C.` : '');
     $('inTechT').textContent = L.technique.title; $('inTech').textContent = L.technique.feel;
     $('inTheory').innerHTML = '<h2 class="disp">Theory rune' + (L.theory.length > 1 ? 's' : '') + '</h2>' + L.theory.map(t => `<div class="t">${t.q}</div><p>${t.a}</p>${t.staff ? staffSVG(t.staff) : ''}<div style="height:10px"></div>`).join('');
     const uniq = h => [...new Set(L.notes.filter(n => n.hand === h && n.pitch !== 'any').map(n => n.pitch))].sort((a, b) => a - b), rs = uniq('R'), ls = uniq('L');
@@ -550,7 +550,7 @@
         for (const n of this.notes) { if (n.state) continue; if (n.pitch !== 'any' && n.pitch !== m) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
         if (bestN && bestD <= GOOD) { bestN.state = bestD <= PERFECT ? 1 : 2; this.hit(bestN, m, bestD <= PERFECT ? 'perfect' : 'good'); } else { this.strays++; this.combo = 0; this.flash[m] = { t: performance.now(), bad: true }; }
       } });
-    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode];
+    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode];
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
   }
   function startFree() {
@@ -622,7 +622,7 @@
     G.fx = G.fx.filter(f => now - f.t < 500); for (const f of G.fx) { const k = (now - f.t) / 500, x = lay.keyX(Math.max(G.lo, Math.min(G.hi, f.m))); g2.globalAlpha = 1 - k; g2.strokeStyle = f.q === 'perfect' ? '#3dff9a' : '#ffd24a'; g2.lineWidth = 3; g2.beginPath(); g2.arc(x, hitY, 10 + k * 46, Math.PI, 2 * Math.PI); g2.stroke(); g2.fillStyle = g2.strokeStyle; g2.font = '800 13px sans-serif'; g2.textAlign = 'center'; g2.fillText(f.q === 'perfect' ? 'PERFECT' : 'GOOD', x, hitY - 26 - k * 30); g2.globalAlpha = 1; }
     const pend = G.notes.filter(x => x.state === 0), first = pend[0], targets = !blind && first ? pend.filter(x => x.start === first.start && x.pitch !== 'any' && (G.mode === 'wait' || x.start - G.beat < 1)).map(x => x.pitch) : [];
     const fl = m => { const f = G.flash[m]; return f && now - f.t < 220 ? f : null; };
-    lay.whites.forEach((m, i) => { const f = fl(m); g2.fillStyle = f ? (f.bad ? '#ff4d6d' : '#3dff9a') : held[m] ? '#2ef2ff' : targets.includes(m) ? '#ffd24a' : '#ece9ff'; g2.fillRect(i * ww + 1, hitY + 2, ww - 2, kbH - 4); g2.fillStyle = m === 60 ? '#b8860b' : '#5b548a'; g2.font = `700 ${ww < 30 ? 10 : 12}px sans-serif`; g2.textAlign = 'center'; g2.fillText(NAMES[m % 12], (i + .5) * ww, H - 12); if (m === 60) { g2.font = '700 8px sans-serif'; g2.fillText('MIDDLE', (i + .5) * ww, H - 26); } });
+    lay.whites.forEach((m, i) => { const f = fl(m); g2.fillStyle = f ? (f.bad ? '#ff4d6d' : '#3dff9a') : held[m] ? '#2ef2ff' : targets.includes(m) ? '#ffd24a' : '#ece9ff'; g2.fillRect(i * ww + 1, hitY + 2, ww - 2, kbH - 4); g2.fillStyle = m === 60 ? '#b8860b' : '#5b548a'; g2.font = `700 ${ww < 30 ? 10 : 12}px sans-serif`; g2.textAlign = 'center'; g2.fillText(NAMES[m % 12], (i + .5) * ww, H - 12); if (m === 60 && ww >= 26) { g2.font = '700 8px sans-serif'; g2.fillText('MIDDLE', (i + .5) * ww, H - 26); } });
     for (let m = G.lo; m <= G.hi; m++) if (isBlack(m)) { const f = fl(m), x = lay.keyX(m); g2.fillStyle = f ? (f.bad ? '#ff4d6d' : '#3dff9a') : held[m] ? '#ff3fd2' : targets.includes(m) ? '#c79a00' : '#15122a'; g2.fillRect(x - lay.bw / 2, hitY + 2, lay.bw, kbH * .6); }
     drawStrip(lay); if (!free) drawStaff(lay);
   }
@@ -655,7 +655,7 @@
         for (let d = S.base - 2; d >= info.d; d -= 2) { const ly = S.bottom - (d - S.base) * sp / 2; g2.beginPath(); g2.moveTo(x - sp, ly); g2.lineTo(x + sp, ly); g2.stroke(); }
         for (let d = S.base + 10; d <= info.d; d += 2) { const ly = S.bottom - (d - S.base) * sp / 2; g2.beginPath(); g2.moveTo(x - sp, ly); g2.lineTo(x + sp, ly); g2.stroke(); }
         g2.beginPath(); g2.ellipse(x, y, sp * .62, sp * .46, -0.35, 0, 2 * Math.PI); if (n.len >= 2) g2.stroke(); else g2.fill();
-        if (n.len < 4) { const up = info.d < S.base + 4; g2.beginPath(); if (up) { g2.moveTo(x + sp * .58, y); g2.lineTo(x + sp * .58, y - sp * 3); } else { g2.moveTo(x - sp * .58, y); g2.lineTo(x - sp * .58, y + sp * 3); } g2.stroke(); }
+        if (n.len < 4) { const up = info.d < S.base + 4; g2.beginPath(); if (up) { g2.moveTo(x + sp * .58, y); g2.lineTo(x + sp * .58, y - sp * 3); if (n.len < 1) g2.lineTo(x + sp * 1.45, y - sp * 1.7); } else { g2.moveTo(x - sp * .58, y); g2.lineTo(x - sp * .58, y + sp * 3); if (n.len < 1) g2.lineTo(x + sp * .3, y + sp * 1.7); } g2.stroke(); }
         if (info.acc) { g2.font = `${sp * 1.9}px serif`; g2.textAlign = 'right'; g2.fillText(info.acc, x - sp * .8, y + sp * .6); }
         if (n.finger) { g2.font = `700 ${Math.max(10, sp * 1.2)}px sans-serif`; g2.textAlign = 'center'; g2.fillStyle = '#9a93c9'; g2.fillText(n.finger, x, S.hand === 'L' ? S.bottom + sp * 2.6 : S.bottom - sp * 6.4); }
       }
@@ -688,7 +688,7 @@
     touchStreak();
     persist(); chime(stars >= 2 || G.mode === 'wait');
     $('resStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars) + (passedTier ? (G.tier === 'fast' ? ' ⚡' : ' 👁') : '');
-    $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : 'The forest wakes a little') : 'Not yet. Again, a little calmer';
+    $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : G.L.quest ? 'Song cleared!' : 'The grid lights up') : 'Not yet. Again, a little calmer';
     $('resBody').innerHTML = G.mode === 'wait'
       ? `${total} notes, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}. +${gain} XP.<br>Now try Perform to earn more stars.`
       : `Accuracy ${Math.round(acc * 100)}% · ${perfect} perfect, ${good} good, ${miss} missed · best combo ${G.best}. +${gain} XP.` + (miss > 2 ? '<br>Tip: run Practice once more and count out loud.' : stars >= 2 && !G.tier ? '<br>Want more? Try the ⚡ and 👁 challenge runs.' : '');

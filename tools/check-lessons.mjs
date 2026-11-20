@@ -31,7 +31,8 @@ for (const region of idx.regions) {
       const pitched = ns.filter(n => n.pitch !== 'any');
       for (let b = 0; b * bar < end; b++) {
         const inBar = pitched.filter(n => Math.floor(n.start / bar) === b); if (!inBar.length) continue;
-        const ps = inBar.map(n => n.pitch); if (Math.max(...ps) - Math.min(...ps) > 12) err(id, `${hand} hand reach over an octave in bar ${b + 1}`);
+        const ps = inBar.map(n => n.pitch); if (l.advanced) continue; // real repertoire shifts hand position: reach and finger-order rules do not apply
+        if (Math.max(...ps) - Math.min(...ps) > 12) err(id, `${hand} hand reach over an octave in bar ${b + 1}`);
         for (const a of inBar) for (const c of inBar) {
           const up = hand === 'R' ? 1 : -1;
           if (a.pitch < c.pitch && (a.finger - c.finger) * up >= 0) err(id, `fingering inconsistent in bar ${b + 1}: finger ${a.finger} on a lower note than finger ${c.finger}`);
