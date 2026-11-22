@@ -110,7 +110,7 @@
     <button id="btnPerform" class="pink">Perform (in time)</button>
   </div>
   <div class="card" id="inChal"><h2 class="disp">Challenge runs</h2><p class="small" id="inChalT"></p><div class="rowb" style="margin-top:10px"><button id="btnFast" class="gold">⚡ Fast (125% speed)</button><button id="btnBlind" class="gold">👁 Staff only (no highway)</button></div></div>
-  <p class="small">Practice earns 1 star. Perform earns up to 3. Two stars open the next stop on the path. Stop if your hand or forearm feels tense or sore.</p>
+  <p class="small">Finish a lesson either way to open the next stop. Practice waits for you and earns 1 star. Perform is in time and earns up to 3. Stop if your hand or forearm feels tense or sore.</p>
 </div>
 
 <div class="screen" id="shrine">
@@ -169,12 +169,12 @@
     oscs.forEach(o => o.stop(now + decay + .05)); voices[m] = { g, oscs };
   }
   function stopTone(m, hard) { const vc = voices[m]; if (!vc || !ctx) return; delete voices[m]; const now = ctx.currentTime, rel = hard ? .03 : .2; try { vc.g.gain.cancelScheduledValues(now); vc.g.gain.setValueAtTime(Math.max(vc.g.gain.value, .0008), now); vc.g.gain.exponentialRampToValueAtTime(.0005, now + rel); vc.oscs.forEach(o => o.stop(now + rel + .02)); } catch (e) {} }
-  function click(strong) { if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), now = ctx.currentTime; o.frequency.value = strong ? 1500 : 1000; g.gain.setValueAtTime(strong ? .25 : .14, now); g.gain.exponentialRampToValueAtTime(.0005, now + .05); o.connect(g); g.connect(master); o.start(now); o.stop(now + .06); }
+  function click(strong, soft) { if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), now = ctx.currentTime; o.frequency.value = strong ? 1500 : 1000; g.gain.setValueAtTime((strong ? .25 : .14) * (soft ? .45 : 1), now); g.gain.exponentialRampToValueAtTime(.0005, now + (soft ? .03 : .05)); o.connect(g); g.connect(master); o.start(now); o.stop(now + .06); }
   let noiseBuf = null;
   function noise(dur, type, freq, v) { if (!ctx) return; if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate * .3, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), now = ctx.currentTime; s.buffer = noiseBuf; f.type = type; f.frequency.value = freq; g.gain.setValueAtTime(v, now); g.gain.exponentialRampToValueAtTime(.0005, now + dur); s.connect(f); f.connect(g); g.connect(master); s.start(now); s.stop(now + dur + .02); }
   function kick(v) { if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), now = ctx.currentTime; o.frequency.setValueAtTime(160, now); o.frequency.exponentialRampToValueAtTime(42, now + .13); g.gain.setValueAtTime(v, now); g.gain.exponentialRampToValueAtTime(.0005, now + .22); o.connect(g); g.connect(master); o.start(now); o.stop(now + .24); }
   const hat = v => noise(.045, 'highpass', 7500, v), snare = v => { noise(.13, 'bandpass', 1900, v); };
-  function drums(G, beat, bar) { const fb = Math.floor(beat + 1e-6), hb = Math.floor(beat * 2 + 1e-6); if (fb !== G.lastClick) { G.lastClick = fb; const i = ((fb % bar) + bar) % bar; if (save.beat && beat >= 0) { kick(i === 0 ? .95 : .7); if (bar === 4 ? (i === 1 || i === 3) : i === bar - 1) snare(.3); } else if (!mic) click(i === 0); } if (save.beat && beat >= 0 && hb !== G.lastHat) { G.lastHat = hb; if (((hb % 2) + 2) % 2 === 1) hat(.1); } }
+  function drums(G, beat, bar) { const fb = Math.floor(beat + 1e-6), hb = Math.floor(beat * 2 + 1e-6); if (fb !== G.lastClick) { G.lastClick = fb; const i = ((fb % bar) + bar) % bar; if (save.beat && beat >= 0) { kick(i === 0 ? .95 : .7); if (bar === 4 ? (i === 1 || i === 3) : i === bar - 1) snare(.3); } else { click(i === 0, !!mic); if (mic) mic.muteUntil = performance.now() + 150; } } if (save.beat && beat >= 0 && hb !== G.lastHat) { G.lastHat = hb; if (((hb % 2) + 2) % 2 === 1) hat(.1); } }
   function chime(ok) { if (!ctx) return; (ok ? [72, 76, 79, 84] : [60, 58]).forEach((m, i) => setTimeout(() => tone(m, .5, .5), i * 110)); }
 
   // ---------------- Input ----------------
@@ -193,7 +193,7 @@
   function chipIn() { const c = $('chipIn'); if (midiName) { c.textContent = '🎹 ' + midiName; c.classList.add('ok'); } else if (mic) { c.textContent = '🎤 Mic listening'; c.classList.add('ok'); } else { c.textContent = 'Touch keys'; c.classList.remove('ok'); } }
 
   // ---------------- Microphone input (single notes; for playing without a cable) ----------------
-  let mic = null;
+  let mic = null; const micLag = () => typeof save.micLag === 'number' ? save.micLag : .2; /* seconds between a key going down and the mic reporting it; learns as you play */
   function yin(b, sr) { const W = 1024, tMin = Math.floor(sr / 1100), tMax = Math.min(Math.floor(sr / 170), b.length - W - 1), d = new Float32Array(tMax + 2); let run = 0, best = -1;
     for (let tau = 1; tau <= tMax + 1; tau++) { let s = 0; for (let i = 0; i < W; i++) { const x = b[i] - b[i + tau]; s += x * x; } run += s; d[tau] = s * tau / (run || 1); }
     for (let tau = tMin; tau < tMax; tau++) if (d[tau] < .15) { while (tau + 1 < tMax && d[tau + 1] < d[tau]) tau++; best = tau; break; }
@@ -207,7 +207,7 @@
   }
   function stopMic() { if (!mic) return; try { mic.stream.getTracks().forEach(t => t.stop()); } catch (e) {} mic = null; }
   function micLoop() {
-    const k = mic; if (!k) return; const now = performance.now(), b = k.buf; k.an.getFloatTimeDomainData(b); let r = 0; for (let i = 0; i < b.length; i++) r += b[i] * b[i]; r = Math.sqrt(r / b.length); k.level = r;
+    const k = mic; if (!k) return; const now = performance.now(), b = k.buf; if (now < (k.muteUntil || 0)) { requestAnimationFrame(micLoop); return; } /* ignore the game's own click */ k.an.getFloatTimeDomainData(b); let r = 0; for (let i = 0; i < b.length; i++) r += b[i] * b[i]; r = Math.sqrt(r / b.length); k.level = r;
     if (r > .012 && r > k.prev * 1.45 && now - k.onsetT > 90) { k.armed = true; k.onsetT = now; k.stable = 0; k.last = -1; } // a new attack
     if (k.armed && now - k.onsetT > 260) k.armed = false; k.prev = k.prev * .7 + r * .3;
     let m = -1; if (r > .01) { const f = yin(b, ctx.sampleRate); if (f > 0) m = Math.round(69 + 12 * Math.log2(f / 440)); }
@@ -227,8 +227,8 @@
   const rec = id => save.lessons[id] || {};
   const starsOf = id => rec(id).stars || 0;
   const bossId = () => order().find(id => lessons[id].boss);
-  const unlocked = id => { const l = lessons[id], o = order(), i = o.indexOf(id), bossDown = starsOf(bossId()) >= 2; if (l.boss) return true; if (l.heroic) return bossDown; return i === 0 || bossDown || starsOf(o[i - 1]) >= 2; };
-  const frontier = () => { const o = order(); return o.find(id => unlocked(id) && starsOf(id) < 2 && !lessons[id].boss) || o.find(id => starsOf(id) < 2) || o[o.length - 1]; };
+  const unlocked = id => { const l = lessons[id], o = order(), i = o.indexOf(id), bossDown = starsOf(bossId()) >= 1; if (l.boss) return true; if (l.heroic) return bossDown; return i === 0 || bossDown || starsOf(o[i - 1]) >= 1; };
+  const frontier = () => { const o = order(); return o.find(id => unlocked(id) && starsOf(id) < 1 && !lessons[id].boss) || o.find(id => starsOf(id) < 1) || o[o.length - 1]; };
 
   // ---------------- Forest path (map) ----------------
   let lastBard = null;
@@ -253,7 +253,7 @@
     [['#3dff9a', 150], ['#2ef2ff', 210], ['#8b5cff', 270]].forEach(([c, y0], i) => { let dd = `M-20 ${y0}`; for (let x = 0; x <= W + 20; x += 40) dd += ` Q${x + 20} ${y0 - 34 + 26 * Math.sin(x / 70 + i * 2)} ${x + 40} ${y0 + 12 * Math.sin(x / 50 + i)}`; s += `<path class="aur" style="animation-delay:-${i * 2.3}s" d="${dd}" fill="none" stroke="${c}" stroke-width="26" stroke-linecap="round" opacity=".3" filter="url(#gl2)"/>`; });
     s += `<g class="shoot"><path d="M250 60l34-19" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g><g class="shoot" style="animation-delay:-4.5s"><path d="M150 ${(Hh * .4).toFixed(0)}l34-19" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>`;
     for (let k = 0; k < 4; k++) { const y0 = 240 + k * (Hh - 300) / 4; let d = `M0 ${y0}`; for (let x = 0; x <= W; x += 30) d += ` L${x} ${(y0 - 26 - 22 * Math.sin(x / 55 + k * 2)).toFixed(0)}`; s += `<path d="${d} L${W} ${y0 + 200} L0 ${y0 + 200}Z" fill="${y0 > litY ? '#123a33' : '#161a30'}" opacity=".55"/>`; }
-    const bi = o.indexOf(bossId()), bx = px(bi), by = py(bi), bossDown = starsOf(bossId()) >= 2, keepX = bx > 195 ? bx - 120 : bx + 120;
+    const bi = o.indexOf(bossId()), bx = px(bi), by = py(bi), bossDown = starsOf(bossId()) >= 1, keepX = bx > 195 ? bx - 120 : bx + 120;
     s += `<g transform="translate(${keepX.toFixed(0)},${(by - 86).toFixed(0)})"><path d="M-34 40V-8l8-8v-14h8v10h8v-22l10-12l10 12v22h8v-10h8v14l8 8v48z" fill="${bossDown ? '#2b5d57' : '#1a1030'}" stroke="${bossDown ? '#3dff9a' : '#ff3fd2'}" stroke-width="1.5"/><rect x="-6" y="14" width="12" height="26" rx="6" fill="${bossDown ? '#ffd24a' : '#ff3fd2'}" opacity=".8"/></g>`;
     s += `<g transform="translate(${(px(0) > 195 ? 30 : 200)},${Hh - 128})">` + [[0, 0, 34], [44, 10, 28], [90, 2, 32], [132, 8, 26]].map(([x, y, w]) => `<path d="M${x} ${y + 30}v-${w * .55}l${w / 2}-${w * .45}l${w / 2} ${w * .45}v${w * .55}z" fill="#1d2a44" stroke="#2ef2ff" stroke-opacity=".5"/><rect x="${x + w / 2 - 4}" y="${y + 14}" width="8" height="9" fill="#ffd24a" opacity=".9"/>`).join('') + `</g>`;
     s += `<text x="195" y="${Hh - 52}" text-anchor="middle" fill="#9a93c9" font-size="12" letter-spacing="3">MIDDLE C VILLAGE</text>`;
@@ -267,7 +267,7 @@
     for (let i = 0; i < 26; i++) { const y = litY + R() * (Hh - litY - 60), x = R() * W; s += `<circle class="ff" style="animation-delay:-${(R() * 4).toFixed(1)}s" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="2" fill="#ffe98a"/>`; }
     o.forEach((id, i) => {
       const l = lessons[id], st = starsOf(id), open = unlocked(id), x = px(i), y = py(i), r = rec(id);
-      const col = !open ? '#3a3658' : l.boss ? '#ff3fd2' : l.heroic ? '#ffd24a' : st >= 2 ? '#3dff9a' : '#2ef2ff', left = x > 195; let tx = left ? x - 34 : x + 34, anchor = left ? 'end' : 'start';
+      const col = !open ? '#3a3658' : l.boss ? '#ff3fd2' : l.heroic ? '#ffd24a' : st >= 1 ? '#3dff9a' : '#2ef2ff', left = x > 195; let tx = left ? x - 34 : x + 34, anchor = left ? 'end' : 'start';
       const title = l.title.replace(/^(BOSS|HEROIC|SONG) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : l.quest ? 'SONG QUEST' : 'Stop ' + (i + 1);
       const tw = Math.max(title.length * 7.7, tag.length * 7.2), fits = left ? tx - tw > 4 : tx + tw < W - 4; let ty = y;
       if (!fits) { anchor = 'middle'; tx = Math.max(tw / 2 + 6, Math.min(W - tw / 2 - 6, x)); ty = y - 54; }
@@ -297,7 +297,7 @@
   $('btnSound').onclick = () => { save.echo = { auto: 'on', on: 'off', off: 'auto' }[save.echo]; persist(); $('btnSound').textContent = 'Game piano on my keys: ' + save.echo; };
   const beatLbl = () => { $('btnBeat').textContent = 'Drum beat: ' + (save.beat ? 'on' : 'off'); }; $('btnBeat').onclick = () => { save.beat = !save.beat; persist(); beatLbl(); };
   $('btnMic').onclick = async () => { const b = $('btnMic'); if (mic) { stopMic(); b.textContent = 'Microphone: off'; chipIn(); return; } b.textContent = 'Microphone: asking…'; const r = await startMic();
-    if (r === true) { b.textContent = 'Microphone: on'; if (save.beat) { save.beat = false; persist(); beatLbl(); } $('micNote').textContent = 'The game now listens for single notes from your piano. Keep the room quiet and the phone close to the keyboard. The beat is off so it can hear you; with headphones on the phone you can switch Drum beat back on. Practice mode works best.'; }
+    if (r === true) { b.textContent = 'Microphone: on'; if (save.beat) { save.beat = false; persist(); beatLbl(); } $('micNote').textContent = 'The game now listens for single notes from your piano. Keep the room quiet and the phone close to the keyboard. In Perform you get a soft click for the beat (the drums stay off so the mic can hear you; with headphones on the phone you can switch Drum beat back on). The game learns the mic delay as you play, so the first notes of a Perform run are judged loosely.'; }
     else { b.textContent = 'Microphone: off'; $('micNote').textContent = window.KOA_BUNDLE ? 'The microphone is blocked inside the Claude app. Open the GitHub link in Safari to use it.' : r === 'NotAllowedError' ? 'Microphone permission was refused. Allow it for this site in Safari settings, then tap again.' : 'Could not start the microphone (' + r + ').'; } chipIn(); };
   $('btnBackup').onclick = () => { const b = $('backupBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; $('saveText').value = JSON.stringify(save); };
   $('btnCopy').onclick = async () => { try { await navigator.clipboard.writeText($('saveText').value); $('btnCopy').textContent = 'Copied'; } catch (e) { $('saveText').select(); } };
@@ -354,11 +354,11 @@
       // arcade village behind the start
       for (const [dx, dz, w, hgt] of [[-5.5, 9, 2.4, 3], [4.5, 11, 2.6, 4.4], [-1, 16, 2.2, 5.5], [8.5, 6, 2, 2.6], [-9, 4, 2, 3.6]]) { const a = P(-.9), g = edged(new T.BoxGeometry(w, hgt, w), 0x0a0524, 0x2ef2ff); g.position.set(a.x + dx, hgt / 2, a.z + dz); for (let r = 0; r < Math.floor(hgt / 1.1); r++) { const win = new T.Mesh(new T.PlaneGeometry(w * .5, .28), basic(r % 2 ? 0xffd24a : 0xff3fd2)); win.position.set(a.x + dx, .8 + r * 1.05, a.z + dz - w / 2 - .02); win.rotation.y = Math.PI; sc.add(win); } }
       // stops
-      o.forEach((id, i) => { const l = lessons[id], st = starsOf(id), open = unlocked(id), v = P(i), colH = !open ? 0x4a3a80 : l.boss ? 0xff3fd2 : l.heroic ? 0xffd24a : st >= 2 ? 0x3dff9a : 0x2ef2ff, r = rec(id);
+      o.forEach((id, i) => { const l = lessons[id], st = starsOf(id), open = unlocked(id), v = P(i), colH = !open ? 0x4a3a80 : l.boss ? 0xff3fd2 : l.heroic ? 0xffd24a : st >= 1 ? 0x3dff9a : 0x2ef2ff, r = rec(id);
         const base = edged(new T.CylinderGeometry(1.5, 1.8, .5, 8), 0x0d0628, colH); base.position.set(v.x, .25, v.z);
         const top = new T.Mesh(new T.CylinderGeometry(1.2, 1.2, .14, 8), basic(colH)); top.position.set(v.x, .57, v.z); sc.add(top);
         if (open) glowAt(new T.Vector3(v.x, 1, v.z), colH, id === cur ? 4.5 : 3);
-        if (l.boss) { const down = st >= 2, c = down ? 0x3dff9a : 0xff3fd2, bxp = v.x + (v.x > 0 ? -6.5 : 6.5), tw = edged(new T.CylinderGeometry(1.6, 2.2, 9, 6), 0x0a0420, c), cap = edged(new T.ConeGeometry(2.3, 3.4, 6), 0x1a0633, c); tw.position.set(bxp, 4.5, v.z - 3); cap.position.set(bxp, 10.7, v.z - 3); glowAt(new T.Vector3(bxp, 6, v.z - 1.2), down ? 0xffd24a : 0xff3fd2, 4); }
+        if (l.boss) { const down = st >= 1, c = down ? 0x3dff9a : 0xff3fd2, bxp = v.x + (v.x > 0 ? -6.5 : 6.5), tw = edged(new T.CylinderGeometry(1.6, 2.2, 9, 6), 0x0a0420, c), cap = edged(new T.ConeGeometry(2.3, 3.4, 6), 0x1a0633, c); tw.position.set(bxp, 4.5, v.z - 3); cap.position.set(bxp, 10.7, v.z - 3); glowAt(new T.Vector3(bxp, 6, v.z - 1.2), down ? 0xffd24a : 0xff3fd2, 4); }
         if (l.heroic) { const cr = new T.Mesh(new T.OctahedronGeometry(1), basic(open ? 0xffd24a : 0x4a3a80, { wireframe: !open })); cr.position.set(v.x, 2.4, v.z); sc.add(cr); m.spin.push(cr); }
         if (id === cur) { const ring = new T.Mesh(new T.TorusGeometry(2.1, .09, 6, 28), basic(colH)); ring.rotation.x = Math.PI / 2; ring.position.set(v.x, .7, v.z); sc.add(ring); m.ring = ring; }
         const title = l.title.replace(/^(BOSS|HEROIC|SONG) · /, ''), tag = l.boss ? 'BOSS · challenge anytime' : l.heroic ? 'HEROIC · two hands' : l.quest ? 'SONG QUEST' : 'Stop ' + (i + 1), hex = '#' + colH.toString(16).padStart(6, '0');
@@ -442,7 +442,7 @@
         { type: 'choice', q: 'And this one?', sounds: [{ label: '▶ Hear the chord', notes: [69, 72, 76], mode: 'together' }], opts: ['Major (bright)', 'Minor (dark)'], a: 1, hint: 'Compare it in your head with the last chord.', why: 'That was A minor.' },
         { type: 'key', q: 'C major is C, E, G. Play the one note you would lower to make it minor.', pcs: [4], hint: 'It is the middle note of the chord.', why: 'E drops a half step to E flat.' }] }
   ];
-  const shrineOpen = S => starsOf(S.after) >= 1 || starsOf(bossId()) >= 2;
+  const shrineOpen = S => starsOf(S.after) >= 1 || starsOf(bossId()) >= 1;
   let shrine = null; const SKLO = 60, SKHI = 79;
   function sizeCv(c) { const r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2); c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, r.width, r.height]; }
   function playSound(snd) {
@@ -541,8 +541,8 @@
     $('inTheory').innerHTML = '<h2 class="disp">Theory rune' + (L.theory.length > 1 ? 's' : '') + '</h2>' + L.theory.map(t => `<div class="t">${t.q}</div><p>${t.a}</p>${t.staff ? staffSVG(t.staff) : ''}<div style="height:10px"></div>`).join('');
     const uniq = h => [...new Set(L.notes.filter(n => n.hand === h && n.pitch !== 'any').map(n => n.pitch))].sort((a, b) => a - b), rs = uniq('R'), ls = uniq('L');
     $('inStaff').innerHTML = (rs.length ? `<p class="small">Every note in this lesson, low to high${ls.length ? ' (right hand)' : ''}:</p>` + staffSVG({ notes: rs, key: L.key }) : '') + (ls.length ? '<p class="small">Left hand:</p>' + staffSVG({ notes: ls, key: L.key, clef: 'bass' }) : ''); $('inStaffCard').style.display = rs.length || ls.length ? 'block' : 'none';
-    const can = (r.stars || 0) >= 2; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
-    $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Earn two stars in Perform to unlock harder runs of this lesson.';
+    const can = (r.stars || 0) >= 1; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
+    $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Finish this lesson once, in Practice or Perform, to unlock harder runs.';
     show('intro');
   }
   $('btnBack').onclick = () => renderMap();
@@ -567,7 +567,7 @@
     const notes = L.notes.map(n => ({ ...n, state: 0 })), [lo, hi] = rangeOf(L), end = Math.max(...notes.map(n => n.start + n.len));
     game = baseGame({ L, mode, tier, notes, lo, hi, end, spb, bar, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
       onPress(m, t, src) {
-        if (this.mode === 'listen' || this.done) return; const byMic = src === 'mic', beatNow = this.beat - (byMic ? .11 / this.spb : 0), same = p => p === 'any' || p === m || (byMic && p % 12 === m % 12), win = byMic ? 270 : GOOD;
+        if (this.mode === 'listen' || this.done) return; const byMic = src === 'mic', lag = byMic ? micLag() : 0, beatNow = this.beat - lag / this.spb, same = p => p === 'any' || p === m || (byMic && p % 12 === m % 12), win = byMic ? 420 : GOOD;
         const stray = () => { this.flash[m] = { t: performance.now(), bad: true }; if (!byMic) { this.strays++; this.combo = 0; } };
         if (this.mode === 'wait') {
           const first = this.notes.find(x => x.state === 0); if (!first) return;
@@ -577,7 +577,7 @@
         }
         let bestN = null, bestD = 1e9;
         for (const n of this.notes) { if (n.state) continue; if (!same(n.pitch)) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
-        if (bestN && bestD <= win) { const q = bestD <= (byMic ? 130 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); } else stray();
+        if (bestN && bestD <= win) { if (byMic) { const raw = (this.beat - bestN.start) * this.spb; save.micLag = Math.max(0, Math.min(.6, lag * .8 + raw * .2)); } const q = bestD <= (byMic ? 150 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); } else stray();
       } });
     $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode];
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
@@ -610,7 +610,7 @@
       if (G.mode !== 'wait' && G.beat <= G.end) drums(G, G.beat, G.bar);
       for (const n of G.notes) { if (n.state) continue;
         if (G.mode === 'listen' && G.beat >= n.start) { n.state = 1; const m = n.pitch === 'any' ? 72 : n.pitch; tone(m, n.hand === 'L' ? .45 : .6, n.len * G.spb * 1.1); G.hit(n, m, 'perfect'); }
-        else if (G.mode === 'perform' && (G.beat - n.start) * G.spb * 1000 > GOOD) { n.state = 3; G.combo = 0; } }
+        else if (G.mode === 'perform' && (G.beat - n.start) * G.spb * 1000 > (mic ? micLag() * 1000 + 430 : GOOD)) { n.state = 3; G.combo = 0; } }
       const count = G.beat < 0 ? Math.ceil(-G.beat) : 0; $('hudMid').textContent = count ? 'Ready… ' + count : (G.combo > 1 ? '×' + G.combo + ' combo' : '');
       if (!G.done && G.notes.every(n => n.state) && G.beat > G.end + (G.mode === 'wait' ? 0 : .5)) { G.done = true; setTimeout(() => { if (game === G) finish(); }, 600); }
     } else { G.beat += dt * 112 / 60; if (save.beat) drums(G, G.beat, 4); }
@@ -718,9 +718,9 @@
     touchStreak();
     persist(); chime(stars >= 2 || G.mode === 'wait');
     $('resStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars) + (passedTier ? (G.tier === 'fast' ? ' ⚡' : ' 👁') : '');
-    $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : G.L.quest ? 'Song cleared!' : 'The grid lights up') : 'Not yet. Again, a little calmer';
+    $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : G.L.quest ? 'Song cleared!' : 'The grid lights up') : stars === 1 ? 'Cleared. Tighten the timing for more stars' : 'Not yet. Again, a little calmer';
     $('resBody').innerHTML = G.mode === 'wait'
-      ? `${total} notes, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}. +${gain} XP.<br>Now try Perform to earn more stars.`
+      ? `${total} notes, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}. +${gain} XP.<br>The next stop is open. Come back and Perform when you want more stars.`
       : `Accuracy ${Math.round(acc * 100)}% · ${perfect} perfect, ${good} good, ${miss} missed · best combo ${G.best}. +${gain} XP.` + (miss > 2 ? '<br>Tip: run Practice once more and count out loud.' : stars >= 2 && !G.tier ? '<br>Want more? Try the ⚡ and 👁 challenge runs.' : '');
     show('results');
   }
