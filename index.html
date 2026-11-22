@@ -90,7 +90,8 @@
   </div>
   <div id="sceneWrap"></div>
   <div class="mapFoot">
-    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button></div>
+    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button></div>
+    <p class="small" id="micNote" style="margin-top:8px"></p>
     <div id="backupBox" style="display:none"><textarea id="saveText"></textarea><div class="rowb" style="margin-top:8px"><button class="ghost" id="btnCopy">Copy</button><button class="ghost" id="btnRestore">Restore from text</button></div></div>
   </div>
 </div>
@@ -173,13 +174,13 @@
   function noise(dur, type, freq, v) { if (!ctx) return; if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate * .3, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), now = ctx.currentTime; s.buffer = noiseBuf; f.type = type; f.frequency.value = freq; g.gain.setValueAtTime(v, now); g.gain.exponentialRampToValueAtTime(.0005, now + dur); s.connect(f); f.connect(g); g.connect(master); s.start(now); s.stop(now + dur + .02); }
   function kick(v) { if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), now = ctx.currentTime; o.frequency.setValueAtTime(160, now); o.frequency.exponentialRampToValueAtTime(42, now + .13); g.gain.setValueAtTime(v, now); g.gain.exponentialRampToValueAtTime(.0005, now + .22); o.connect(g); g.connect(master); o.start(now); o.stop(now + .24); }
   const hat = v => noise(.045, 'highpass', 7500, v), snare = v => { noise(.13, 'bandpass', 1900, v); };
-  function drums(G, beat, bar) { const fb = Math.floor(beat + 1e-6), hb = Math.floor(beat * 2 + 1e-6); if (fb !== G.lastClick) { G.lastClick = fb; const i = ((fb % bar) + bar) % bar; if (save.beat && beat >= 0) { kick(i === 0 ? .95 : .7); if (bar === 4 ? (i === 1 || i === 3) : i === bar - 1) snare(.3); } else click(i === 0); } if (save.beat && beat >= 0 && hb !== G.lastHat) { G.lastHat = hb; if (((hb % 2) + 2) % 2 === 1) hat(.1); } }
+  function drums(G, beat, bar) { const fb = Math.floor(beat + 1e-6), hb = Math.floor(beat * 2 + 1e-6); if (fb !== G.lastClick) { G.lastClick = fb; const i = ((fb % bar) + bar) % bar; if (save.beat && beat >= 0) { kick(i === 0 ? .95 : .7); if (bar === 4 ? (i === 1 || i === 3) : i === bar - 1) snare(.3); } else if (!mic) click(i === 0); } if (save.beat && beat >= 0 && hb !== G.lastHat) { G.lastHat = hb; if (((hb % 2) + 2) % 2 === 1) hat(.1); } }
   function chime(ok) { if (!ctx) return; (ok ? [72, 76, 79, 84] : [60, 58]).forEach((m, i) => setTimeout(() => tone(m, .5, .5), i * 110)); }
 
   // ---------------- Input ----------------
   let midiName = ''; const held = {};
-  const echoOn = src => save.echo === 'on' || (save.echo === 'auto' && src !== 'midi');
-  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; game && game.onPress(m, performance.now()); shrine && shrine.onPress(m); }
+  const echoOn = src => src !== 'mic' && (save.echo === 'on' || (save.echo === 'auto' && src !== 'midi'));
+  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; game && game.onPress(m, performance.now(), src); shrine && shrine.onPress(m); }
   function release(m) { delete held[m]; stopTone(m); }
   async function initMidi() {
     if (!navigator.requestMIDIAccess) return;
@@ -189,7 +190,31 @@
       acc.onstatechange = hook; hook();
     } catch (e) {}
   }
-  function chipIn() { const c = $('chipIn'); if (midiName) { c.textContent = '🎹 ' + midiName; c.classList.add('ok'); } else { c.textContent = 'Touch keys'; c.classList.remove('ok'); } }
+  function chipIn() { const c = $('chipIn'); if (midiName) { c.textContent = '🎹 ' + midiName; c.classList.add('ok'); } else if (mic) { c.textContent = '🎤 Mic listening'; c.classList.add('ok'); } else { c.textContent = 'Touch keys'; c.classList.remove('ok'); } }
+
+  // ---------------- Microphone input (single notes; for playing without a cable) ----------------
+  let mic = null;
+  function yin(b, sr) { const W = 1024, tMin = Math.floor(sr / 1100), tMax = Math.min(Math.floor(sr / 170), b.length - W - 1), d = new Float32Array(tMax + 2); let run = 0, best = -1;
+    for (let tau = 1; tau <= tMax + 1; tau++) { let s = 0; for (let i = 0; i < W; i++) { const x = b[i] - b[i + tau]; s += x * x; } run += s; d[tau] = s * tau / (run || 1); }
+    for (let tau = tMin; tau < tMax; tau++) if (d[tau] < .15) { while (tau + 1 < tMax && d[tau + 1] < d[tau]) tau++; best = tau; break; }
+    if (best < 2) return -1; const a = d[best - 1], c = d[best + 1], den = a - 2 * d[best] + c, sh = den ? (a - c) / (2 * den) : 0; return sr / (best + (Math.abs(sh) < 1 ? sh : 0)); }
+  async function startMic() {
+    if (mic) return true; if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return 'unsupported';
+    try { const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); if (!ctx) initAudio(); await ctx.resume();
+      const src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(); an.fftSize = 2048; src.connect(an);
+      mic = { stream, an, buf: new Float32Array(2048), last: -1, stable: 0, cur: -1, prev: 0, armed: false, onsetT: 0, level: 0, note: -1, noteT: 0 }; requestAnimationFrame(micLoop); return true;
+    } catch (e) { return e.name || 'error'; }
+  }
+  function stopMic() { if (!mic) return; try { mic.stream.getTracks().forEach(t => t.stop()); } catch (e) {} mic = null; }
+  function micLoop() {
+    const k = mic; if (!k) return; const now = performance.now(), b = k.buf; k.an.getFloatTimeDomainData(b); let r = 0; for (let i = 0; i < b.length; i++) r += b[i] * b[i]; r = Math.sqrt(r / b.length); k.level = r;
+    if (r > .012 && r > k.prev * 1.45 && now - k.onsetT > 90) { k.armed = true; k.onsetT = now; k.stable = 0; k.last = -1; } // a new attack
+    if (k.armed && now - k.onsetT > 260) k.armed = false; k.prev = k.prev * .7 + r * .3;
+    let m = -1; if (r > .01) { const f = yin(b, ctx.sampleRate); if (f > 0) m = Math.round(69 + 12 * Math.log2(f / 440)); }
+    if (m > 0 && m === k.last) k.stable++; else k.stable = 0; k.last = m;
+    if (m > 0 && k.stable >= 1 && (k.armed || (m !== k.cur && now - k.onsetT > 160)) && !(m === k.note && now - k.noteT < 220)) { k.armed = false; k.cur = m; k.note = m; k.noteT = now; press(m, .7, 'mic'); setTimeout(() => release(m), 180); }
+    if (r < .006) k.cur = -1; requestAnimationFrame(micLoop);
+  }
 
   // ---------------- Lessons ----------------
   let index = null; const lessons = {};
@@ -271,6 +296,9 @@
   }
   $('btnSound').onclick = () => { save.echo = { auto: 'on', on: 'off', off: 'auto' }[save.echo]; persist(); $('btnSound').textContent = 'Game piano on my keys: ' + save.echo; };
   const beatLbl = () => { $('btnBeat').textContent = 'Drum beat: ' + (save.beat ? 'on' : 'off'); }; $('btnBeat').onclick = () => { save.beat = !save.beat; persist(); beatLbl(); };
+  $('btnMic').onclick = async () => { const b = $('btnMic'); if (mic) { stopMic(); b.textContent = 'Microphone: off'; chipIn(); return; } b.textContent = 'Microphone: asking…'; const r = await startMic();
+    if (r === true) { b.textContent = 'Microphone: on'; if (save.beat) { save.beat = false; persist(); beatLbl(); } $('micNote').textContent = 'The game now listens for single notes from your piano. Keep the room quiet and the phone close to the keyboard. The beat is off so it can hear you; with headphones on the phone you can switch Drum beat back on. Practice mode works best.'; }
+    else { b.textContent = 'Microphone: off'; $('micNote').textContent = window.KOA_BUNDLE ? 'The microphone is blocked inside the Claude app. Open the GitHub link in Safari to use it.' : r === 'NotAllowedError' ? 'Microphone permission was refused. Allow it for this site in Safari settings, then tap again.' : 'Could not start the microphone (' + r + ').'; } chipIn(); };
   $('btnBackup').onclick = () => { const b = $('backupBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; $('saveText').value = JSON.stringify(save); };
   $('btnCopy').onclick = async () => { try { await navigator.clipboard.writeText($('saveText').value); $('btnCopy').textContent = 'Copied'; } catch (e) { $('saveText').select(); } };
   $('btnRestore').onclick = () => { try { const s = JSON.parse($('saveText').value); if (!s.stats) throw 0; save = Object.assign(blank(), s); persist(); renderMap(); } catch (e) { $('btnRestore').textContent = 'Not a valid save'; } };
@@ -538,17 +566,18 @@
     const L = current, tempo = L.tempo * (tier === 'fast' ? 1.25 : 1), spb = 60 / tempo, bar = L.timeSig[0];
     const notes = L.notes.map(n => ({ ...n, state: 0 })), [lo, hi] = rangeOf(L), end = Math.max(...notes.map(n => n.start + n.len));
     game = baseGame({ L, mode, tier, notes, lo, hi, end, spb, bar, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
-      onPress(m) {
-        if (this.mode === 'listen' || this.done) return; const beatNow = this.beat;
+      onPress(m, t, src) {
+        if (this.mode === 'listen' || this.done) return; const byMic = src === 'mic', beatNow = this.beat - (byMic ? .11 / this.spb : 0), same = p => p === 'any' || p === m || (byMic && p % 12 === m % 12), win = byMic ? 270 : GOOD;
+        const stray = () => { this.flash[m] = { t: performance.now(), bad: true }; if (!byMic) { this.strays++; this.combo = 0; } };
         if (this.mode === 'wait') {
           const first = this.notes.find(x => x.state === 0); if (!first) return;
-          const n = this.notes.find(x => x.state === 0 && x.start === first.start && (x.pitch === 'any' || x.pitch === m));
-          if (n && n.start - beatNow < 0.6) { n.state = 1; this.hit(n, m, 'perfect'); this.beat = Math.max(this.beat, n.start); } else { this.strays++; this.combo = 0; this.flash[m] = { t: performance.now(), bad: true }; }
+          const n = this.notes.find(x => x.state === 0 && x.start === first.start && same(x.pitch));
+          if (n && n.start - this.beat < 0.6) { n.state = 1; this.hit(n, n.pitch === 'any' ? m : n.pitch, 'perfect'); this.beat = Math.max(this.beat, n.start); } else stray();
           return;
         }
         let bestN = null, bestD = 1e9;
-        for (const n of this.notes) { if (n.state) continue; if (n.pitch !== 'any' && n.pitch !== m) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
-        if (bestN && bestD <= GOOD) { bestN.state = bestD <= PERFECT ? 1 : 2; this.hit(bestN, m, bestD <= PERFECT ? 'perfect' : 'good'); } else { this.strays++; this.combo = 0; this.flash[m] = { t: performance.now(), bad: true }; }
+        for (const n of this.notes) { if (n.state) continue; if (!same(n.pitch)) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
+        if (bestN && bestD <= win) { const q = bestD <= (byMic ? 130 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); } else stray();
       } });
     $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode];
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
@@ -635,6 +664,7 @@
     wi = 0; for (let m = 21; m <= 108; m++) { if (isBlack(m)) { g2.fillStyle = '#0a0818'; g2.fillRect(wi * w - w * .28, y + 3, w * .56, (lay.stripH - 17) * .55); } else wi++; }
     g2.fillStyle = '#ffd24a'; g2.beginPath(); g2.moveTo(mc, y + 16); g2.lineTo(mc - 4, y + lay.stripH - 3); g2.lineTo(mc + 4, y + lay.stripH - 3); g2.fill();
     g2.font = '700 9px sans-serif'; g2.textAlign = 'left'; g2.fillText('Middle C', mc + 7, y + lay.stripH - 3); g2.fillStyle = '#6d66a3'; g2.fillText('your 88 keys', 4, y + lay.stripH - 3);
+    if (mic) { const heard = performance.now() - mic.noteT < 700 && mic.note > 0; g2.textAlign = 'right'; g2.fillStyle = heard ? '#3dff9a' : '#9a93c9'; g2.fillText('🎤 ' + (heard ? 'heard ' + NAMES[mic.note % 12] : 'listening'), W - 6, y + lay.stripH - 3); g2.fillStyle = '#3dff9a'; g2.fillRect(W - 66, y + 1, Math.min(60, mic.level * 600), 2); g2.textAlign = 'left'; }
   }
 
   const LET = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
@@ -704,7 +734,7 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  window.__koa = { startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>
