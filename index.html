@@ -413,6 +413,29 @@
         { type: 'key', q: 'Play any C.', pcs: [0], hint: 'C is the white key just left of a pair of two black keys.', why: 'Every C on the piano is the same note at a different octave.' },
         { type: 'choice', q: 'Listen to both pairs. Which pair is an octave: the same note, higher?', sounds: [{ label: '▶ First pair', notes: [60, 67], gap: 420 }, { label: '▶ Second pair', notes: [60, 72], gap: 420 }], opts: ['First pair', 'Second pair'], a: 1, hint: 'The octave sounds like one note copying the other, higher up.', why: 'The second pair was C to the next C. The first was C to G.' },
         { type: 'choice', q: 'How many half steps are there from one C to the next C?', opts: ['7', '8', '12'], a: 2, hint: 'Count white and black keys together.', why: '7 white + 5 black = 12.' }] },
+    { id: 'sh-letters', after: 'r1-02-steps', title: 'Why the notes have letters, and why C', short: 'Why letters, why C',
+    takeaway: 'Letters are medieval labels for a seven-note scale. C is the reference only because the bright major scale needs no black keys when it starts there.',
+    pages: [
+      { h: 'The letters are just name tags', t: 'About a thousand years ago, monks writing down chants needed names for their notes. Their scale had seven different notes, so they used seven letters, A to G, starting from the lowest note they sang. After G the next note is the octave, the same note higher, so the letters start again at A. The sound is physics. The letters are history.', hl: { 69: 'A', 71: 'B', 72: 'C', 74: 'D', 76: 'E', 77: 'F', 79: 'G', 81: 'A' }, demos: [{ label: '▶ A to A', notes: [69, 71, 72, 74, 76, 77, 79, 81], gap: 280 }] },
+      { h: 'So why does everything start at C?', t: 'Play the white keys from A to A and you get the old home scale. Today we call it A minor: the shadowed sound of Für Elise. Centuries later, music came to favour the brighter major sound, and the only place the major scale fits on white keys alone is from C to C. So C became the reference point, but nobody renamed the notes. That is why the alphabet of music seems to start on its third letter.', hl: { 60: 'C', 69: 'A', 72: 'C', 81: 'A' }, demos: [{ label: '▶ A to A (minor)', notes: [69, 71, 72, 74, 76, 77, 79, 81], gap: 260 }, { label: '▶ C to C (major)', notes: [60, 62, 64, 65, 67, 69, 71, 72], gap: 260 }] },
+      { h: 'Twelve notes, only seven letters', t: 'The five black keys never got letters of their own. They borrow a neighbour\'s name. Sharp (♯) means the very next key to the right, flat (♭) the very next key to the left. So the black key between C and D is both C sharp and D flat: two names, one key, one sound. Which name is used depends on the scale the music is in.', hl: { 60: 'C', 61: 'C♯', 62: 'D', 63: 'D♯', 64: 'E', 66: 'F♯', 68: 'G♯', 70: 'A♯' }, demos: [{ label: '▶ C, C sharp, D', notes: [60, 61, 62], gap: 380 }] }],
+    quiz: [
+      { type: 'key', q: 'Play any A.', pcs: [9], hint: 'In each group of three black keys, A sits between the second and third black key.', why: 'A was the first letter because it was the lowest note of the old system.' },
+      { type: 'choice', q: 'Listen. Which scale is the white keys from A to A?', sounds: [{ label: '▶ First', notes: [60, 62, 64, 65, 67, 69, 71, 72], gap: 230 }, { label: '▶ Second', notes: [69, 71, 72, 74, 76, 77, 79, 81], gap: 230 }], opts: ['First', 'Second'], a: 1, hint: 'A to A is the darker, minor one.', why: 'The first was C to C, the major scale.' },
+      { type: 'key', q: 'Play D flat.', pcs: [1], hint: 'Flat means the very next key to the left of D.', why: 'The same key is also called C sharp.' },
+      { type: 'choice', q: 'Why do the letters start again after G?', opts: ['There are only seven keys', 'The next note is the octave: the same note, higher', 'It is a tuning mistake'], a: 1, hint: 'Think about what doubling the speed of a note does.', why: 'Seven letters name the seven notes of the scale, then the octave repeats them.' }] },
+  { id: 'sh-seven', after: 'r1-05-g-home', title: 'Why seven white keys and five black', short: 'Why 7 white, 5 black',
+    takeaway: 'Stack the smoothest interval, the fifth, and you get seven notes, then five more, then you are home. The black-key pattern is the fingerprint of that scale.',
+    pages: [
+      { h: 'Build a scale from the smoothest sound', t: 'After the octave, the smoothest blend is the fifth, the 3 to 2 ratio. So do the obvious thing: start on F and keep jumping up a fifth. F, C, G, D, A, E, B. Seven different notes. Gather them into one octave and look at the keyboard: they are exactly the white keys. The white keys are not arbitrary. They are the first seven notes you find by stacking fifths.', circle: true, demos: [{ label: '▶ Stack the fifths', notes: [65, 72, 67, 74, 69, 76, 71], gap: 520, keep: true }] },
+      { h: 'Keep going: here come the black keys', t: 'Do not stop at seven. Five more fifths give F sharp, C sharp, G sharp, D sharp, A sharp: the five black keys. One more jump lands back on F (very nearly: the piano is tuned a hair off pure so the circle closes exactly). That is why music has 12 notes and not 10 or 15. Twelve is where the circle of fifths comes home.', circle: true, hl: { 65: 'F', 72: 'C', 67: 'G', 74: 'D', 69: 'A', 76: 'E', 71: 'B' }, demos: [{ label: '▶ Five more fifths', notes: [66, 73, 68, 75, 70], gap: 520, keep: true }] },
+      { h: 'Why the black keys sit in twos and threes', t: 'Line the seven white notes up from low to high and measure the gaps. Five gaps are whole steps: there is room for one of the later notes in between, and that is where a black key goes. Two gaps, E to F and B to C, are only half steps: no room, so no black key. Result: black keys in a group of two, then a group of three. The layout is a fingerprint of the scale, and a free map for your hands.', hl: { 60: 'C', 62: 'D', 64: 'E', 65: 'F', 67: 'G', 69: 'A', 71: 'B', 72: 'C', 61: '•', 63: '•', 66: '•', 68: '•', 70: '•' } },
+      { h: 'Bonus: the black keys alone', t: 'Play only black keys, in any order. It is hard to make them sound wrong. Those five notes form the pentatonic scale, found in folk music all over the world. Try it now on the keys below.', hl: { 61: '', 63: '', 66: '', 68: '', 70: '' }, demos: [{ label: '▶ A black-key tune', notes: [66, 68, 70, 73, 70, 68, 66, 63, 61, 63, 66], gap: 260 }] }],
+    quiz: [
+      { type: 'choice', q: 'Jump up a fifth from C. Where do you land?', opts: ['F', 'G', 'A'], a: 1, hint: 'Your two landmarks: thumb on C, pinky on…', why: 'C to G is a fifth: five letters, seven half steps.' },
+      { type: 'key', q: 'Play the note a fifth above G.', pcs: [2], hint: 'Count five letters starting on G: G, A, B, C, …', why: 'G to D. Keep going and you get A, E, B: the rest of the white keys.' },
+      { type: 'choice', q: 'How many jumps of a fifth before you arrive back where you started?', opts: ['5', '7', '12'], a: 2, hint: 'Seven white notes, then five black ones.', why: 'That is why there are exactly 12 notes.' },
+      { type: 'choice', q: 'Why is there no black key between E and F?', opts: ['The piano maker ran out of room', 'E and F are already only a half step apart', 'F is a special note'], a: 1, hint: 'A black key fills a whole step. How big is the gap from E to F?', why: 'Same story for B and C.' }] },
     { id: 'sh-keys', after: 'r1-03-five', title: 'Why black and white keys', short: 'Why black + white keys', takeaway: 'The white keys are the major-scale recipe starting on C. Black keys let the same recipe start anywhere.',
       pages: [
         { h: 'The black keys are a map', t: 'If all 12 keys looked alike you would be lost. The black keys come in groups of two and three, and that pattern is your map. C is always just left of the two. F is always just left of the three.', hl: { 60: 'C', 65: 'F', 72: 'C', 77: 'F' } },
@@ -443,12 +466,12 @@
         { type: 'key', q: 'C major is C, E, G. Play the one note you would lower to make it minor.', pcs: [4], hint: 'It is the middle note of the chord.', why: 'E drops a half step to E flat.' }] }
   ];
   const shrineOpen = S => starsOf(S.after) >= 1 || starsOf(bossId()) >= 1;
-  let shrine = null; const SKLO = 60, SKHI = 79;
+  let shrine = null; const SKLO = 60, SKHI = 84;
   function sizeCv(c) { const r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2); c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return [x, r.width, r.height]; }
   function playSound(snd) {
     if (snd.pulse) { shrine.pulseN = snd.pulse; shrine.pulseT0 = performance.now(); shrine.pulseLeft = snd.pulse * 3; return; }
     if (snd.viz) shrine.viz = snd.viz; else if (shrine.viz && snd.notes.length <= 2 && !shrine.quiz) shrine.viz = snd.notes;
-    snd.notes.forEach((m, i) => setTimeout(() => { if (!shrine) return; tone(m, .6, snd.mode === 'together' ? 1.6 : .7); shrine.flash[m] = performance.now(); }, snd.mode === 'together' ? 0 : i * (snd.gap || 300)));
+    snd.notes.forEach((m, i) => setTimeout(() => { if (!shrine) return; tone(m, .6, snd.mode === 'together' ? 1.6 : .7); shrine.flash[m] = performance.now(); if (snd.keep) shrine.hl = Object.assign({}, shrine.hl, { [m]: NAMES[m % 12] }); }, snd.mode === 'together' ? 0 : i * (snd.gap || 300)));
   }
   function openShrine(id) {
     const S = SHRINES.find(x => x.id === id); shrine = { S, step: 0, quiz: false, q: 0, viz: null, hl: {}, flash: {}, pulseN: 0, pulseT0: 0, pulseLast: -1, pulseLeft: 0, lock: false,
@@ -460,16 +483,16 @@
     const sh = shrine, S = sh.S; $('shTitle').textContent = S.title; $('shFb').textContent = ''; sh.lock = false; sh.pulseN = 0; sh.pulseLeft = 0;
     const btn = (label, cls, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = cls; b.onclick = fn; return b; };
     const demo = $('shDemo'), nav = $('shNav'); demo.innerHTML = ''; nav.innerHTML = '';
-    if (sh.done) { $('shDots').textContent = 'Rune learned'; $('shH').textContent = '✦ Rune learned'; $('shT').textContent = S.takeaway + (sh.gain ? ` +${sh.gain} XP.` : ''); sh.viz = null; sh.hl = {}; nav.appendChild(btn('Walk on ▶', '', () => { shrine = null; renderMap(true); })); }
-    else if (!sh.quiz) { const p = S.pages[sh.step]; $('shDots').textContent = `Page ${sh.step + 1} of ${S.pages.length}`; $('shH').textContent = p.h; $('shT').textContent = p.t; sh.viz = p.viz || null; sh.hl = p.hl || {};
+    if (sh.done) { $('shDots').textContent = 'Rune learned'; $('shH').textContent = '✦ Rune learned'; $('shT').textContent = S.takeaway + (sh.gain ? ` +${sh.gain} XP.` : ''); sh.viz = null; sh.hl = {}; sh.circle = false; nav.appendChild(btn('Walk on ▶', '', () => { shrine = null; renderMap(true); })); }
+    else if (!sh.quiz) { const p = S.pages[sh.step]; $('shDots').textContent = `Page ${sh.step + 1} of ${S.pages.length}`; $('shH').textContent = p.h; $('shT').textContent = p.t; sh.viz = p.viz || null; sh.hl = p.hl || {}; sh.circle = !!p.circle;
       if (p.pulse) { sh.pulseN = p.pulse; sh.pulseT0 = performance.now(); sh.pulseLeft = 1e9; sh.plain = !!p.plain; }
       (p.demos || []).forEach(d => demo.appendChild(btn(d.label, 'gold', () => { if (d.pulse) { sh.pulseN = d.pulse; sh.pulseT0 = performance.now(); sh.pulseLast = -1; sh.plain = false; } else playSound(d); })));
       if (sh.step > 0) nav.appendChild(btn('◀ Back', 'ghost', () => { sh.step--; renderShrine(); }));
       nav.appendChild(sh.step < S.pages.length - 1 ? btn('Next ▶', '', () => { sh.step++; renderShrine(); }) : btn('Take the rune test ▶', 'pink', () => { sh.quiz = true; sh.q = 0; renderShrine(); })); }
-    else { const it = S.quiz[sh.q]; $('shDots').textContent = `Rune test ${sh.q + 1} of ${S.quiz.length}`; $('shH').textContent = it.type === 'key' ? 'Answer on the keys' : 'Choose'; $('shT').textContent = it.q; sh.viz = null; sh.hl = {};
+    else { const it = S.quiz[sh.q]; $('shDots').textContent = `Rune test ${sh.q + 1} of ${S.quiz.length}`; $('shH').textContent = it.type === 'key' ? 'Answer on the keys' : 'Choose'; $('shT').textContent = it.q; sh.viz = null; sh.hl = {}; sh.circle = false;
       (it.sounds || []).forEach(d => demo.appendChild(btn(d.label, 'gold', () => playSound(d))));
       if (it.type === 'choice') it.opts.forEach((o, i) => nav.appendChild(btn(o, '', () => { if (!sh.lock) answer(i === it.a); }))); else $('shFb').textContent = 'Tap a key below, or play it on your piano.'; }
-    $('sv').style.display = (sh.viz || sh.pulseN) ? 'block' : 'none';
+    $('sv').style.display = (sh.viz || sh.pulseN || sh.circle) ? 'block' : 'none';
   }
   function answer(ok) {
     const sh = shrine, it = sh.S.quiz[sh.q];
@@ -485,6 +508,11 @@
       if (sh.pulseN) { const period = 60000 / 84, k = Math.floor((now - sh.pulseT0) / period), n = sh.pulseN, running = sh.pulseLeft > 0;
         if (running && k !== sh.pulseLast) { sh.pulseLast = k; sh.pulseLeft--; click(!sh.plain && k % n === 0); }
         for (let i = 0; i < n; i++) { const cx = W * (i + .5) / n, on = running && k % n === i, strong = i === 0 && !sh.plain; x.beginPath(); x.arc(cx, H * .45, (strong ? 22 : 15) + (on ? 8 : 0), 0, 2 * Math.PI); x.fillStyle = on ? (strong ? '#ff3fd2' : '#2ef2ff') : '#1d1838'; x.shadowColor = x.fillStyle; x.shadowBlur = on ? 22 : 0; x.fill(); x.shadowBlur = 0; x.fillStyle = '#9a93c9'; x.font = `${strong ? 800 : 600} ${strong ? 15 : 12}px sans-serif`; x.textAlign = 'center'; x.fillText(strong ? 'ONE' : ['one', 'two', 'three', 'four'][i], cx, H - 14); } }
+      else if (sh.circle) { const ORD = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5], cx = W / 2, cy = H / 2, R = Math.min(H * .38, 62), lit = {}; Object.keys(sh.hl).forEach(m => { lit[m % 12] = 1; }); const pt = i => [cx + R * Math.sin(i * Math.PI / 6), cy - R * Math.cos(i * Math.PI / 6)];
+        x.strokeStyle = '#2a2450'; x.lineWidth = 1.5; x.beginPath(); x.arc(cx, cy, R, 0, 2 * Math.PI); x.stroke();
+        x.strokeStyle = '#ffd24a'; x.lineWidth = 2; x.shadowColor = '#ffd24a'; x.shadowBlur = 8; for (let i = 0; i < 12; i++) { const a = ORD[i], b = ORD[(i + 1) % 12]; if (lit[a] && lit[b]) { const [x1, y1] = pt(i), [x2, y2] = pt(i + 1); x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke(); } } x.shadowBlur = 0;
+        ORD.forEach((pc, i) => { const [px, py] = pt(i), bl = isBlack(pc), on = lit[pc]; x.beginPath(); x.arc(px, py, on ? 11 : 8, 0, 2 * Math.PI); x.fillStyle = on ? (bl ? '#ff3fd2' : '#ffe9a0') : '#1d1838'; x.shadowColor = x.fillStyle; x.shadowBlur = on ? 12 : 0; x.fill(); x.shadowBlur = 0; x.fillStyle = on ? '#120f24' : '#6d66a3'; x.font = '700 9px sans-serif'; x.textAlign = 'center'; x.fillText(NAMES[pc], px, py + 3); });
+        x.fillStyle = '#9a93c9'; x.font = '600 10px sans-serif'; x.textAlign = 'left'; x.fillText('each step clockwise', 8, 16); x.fillText('= up a fifth', 8, 30); x.textAlign = 'right'; x.fillText(Object.keys(lit).length + ' of 12 notes', W - 8, 16); }
       else if (sh.viz) { const ns = sh.viz, base = Math.min(...ns), cols = ['#2ef2ff', '#ff3fd2'], rows = ns.length + (ns.length > 1 ? 1 : 0), band = H / rows, ph = now / 500;
         const wave = (f, yc, col, amp, lw) => { x.strokeStyle = col; x.lineWidth = lw; x.shadowColor = col; x.shadowBlur = 8; x.beginPath(); for (let px = 0; px <= W; px += 2) { const y = yc - f(px / W) * amp; px ? x.lineTo(px, y) : x.moveTo(px, y); } x.stroke(); x.shadowBlur = 0; };
         const fr = ns.map(n => Math.pow(2, (n - base) / 12)), cyc = ns.length === 1 ? 3 * Math.pow(2, (ns[0] - 60) / 12) : 3;
