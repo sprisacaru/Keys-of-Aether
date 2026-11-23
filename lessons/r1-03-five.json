@@ -12,7 +12,7 @@
  },
  "id": "r1-03-five",
  "title": "Five fingers, C to G",
- "tempo": 69,
+ "tempo": 84,
  "skills": [
   "technique",
   "reading"
@@ -37,10 +37,10 @@
     ]
    },
    "q": "Skip",
-   "a": "Jumping over one note: line to line, or space to space. On the keys you skip one white key."
+   "a": "Jumping over one letter: line to the next line, or space to the next space. On the keys you skip one white key. C to E is a skip; so is E to G."
   }
  ],
- "intro": "All five fingers now, C up to G. Bar 3 uses skips: line to line on the staff.",
+ "intro": "All five fingers, C up to G, mixing steps and skips. Skips look like line-to-line or space-to-space on the staff.",
  "notes": [
   {
    "pitch": 60,
@@ -77,41 +77,25 @@
   {
    "pitch": 67,
    "start": 4,
-   "len": 1,
+   "len": 2,
    "hand": "R",
    "finger": 5,
    "vel": 0.7
   },
   {
-   "pitch": 65,
-   "start": 5,
-   "len": 1,
-   "hand": "R",
-   "finger": 4,
-   "vel": 0.7
-  },
-  {
    "pitch": 64,
    "start": 6,
-   "len": 1,
+   "len": 2,
    "hand": "R",
    "finger": 3,
    "vel": 0.7
   },
   {
-   "pitch": 62,
-   "start": 7,
-   "len": 1,
-   "hand": "R",
-   "finger": 2,
-   "vel": 0.7
-  },
-  {
-   "pitch": 60,
+   "pitch": 65,
    "start": 8,
    "len": 1,
    "hand": "R",
-   "finger": 1,
+   "finger": 4,
    "vel": 0.7
   },
   {
@@ -123,24 +107,32 @@
    "vel": 0.7
   },
   {
-   "pitch": 67,
+   "pitch": 62,
    "start": 10,
    "len": 1,
    "hand": "R",
-   "finger": 5,
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
    "vel": 0.7
   },
   {
    "pitch": 64,
-   "start": 11,
-   "len": 1,
+   "start": 12,
+   "len": 2,
    "hand": "R",
    "finger": 3,
    "vel": 0.7
   },
   {
    "pitch": 60,
-   "start": 12,
+   "start": 14,
    "len": 2,
    "hand": "R",
    "finger": 1,
@@ -148,7 +140,103 @@
   },
   {
    "pitch": 60,
-   "start": 14,
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 17,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 18,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 19,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 20,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 21,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 22,
+   "len": 2,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 24,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 25,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 28,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 30,
    "len": 2,
    "hand": "R",
    "finger": 1,

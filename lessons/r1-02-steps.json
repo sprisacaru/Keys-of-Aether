@@ -12,7 +12,7 @@
  },
  "id": "r1-02-steps",
  "title": "Steps: C D E",
- "tempo": 66,
+ "tempo": 80,
  "skills": [
   "reading",
   "technique"
@@ -38,10 +38,10 @@
     ]
    },
    "q": "Step",
-   "a": "Moving to the very next note: line to the next space, or space to the next line. On the keys it is the next white key."
+   "a": "On the staff, a step is the move from a line to the very next space, or a space to the very next line. Each line and each space is one letter, so a step is one letter: C to D, D to E. On the keys it is the next white key."
   }
  ],
- "intro": "A step on the staff is line to space or space to line. Read the direction: up, down, or same.",
+ "intro": "A step on the staff is line to space or space to line. Read the direction of each move: up, down, or same. Do not name every note; follow the shape.",
  "notes": [
   {
    "pitch": 60,
@@ -132,8 +132,112 @@
    "vel": 0.7
   },
   {
-   "pitch": 60,
+   "pitch": 64,
    "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 17,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 18,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 19,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 20,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 21,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 22,
+   "len": 2,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 24,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 25,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 28,
+   "len": 2,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 30,
    "len": 2,
    "hand": "R",
    "finger": 1,

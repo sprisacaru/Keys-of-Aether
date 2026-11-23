@@ -1,0 +1,269 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "F",
+ "hand": "R",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-13-three-homes",
+ "title": "Three homes, one piece",
+ "tempo": 84,
+ "skills": [
+  "technique",
+  "reading"
+ ],
+ "introduces": {
+  "pitches": [],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Shift in the gap",
+  "feel": "After each long note, lift and move the whole arm to the next position: thumb to G, then thumb to F, then back to C. Look ahead at the staff during the long note."
+ },
+ "theory": [
+  {
+   "q": "Position shift",
+   "a": "Real music rarely stays under five fingers. Players move the hand during long notes or rests. The fingering numbers tell you where a new position starts: a sudden finger 1 on a higher note means \"move here\"."
+  }
+ ],
+ "intro": "One piece, three hand positions: C, then G, then F with its B flat, then home. The first real test of reading while moving.",
+ "notes": [
+  {
+   "pitch": 60,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 2,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 4,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 4.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 5.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 6,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 8,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 74,
+   "start": 10,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 74,
+   "start": 12,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 12.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 71,
+   "start": 13,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 13.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 17,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 18,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 72,
+   "start": 20,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 70,
+   "start": 20.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 69,
+   "start": 21,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 21.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 22,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 24,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 25,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 28,
+   "len": 4,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  }
+ ]
+}

@@ -1,0 +1,261 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "L",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-11-left-hand",
+ "title": "The left hand",
+ "tempo": 76,
+ "skills": [
+  "technique",
+  "reading"
+ ],
+ "introduces": {
+  "pitches": [
+   "C3",
+   "D3",
+   "E3",
+   "F3",
+   "G3"
+  ],
+  "lengths": []
+ },
+ "technique": {
+  "title": "Mirror image",
+  "feel": "Left pinky (5) on the C below Middle C, thumb (1) on G. The finger numbers run the other way: going up the keys, the left hand counts 5, 4, 3, 2, 1."
+ },
+ "theory": [
+  {
+   "staff": {
+    "clef": "bass",
+    "notes": [
+     48,
+     50,
+     52,
+     53,
+     55
+    ]
+   },
+   "q": "Bass clef",
+   "a": "The lower staff, for lower notes. Its two dots sit either side of the F line: the clef is an old letter F. The same line-space-line logic applies, but the lines have different letters than in the treble staff, so learn it by its own landmark, F."
+  }
+ ],
+ "intro": "Left hand alone, reading the bass staff. Same steps and skips as before; only the landmark changes.",
+ "notes": [
+  {
+   "pitch": 48,
+   "start": 0,
+   "len": 1,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 50,
+   "start": 1,
+   "len": 1,
+   "hand": "L",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 2,
+   "len": 1,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 53,
+   "start": 3,
+   "len": 1,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 4,
+   "len": 2,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 6,
+   "len": 2,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 53,
+   "start": 8,
+   "len": 1,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 9,
+   "len": 1,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 50,
+   "start": 10,
+   "len": 1,
+   "hand": "L",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 11,
+   "len": 1,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 12,
+   "len": 2,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 14,
+   "len": 2,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 16,
+   "len": 1,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 17,
+   "len": 1,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 18,
+   "len": 1,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 19,
+   "len": 1,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 53,
+   "start": 20,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 20.5,
+   "len": 0.5,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 50,
+   "start": 21,
+   "len": 1,
+   "hand": "L",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 53,
+   "start": 22,
+   "len": 2,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 24,
+   "len": 1,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 53,
+   "start": 25,
+   "len": 1,
+   "hand": "L",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 52,
+   "start": 26,
+   "len": 1,
+   "hand": "L",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 50,
+   "start": 27,
+   "len": 1,
+   "hand": "L",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 28,
+   "len": 2,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 30,
+   "len": 2,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.7
+  }
+ ]
+}

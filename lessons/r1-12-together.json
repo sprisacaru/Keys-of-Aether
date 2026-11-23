@@ -1,0 +1,316 @@
+{
+ "region": 1,
+ "timeSig": [
+  4,
+  4
+ ],
+ "key": "C",
+ "hand": "both",
+ "pass": {
+  "stars2": 0.7,
+  "stars3": 0.9
+ },
+ "id": "r1-12-together",
+ "title": "Hands together",
+ "tempo": 72,
+ "skills": [
+  "technique",
+  "reading",
+  "rhythm"
+ ],
+ "introduces": {
+  "pitches": [],
+  "lengths": [
+   4
+  ]
+ },
+ "technique": {
+  "title": "Two hands, one pulse",
+  "feel": "The left hand holds one long note per bar while the right hand moves. Land both hands together on beat 1, then let the left hand simply rest on its key."
+ },
+ "theory": [
+  {
+   "staff": {
+    "notes": [
+     72
+    ],
+    "lens": [
+     4
+    ]
+   },
+   "q": "Whole note",
+   "a": "Lasts four beats, a whole bar in 4/4. An open notehead with no stem."
+  },
+  {
+   "q": "The grand staff",
+   "a": "Treble staff on top for the right hand, bass staff below for the left, read at the same time. Middle C sits on a short line exactly between them: the two staves are one continuous ladder of notes."
+  }
+ ],
+ "intro": "Right hand plays a tune in C position. Left hand holds C or G underneath, one whole note per bar. Read both staves as one picture, top to bottom.",
+ "notes": [
+  {
+   "pitch": 64,
+   "start": 0,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 0,
+   "len": 4,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 62,
+   "start": 1,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 2,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 4,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 4,
+   "len": 4,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 65,
+   "start": 5,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 6,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 8,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 8,
+   "len": 4,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 65,
+   "start": 8.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 9,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 10,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 11,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 12,
+   "len": 2,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 12,
+   "len": 4,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 62,
+   "start": 14,
+   "len": 2,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 16,
+   "len": 4,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 62,
+   "start": 17,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 18,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 20,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 20,
+   "len": 4,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  },
+  {
+   "pitch": 65,
+   "start": 21,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 22,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 24,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 24,
+   "len": 4,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 64,
+   "start": 25,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 25.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 28,
+   "len": 4,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 48,
+   "start": 28,
+   "len": 4,
+   "hand": "L",
+   "finger": 5,
+   "vel": 0.55
+  }
+ ]
+}

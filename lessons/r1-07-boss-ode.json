@@ -5,7 +5,7 @@
   4
  ],
  "key": "C",
- "hand": "R",
+ "hand": "both",
  "pass": {
   "stars2": 0.7,
   "stars3": 0.9
@@ -13,7 +13,7 @@
  "id": "r1-07-boss-ode",
  "title": "BOSS · Ode to Joy",
  "boss": true,
- "tempo": 76,
+ "tempo": 92,
  "skills": [
   "technique",
   "reading",
@@ -21,19 +21,37 @@
  ],
  "introduces": {
   "pitches": [],
-  "lengths": []
+  "lengths": [
+   1.5
+  ]
  },
  "technique": {
   "title": "Breathe and look ahead",
-  "feel": "Keep your eyes one note ahead on the staff. If your hand tenses, drop the shoulders and exhale."
+  "feel": "Keep your eyes one note ahead on the staff. In the third line the tune dips below your hand: the left thumb takes that one low G."
  },
  "theory": [
   {
-   "q": "Phrase",
-   "a": "A musical sentence. Ode to Joy has two four-bar phrases: a question that ends on D, and an answer that ends on C."
+   "staff": {
+    "notes": [
+     64,
+     62,
+     62
+    ],
+    "lens": [
+     1.5,
+     0.5,
+     2
+    ]
+   },
+   "q": "Dotted note",
+   "a": "A dot adds half the note's length again. A dotted quarter lasts one and a half beats; the eighth note after it fills the rest of beat two. Count \"1, 2-and\"."
+  },
+  {
+   "q": "Form: A A B A",
+   "a": "Sixteen bars in four lines. Line 1 asks a question and ends on D. Line 2 answers and lands on C. Line 3 wanders off. Line 4 brings the answer back. Most tunes you know are built like this."
   }
  ],
- "intro": "Beethoven, 1824. Hand in C position, starting on finger 3 (E). Two phrases; the second one lands home on C.",
+ "intro": "Beethoven, 1824, the whole tune: sixteen bars with the true dotted rhythm. Right hand in C position, starting on finger 3 (E). One note in line 3 belongs to the left hand.",
  "notes": [
   {
    "pitch": 64,
@@ -134,15 +152,15 @@
   {
    "pitch": 64,
    "start": 12,
-   "len": 1,
+   "len": 1.5,
    "hand": "R",
    "finger": 3,
    "vel": 0.7
   },
   {
    "pitch": 62,
-   "start": 13,
-   "len": 1,
+   "start": 13.5,
+   "len": 0.5,
    "hand": "R",
    "finger": 2,
    "vel": 0.7
@@ -254,15 +272,15 @@
   {
    "pitch": 62,
    "start": 28,
-   "len": 1,
+   "len": 1.5,
    "hand": "R",
    "finger": 2,
    "vel": 0.7
   },
   {
    "pitch": 60,
-   "start": 29,
-   "len": 1,
+   "start": 29.5,
+   "len": 0.5,
    "hand": "R",
    "finger": 1,
    "vel": 0.7
@@ -270,6 +288,262 @@
   {
    "pitch": 60,
    "start": 30,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 32,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 33,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 34,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 35,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 36,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 37,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 37.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 38,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 39,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 40,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 41,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 41.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 42,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 43,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 44,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 45,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 55,
+   "start": 46,
+   "len": 2,
+   "hand": "L",
+   "finger": 1,
+   "vel": 0.55
+  },
+  {
+   "pitch": 64,
+   "start": 48,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 49,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 50,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 51,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 52,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 53,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 54,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 55,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 56,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 57,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 58,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 59,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 60,
+   "len": 1.5,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 61.5,
+   "len": 0.5,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 62,
    "len": 2,
    "hand": "R",
    "finger": 1,

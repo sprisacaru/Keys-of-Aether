@@ -12,7 +12,7 @@
  },
  "id": "r1-01-landmarks",
  "title": "Two landmarks",
- "tempo": 60,
+ "tempo": 72,
  "skills": [
   "reading",
   "technique"
@@ -48,10 +48,24 @@
     ]
    },
    "q": "Treble G",
-   "a": "The second line from the bottom of the treble staff. The curl of the treble clef wraps around it."
+   "a": "The second line from the bottom of the treble staff. The curl of the treble clef wraps around it: the clef is an old letter G."
+  },
+  {
+   "staff": {
+    "notes": [
+     71,
+     71
+    ],
+    "lens": [
+     1,
+     2
+    ]
+   },
+   "q": "Quarter and half notes",
+   "a": "A filled notehead lasts one beat. A hollow one lasts two."
   }
  ],
- "intro": "Reading starts with landmarks, not memorized letter rhymes. Middle C is thumb (finger 1). Treble G is five keys up, pinky (finger 5).",
+ "intro": "Reading starts with landmarks, not memorised rhymes. Middle C is thumb (finger 1). Treble G is five keys up, pinky (finger 5). Eight bars: keep your eyes on the staff, not your hand.",
  "notes": [
   {
    "pitch": 60,
@@ -70,11 +84,11 @@
    "vel": 0.7
   },
   {
-   "pitch": 60,
+   "pitch": 67,
    "start": 2,
    "len": 2,
    "hand": "R",
-   "finger": 1,
+   "finger": 5,
    "vel": 0.7
   },
   {
@@ -94,11 +108,11 @@
    "vel": 0.7
   },
   {
-   "pitch": 67,
+   "pitch": 60,
    "start": 6,
    "len": 2,
    "hand": "R",
-   "finger": 5,
+   "finger": 1,
    "vel": 0.7
   },
   {
@@ -147,6 +161,102 @@
    "len": 2,
    "hand": "R",
    "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 16,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 17,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 18,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 19,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 20,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 22,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 24,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 25,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 28,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 30,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
    "vel": 0.7
   }
  ]

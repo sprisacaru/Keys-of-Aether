@@ -12,7 +12,7 @@
   .gridCss{position:absolute;left:-50%;right:-50%;bottom:0;height:42%;background:linear-gradient(#ff3fd2,#ff3fd2) top/100% 2px no-repeat,repeating-linear-gradient(90deg,rgba(46,242,255,.55) 0 2px,transparent 2px 60px),repeating-linear-gradient(0deg,rgba(46,242,255,.55) 0 2px,transparent 2px 46px);transform:perspective(260px) rotateX(62deg);transform-origin:top;opacity:.7}
   :root{--bg:#07060f;--panel:#120f24;--line:#2a2450;--ink:#ece9ff;--quiet:#9a93c9;--cyan:#2ef2ff;--pink:#ff3fd2;--violet:#8b5cff;--good:#3dff9a;--bad:#ff4d6d;--gold:#ffd24a}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-  textarea{-webkit-user-select:text;user-select:text} body{touch-action:manipulation}
+  textarea,input{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default} input{width:100%;margin-top:8px;background:#0a0818;color:var(--ink);border:1px solid var(--line);border-radius:8px;font-size:14px;padding:10px} body{touch-action:manipulation}
   @media (orientation:landscape) and (max-height:540px){
     #map.on{display:grid;grid-template-columns:250px 1fr;grid-template-rows:auto 1fr;height:100vh;height:100dvh;max-width:none;overflow:hidden}
     #map .mapHud{grid-column:1;grid-row:1;position:static;padding:8px 10px 4px} #map .mapFoot{grid-column:1;grid-row:2;overflow:auto;padding:6px 10px 10px} #map .mapFoot button{font-size:11px;padding:8px 10px}
@@ -90,8 +90,11 @@
   </div>
   <div id="sceneWrap"></div>
   <div class="mapFoot">
-    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button></div>
+    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnCloud">Cloud save: off</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button></div>
     <p class="small" id="micNote" style="margin-top:8px"></p>
+    <div id="cloudBox" style="display:none" class="card"><h2 class="disp">Cloud save</h2><p class="small">Keeps your progress in your own private GitHub repo so phone and iPad share it. The token is stored only on this device.</p>
+      <input id="cloudRepo" placeholder="yourname/keys-of-aether-save" autocapitalize="off" autocorrect="off" spellcheck="false"><input id="cloudTok" type="password" placeholder="Access token (starts with github_pat_)" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="rowb" style="margin-top:8px"><button id="btnCloudOn">Connect</button><button class="ghost" id="btnCloudNow">Sync now</button><button class="ghost" id="btnCloudOff">Disconnect</button></div><p class="small" id="cloudNote" style="margin-top:8px"></p></div>
     <div id="backupBox" style="display:none"><textarea id="saveText"></textarea><div class="rowb" style="margin-top:8px"><button class="ghost" id="btnCopy">Copy</button><button class="ghost" id="btnRestore">Restore from text</button></div></div>
   </div>
 </div>
@@ -117,6 +120,7 @@
   <div class="top"><button class="ghost" id="shBack">◀ Path</button><span class="chip" id="shDots"></span></div>
   <h1 class="glow" id="shTitle" style="font-size:22px;margin:0"></h1>
   <div class="card"><div class="t" id="shH" style="font-size:17px"></div><p id="shT"></p></div>
+  <div id="shStaff"></div>
   <canvas id="sv"></canvas>
   <div class="rowb" id="shDemo"></div>
   <canvas id="skb"></canvas>
@@ -153,7 +157,30 @@
   const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, shrines: {}, streak: { last: '', count: 0 }, echo: 'auto', beat: true });
   let save = blank();
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.stats) save = Object.assign(blank(), s); } catch (e) {}
-  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} };
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} if (cloud) { clearTimeout(cloudTimer); cloudTimer = setTimeout(() => cloudSync(), 2500); } };
+  // ---------------- Cloud save: a save.json file in the player's own private GitHub repo ----------------
+  const CKEY = 'koa_cloud_v1'; let cloud = null, cloudSha = null, cloudTimer = 0, cloudBusy = false, cloudNote = '';
+  try { const c = JSON.parse(localStorage.getItem(CKEY)); if (c && c.repo && c.token) cloud = c; } catch (e) {}
+  const b64e = s => btoa(unescape(encodeURIComponent(s))), b64d = s => decodeURIComponent(escape(atob(s.replace(/\s/g, ''))));
+  const shared = s => { const o = Object.assign({}, s); delete o.micLag; delete o.echo; delete o.beat; return o; }; /* device settings stay on the device */
+  function mergeSaves(a, b) { /* never lose progress: take the best of both */
+    const out = Object.assign(blank(), a); out.xp = Math.max(a.xp || 0, b.xp || 0); out.stats = Object.assign({}, a.stats); for (const k in b.stats || {}) out.stats[k] = Math.max(out.stats[k] || 0, b.stats[k] || 0);
+    out.lessons = Object.assign({}, a.lessons); for (const id in b.lessons || {}) { const x = out.lessons[id] || {}, y = b.lessons[id], m = { stars: Math.max(x.stars || 0, y.stars || 0), best: Math.max(x.best || 0, y.best || 0) }; if (x.fast || y.fast) m.fast = true; if (x.blind || y.blind) m.blind = true; out.lessons[id] = m; }
+    out.shrines = Object.assign({}, b.shrines, a.shrines); const sa = a.streak || {}, sb = b.streak || {}; out.streak = (sb.last || '') > (sa.last || '') || ((sb.last || '') === (sa.last || '') && (sb.count || 0) > (sa.count || 0)) ? sb : sa; return out; }
+  const cloudApi = (method, body) => fetch('https://api.github.com/repos/' + cloud.repo + '/contents/save.json' + (method === 'GET' ? '?t=' + Date.now() : ''), { method, headers: { Authorization: 'Bearer ' + cloud.token, Accept: 'application/vnd.github+json' }, body: body ? JSON.stringify(body) : undefined });
+  const cloudSay = t => { cloudNote = t; const el = $('cloudNote'); if (el) el.textContent = t; const b = $('btnCloud'); if (b) b.textContent = 'Cloud save: ' + (cloud ? 'on' : 'off'); };
+  async function cloudSync(tries) {
+    if (!cloud || cloudBusy) return false; cloudBusy = true;
+    try {
+      const r = await cloudApi('GET'); let remote = null;
+      if (r.status === 200) { const j = await r.json(); cloudSha = j.sha; remote = JSON.parse(b64d(j.content)); } else if (r.status === 404) { const chk = await fetch('https://api.github.com/repos/' + cloud.repo, { headers: { Authorization: 'Bearer ' + cloud.token } }); if (!chk.ok) throw new Error(chk.status === 401 ? 'GitHub rejected the token' : 'Cannot see that repo with this token'); cloudSha = null; }
+      else throw new Error(r.status === 401 ? 'GitHub rejected the token' : r.status === 403 ? 'The token is not allowed to read that repo' : 'GitHub answered ' + r.status);
+      const before = JSON.stringify(shared(save)); if (remote && remote.stats) save = mergeSaves(save, remote); const mine = JSON.stringify(shared(save)), pulled = mine !== before;
+      if (pulled) { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} }
+      if (!remote || JSON.stringify(shared(remote)) !== mine) { const w = await cloudApi('PUT', Object.assign({ message: 'Keys of Aether save', content: b64e(mine) }, cloudSha ? { sha: cloudSha } : {})); if ((w.status === 409 || w.status === 422) && !tries) { cloudBusy = false; return cloudSync(1); } if (!w.ok) throw new Error(w.status === 403 || w.status === 404 ? 'The token cannot write to that repo (it needs Contents: Read and write)' : 'GitHub would not save (' + w.status + ')'); cloudSha = (await w.json()).content.sha; }
+      cloudSay('Synced at ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (pulled ? '. Pulled newer progress from your other device.' : '.')); cloudBusy = false; if (pulled && $('map').classList.contains('on')) renderMap(); return true;
+    } catch (e) { cloudSay('Not synced: ' + (e.message === 'Failed to fetch' ? 'no connection to GitHub' : e.message) + '. Your progress is still saved on this device.'); cloudBusy = false; return false; }
+  }
 
   // ---------------- Audio ----------------
   let ctx = null, master = null; const voices = {};
@@ -236,7 +263,7 @@
     const lv = 1 + Math.floor(save.xp / 200); $('lv').textContent = lv; $('xp').textContent = save.xp; $('xpfill').style.width = (save.xp % 200) / 2 + '%';
     $('streak').textContent = 'Day streak ' + save.streak.count;
     $('stats').innerHTML = Object.entries(save.stats).map(([k, v]) => `<span class="stat">${k[0].toUpperCase() + k.slice(1)} <b>${v}</b></span>`).join('');
-    $('btnSound').textContent = 'Game piano on my keys: ' + save.echo; beatLbl();
+    $('btnSound').textContent = 'Game piano on my keys: ' + save.echo; beatLbl(); $('btnCloud').textContent = 'Cloud save: ' + (cloud ? 'on' : 'off');
     const o = order(), n = o.length, STEP = 138, Hh = n * STEP + 330, W = 390;
     const px = i => 195 + 105 * Math.sin(i * 1.25 + .4), py = i => Hh - 190 - i * STEP;
     const pathX = y => px((Hh - 190 - y) / STEP);
@@ -299,6 +326,11 @@
   $('btnMic').onclick = async () => { const b = $('btnMic'); if (mic) { stopMic(); b.textContent = 'Microphone: off'; chipIn(); return; } b.textContent = 'Microphone: asking…'; const r = await startMic();
     if (r === true) { b.textContent = 'Microphone: on'; if (save.beat) { save.beat = false; persist(); beatLbl(); } $('micNote').textContent = 'The game now listens for single notes from your piano. Keep the room quiet and the phone close to the keyboard. In Perform you get a soft click for the beat (the drums stay off so the mic can hear you; with headphones on the phone you can switch Drum beat back on). The game learns the mic delay as you play, so the first notes of a Perform run are judged loosely.'; }
     else { b.textContent = 'Microphone: off'; $('micNote').textContent = window.KOA_BUNDLE ? 'The microphone is blocked inside the Claude app. Open the GitHub link in Safari to use it.' : r === 'NotAllowedError' ? 'Microphone permission was refused. Allow it for this site in Safari settings, then tap again.' : 'Could not start the microphone (' + r + ').'; } chipIn(); };
+  $('btnCloud').onclick = () => { const b = $('cloudBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; if (cloud) $('cloudRepo').value = cloud.repo; cloudSay(cloudNote || (window.KOA_BUNDLE ? 'Cloud save only works on the GitHub link, not inside the Claude app.' : cloud ? 'Connected.' : 'Not connected.')); };
+  $('btnCloudOn').onclick = async () => { const repo = $('cloudRepo').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, ''), token = $('cloudTok').value.trim() || (cloud && cloud.token) || ''; if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) return cloudSay('Type the repo as yourname/reponame.'); if (!token) return cloudSay('Paste the access token.');
+    cloud = { repo, token }; cloudSha = null; cloudSay('Connecting…'); if (await cloudSync()) { try { localStorage.setItem(CKEY, JSON.stringify(cloud)); } catch (e) {} $('cloudTok').value = ''; cloudSay(cloudNote + ' This device is connected.'); } else { const why = cloudNote; cloud = null; try { cloud = JSON.parse(localStorage.getItem(CKEY)); } catch (e) {} cloudSay(why); } };
+  $('btnCloudNow').onclick = () => { if (cloud) { cloudSay('Syncing…'); cloudSync(); } else cloudSay('Connect first.'); };
+  $('btnCloudOff').onclick = () => { cloud = null; try { localStorage.removeItem(CKEY); } catch (e) {} cloudSay('Disconnected. Progress on this device is kept.'); };
   $('btnBackup').onclick = () => { const b = $('backupBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; $('saveText').value = JSON.stringify(save); };
   $('btnCopy').onclick = async () => { try { await navigator.clipboard.writeText($('saveText').value); $('btnCopy').textContent = 'Copied'; } catch (e) { $('saveText').select(); } };
   $('btnRestore').onclick = () => { try { const s = JSON.parse($('saveText').value); if (!s.stats) throw 0; save = Object.assign(blank(), s); persist(); renderMap(); } catch (e) { $('btnRestore').textContent = 'Not a valid save'; } };
@@ -445,6 +477,22 @@
         { type: 'key', q: 'Play the key a half step above E.', pcs: [5], hint: 'A half step is the very next key. Is there a black key right after E?', why: 'E to F is a half step: no black key between them.' },
         { type: 'key', q: 'Play the key a whole step above C.', pcs: [2], hint: 'A whole step skips one key. Skip the black key after C.', why: 'C to D is a whole step: it skips C sharp.' },
         { type: 'choice', q: 'Which pairs of white keys have no black key between them?', opts: ['C–D and F–G', 'E–F and B–C', 'A–B and D–E'], a: 1, hint: 'Look at the keyboard below for the gaps in the black keys.', why: 'Those are the two half steps built into the white keys.' }] },
+    { id: 'sh-staff', after: 'r1-11-left-hand', title: 'How the staff really works', short: 'How the staff works', takeaway: 'The staff is a graph of the seven letters over time. A step is one letter, but not always the same distance in sound. Two clefs, one ladder, Middle C in between.',
+      pages: [
+        { h: 'A graph, not a code', t: 'The staff is a graph. Left to right is time. Bottom to top is pitch: higher on the page sounds higher. Each notehead is a point on that graph. Once you see it that way, reading is following a line as it rises and falls, not decoding symbols one at a time.', staff: { notes: [60, 62, 64, 65, 67, 65, 64, 62], noLabel: true }, demos: [{ label: '▶ Hear the shape', notes: [60, 62, 64, 65, 67, 65, 64, 62], gap: 260 }] },
+        { h: 'Each line and each space is one letter', t: 'Going up, every line and every space is the next letter: line, space, line, space. So the staff has slots for exactly seven different notes per octave, the seven letters, which are the white keys. It has no slots at all for the black keys. That is the key fact about the staff: it is a picture of the letter scale, not of all twelve notes.', staff: { notes: [64, 65, 67, 69, 71, 72, 74, 76, 77] }, hl: { 64: 'E', 65: 'F', 67: 'G', 69: 'A', 71: 'B', 72: 'C', 74: 'D', 76: 'E', 77: 'F' } },
+        { h: 'A step is one letter, but not one size', t: 'A step means moving to the next letter: line to space, or space to line. On the staff every step looks identical. In sound they are not. Most steps cover two of the twelve notes (a whole step, with a black key in between). But E to F and B to C cover only one (a half step). The staff hides this. You have to know it. That is why a tune written on the staff sounds different depending on where it starts.', staff: { notes: [62, 64, 65, 67] }, hl: { 62: 'D', 63: 'whole', 64: 'E', 65: 'F', 66: 'whole', 67: 'G' }, demos: [{ label: '▶ D to E (whole)', notes: [62, 64], gap: 450 }, { label: '▶ E to F (half)', notes: [64, 65], gap: 450 }] },
+        { h: 'So where do black keys go?', t: 'A black key borrows a neighbour\'s slot and adds a sign. A sharp (♯) in front of a note means "play the key just to the right". A flat (♭) means "the key just to the left". You met this in the F position: B flat sits on the B line with a ♭ in front.', staff: { notes: [69, 70, 71], key: 'F' }, demos: [{ label: '▶ A, B flat, B', notes: [69, 70, 71], gap: 420 }] },
+        { h: 'Two clefs, one ladder', t: 'Five lines only cover about an octave and a half, so piano music uses two staves. Picture eleven lines stacked as one tall ladder. Remove the middle line: that missing line is Middle C, drawn as a short stub only when needed. The five lines above are the treble staff, the five below are the bass staff. The treble clef is an old letter G curling around the G line. The bass clef is an old letter F with its dots around the F line. Those two landmarks are all the clefs tell you.', staff: { clef: 'bass', notes: [53, 55, 57, 59, 60] } }],
+      quiz: [
+        { type: 'key', q: 'Play this note.', staff: { notes: [64] }, pcs: [4], hint: 'It is on the bottom line of the treble staff, one skip above Middle C.', why: 'Bottom line of the treble staff is E.' },
+        { type: 'key', q: 'Play this note.', staff: { notes: [67] }, pcs: [7], hint: 'The second line: the one the treble clef curls around.', why: 'Treble G, your landmark.' },
+        { type: 'key', q: 'Play the SECOND note.', staff: { notes: [60, 62] }, pcs: [2], hint: 'The first is Middle C on its short line. The second is one step up.', why: 'A step above C is D.' },
+        { type: 'key', q: 'Play this note.', staff: { notes: [72] }, pcs: [0], hint: 'Count up by steps from Treble G on the second line: G, A, B, …', why: 'The third space is C, an octave above Middle C.' },
+        { type: 'choice', q: 'On the staff every step looks the same. Which step is only a half step in sound?', opts: ['C to D', 'E to F', 'G to A'], a: 1, hint: 'Which white keys have no black key between them?', why: 'E to F and B to C are the two half steps hidden in the staff.' },
+        { type: 'key', q: 'Bass staff. Play this note.', staff: { clef: 'bass', notes: [53] }, pcs: [5], hint: 'It is on the line between the bass clef\'s two dots.', why: 'That line is F, the bass landmark.' },
+        { type: 'choice', q: 'Why does a black-key note need a ♯ or ♭ sign?', opts: ['Black keys are louder', 'The staff only has places for the seven letters', 'It is optional decoration'], a: 1, hint: 'How many different slots does the staff have per octave?', why: 'Seven slots, twelve notes: the other five borrow a slot and add a sign.' },
+        { type: 'key', q: 'Play this note.', staff: { notes: [70], key: 'F' }, pcs: [10], hint: 'B line, with a flat sign: the key just left of B.', why: 'B flat.' }] },
     { id: 'sh-pulse', after: 'r1-04-pulse', title: 'Why music has a pulse', short: 'Why music has a pulse', takeaway: 'Beats are grouped into bars with a strong first beat. Note names are fractions of a four-beat bar.',
       pages: [
         { h: 'The pulse', t: 'Under almost all music is a steady beat, like walking or a heartbeat. Tempo is how fast it goes, counted in beats per minute. 60 is one beat a second. Your lessons so far ran between 60 and 76.', pulse: 4, plain: true },
@@ -483,13 +531,13 @@
     const sh = shrine, S = sh.S; $('shTitle').textContent = S.title; $('shFb').textContent = ''; sh.lock = false; sh.pulseN = 0; sh.pulseLeft = 0;
     const btn = (label, cls, fn) => { const b = document.createElement('button'); b.textContent = label; b.className = cls; b.onclick = fn; return b; };
     const demo = $('shDemo'), nav = $('shNav'); demo.innerHTML = ''; nav.innerHTML = '';
-    if (sh.done) { $('shDots').textContent = 'Rune learned'; $('shH').textContent = '✦ Rune learned'; $('shT').textContent = S.takeaway + (sh.gain ? ` +${sh.gain} XP.` : ''); sh.viz = null; sh.hl = {}; sh.circle = false; nav.appendChild(btn('Walk on ▶', '', () => { shrine = null; renderMap(true); })); }
-    else if (!sh.quiz) { const p = S.pages[sh.step]; $('shDots').textContent = `Page ${sh.step + 1} of ${S.pages.length}`; $('shH').textContent = p.h; $('shT').textContent = p.t; sh.viz = p.viz || null; sh.hl = p.hl || {}; sh.circle = !!p.circle;
+    if (sh.done) { $('shDots').textContent = 'Rune learned'; $('shH').textContent = '✦ Rune learned'; $('shT').textContent = S.takeaway + (sh.gain ? ` +${sh.gain} XP.` : ''); sh.viz = null; sh.hl = {}; sh.circle = false; $('shStaff').innerHTML = ''; nav.appendChild(btn('Walk on ▶', '', () => { shrine = null; renderMap(true); })); }
+    else if (!sh.quiz) { const p = S.pages[sh.step]; $('shDots').textContent = `Page ${sh.step + 1} of ${S.pages.length}`; $('shH').textContent = p.h; $('shT').textContent = p.t; sh.viz = p.viz || null; sh.hl = p.hl || {}; sh.circle = !!p.circle; $('shStaff').innerHTML = p.staff ? staffSVG(p.staff) : '';
       if (p.pulse) { sh.pulseN = p.pulse; sh.pulseT0 = performance.now(); sh.pulseLeft = 1e9; sh.plain = !!p.plain; }
       (p.demos || []).forEach(d => demo.appendChild(btn(d.label, 'gold', () => { if (d.pulse) { sh.pulseN = d.pulse; sh.pulseT0 = performance.now(); sh.pulseLast = -1; sh.plain = false; } else playSound(d); })));
       if (sh.step > 0) nav.appendChild(btn('◀ Back', 'ghost', () => { sh.step--; renderShrine(); }));
       nav.appendChild(sh.step < S.pages.length - 1 ? btn('Next ▶', '', () => { sh.step++; renderShrine(); }) : btn('Take the rune test ▶', 'pink', () => { sh.quiz = true; sh.q = 0; renderShrine(); })); }
-    else { const it = S.quiz[sh.q]; $('shDots').textContent = `Rune test ${sh.q + 1} of ${S.quiz.length}`; $('shH').textContent = it.type === 'key' ? 'Answer on the keys' : 'Choose'; $('shT').textContent = it.q; sh.viz = null; sh.hl = {}; sh.circle = false;
+    else { const it = S.quiz[sh.q]; $('shDots').textContent = `Rune test ${sh.q + 1} of ${S.quiz.length}`; $('shH').textContent = it.type === 'key' ? 'Answer on the keys' : 'Choose'; $('shT').textContent = it.q; sh.viz = null; sh.hl = {}; sh.circle = false; $('shStaff').innerHTML = it.staff ? staffSVG(Object.assign({ noLabel: true }, it.staff)) : '';
       (it.sounds || []).forEach(d => demo.appendChild(btn(d.label, 'gold', () => playSound(d))));
       if (it.type === 'choice') it.opts.forEach((o, i) => nav.appendChild(btn(o, '', () => { if (!sh.lock) answer(i === it.a); }))); else $('shFb').textContent = 'Tap a key below, or play it on your piano.'; }
     $('sv').style.display = (sh.viz || sh.pulseN || sh.circle) ? 'block' : 'none';
@@ -552,7 +600,8 @@
       s += `<ellipse cx="${x}" cy="${y}" rx="${sp * .64}" ry="${sp * .47}" transform="rotate(-20 ${x} ${y})" fill="${len >= 2 ? 'none' : '#ffd24a'}" stroke="#ffd24a" stroke-width="1.8"/>`;
       const up = info.d < base + 4; if (len < 4) { s += up ? `<line x1="${x + sp * .58}" x2="${x + sp * .58}" y1="${y}" y2="${y - sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>` : `<line x1="${x - sp * .58}" x2="${x - sp * .58}" y1="${y}" y2="${y + sp * 3}" stroke="#ffd24a" stroke-width="1.6"/>`; if (len < 1) s += up ? `<line x1="${x + sp * .58}" x2="${x + sp * 1.45}" y1="${y - sp * 3}" y2="${y - sp * 1.7}" stroke="#ffd24a" stroke-width="1.6"/>` : `<line x1="${x - sp * .58}" x2="${x + sp * .3}" y1="${y + sp * 3}" y2="${y + sp * 1.7}" stroke="#ffd24a" stroke-width="1.6"/>`; }
       if (info.acc) s += `<text x="${x - sp * .9}" y="${y + sp * .6}" text-anchor="end" font-size="${sp * 1.9}" fill="#ffd24a" font-family="serif">${info.acc}</text>`;
-      s += `<text x="${x}" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd24a">${o.lens ? (len === 1 ? '1 beat' : len === .5 ? '½ beat' : len + ' beats') : name}</text>`; });
+      if (len === 1.5 || len === 3) s += `<circle cx="${x + sp * 1.2}" cy="${y - ((info.d - base) % 2 === 0 ? sp * .3 : 0)}" r="1.9" fill="#ffd24a"/>`;
+      if (!o.noLabel) s += `<text x="${x}" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd24a">${o.lens ? (len === 1 ? '1 beat' : len === .5 ? '½ beat' : len + ' beats') : name}</text>`; });
     return `<svg viewBox="0 0 ${W} 124" style="display:block;width:${W}px;max-width:100%;margin:6px 0 4px;background:#0a0818;border-radius:10px">${s}</svg>`;
   }
 
@@ -563,7 +612,7 @@
     $('inTitle').textContent = L.title; $('inIdea').textContent = L.intro;
     $('inFind').innerHTML = finderSVG(lo, hi);
     const firstR = L.notes.find(n => n.hand === 'R' && n.pitch !== 'any'), firstL = L.notes.find(n => n.hand === 'L');
-    $('inFindT').innerHTML = (firstR ? `The blue zone is the only part of the piano this lesson uses. <b>Middle C</b> is the white key just left of the pair of two black keys nearest the centre of your keyboard: the fourth C counting from the left end, just below the red number display on your Alesis. Right hand starts with finger ${firstR.finger} on <b>${nm(firstR.pitch, L)}</b>${firstR.pitch === 60 ? ' (Middle C)' : firstR.pitch > 60 ? `, ${whiteSteps(firstR.pitch)} white key${whiteSteps(firstR.pitch) === 1 ? '' : 's'} above Middle C` : ''}.` : 'This is a rhythm drill: any key works. Use Middle C, the fourth C from the left end, just below the red number display.')
+    $('inFindT').innerHTML = (firstR ? `The blue zone is the only part of the piano this lesson uses. <b>Middle C</b> is the white key just left of the pair of two black keys nearest the centre of your keyboard: the fourth C counting from the left end, just below the red number display on your Alesis. Right hand starts with finger ${firstR.finger} on <b>${nm(firstR.pitch, L)}</b>${firstR.pitch === 60 ? ' (Middle C)' : firstR.pitch > 60 ? `, ${whiteSteps(firstR.pitch)} white key${whiteSteps(firstR.pitch) === 1 ? '' : 's'} above Middle C` : ''}.` : firstL ? 'The blue zone is the only part of the piano this lesson uses. It sits just left of <b>Middle C</b> (the fourth C from the left end, below the red number display).' : 'This is a rhythm drill: any key works. Use Middle C, the fourth C from the left end, just below the red number display.')
       + (firstL ? ` Left hand starts with finger ${firstL.finger} on <b>${nm(firstL.pitch, L)}</b>, the ${['next', 'second', 'third'][Math.ceil((60 - firstL.pitch) / 12) - 1] || 'low'} ${nm(firstL.pitch, L)} below Middle C.` : '');
     $('inTechT').textContent = L.technique.title; $('inTech').textContent = L.technique.feel;
     $('inTheory').innerHTML = '<h2 class="disp">Theory rune' + (L.theory.length > 1 ? 's' : '') + '</h2>' + L.theory.map(t => `<div class="t">${t.q}</div><p>${t.a}</p>${t.staff ? staffSVG(t.staff) : ''}<div style="height:10px"></div>`).join('');
@@ -600,12 +649,12 @@
         if (this.mode === 'wait') {
           const first = this.notes.find(x => x.state === 0); if (!first) return;
           const n = this.notes.find(x => x.state === 0 && x.start === first.start && same(x.pitch));
-          if (n && n.start - this.beat < 0.6) { n.state = 1; this.hit(n, n.pitch === 'any' ? m : n.pitch, 'perfect'); this.beat = Math.max(this.beat, n.start); } else stray();
+          if (n && n.start - this.beat < 0.6) { n.state = 1; this.hit(n, n.pitch === 'any' ? m : n.pitch, 'perfect'); if (byMic) this.notes.forEach(x => { if (!x.state && x.start === n.start) x.state = 1; }); this.beat = Math.max(this.beat, n.start); } else stray();
           return;
         }
         let bestN = null, bestD = 1e9;
         for (const n of this.notes) { if (n.state) continue; if (!same(n.pitch)) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
-        if (bestN && bestD <= win) { if (byMic) { const raw = (this.beat - bestN.start) * this.spb; save.micLag = Math.max(0, Math.min(.6, lag * .8 + raw * .2)); } const q = bestD <= (byMic ? 150 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); } else stray();
+        if (bestN && bestD <= win) { if (byMic) { const raw = (this.beat - bestN.start) * this.spb; save.micLag = Math.max(0, Math.min(.6, lag * .8 + raw * .2)); } const q = bestD <= (byMic ? 150 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); if (byMic) this.notes.forEach(x => { if (!x.state && x.start === bestN.start) x.state = bestN.state; }); } else stray();
       } });
     $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode];
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
@@ -715,6 +764,7 @@
         g2.beginPath(); g2.ellipse(x, y, sp * .62, sp * .46, -0.35, 0, 2 * Math.PI); if (n.len >= 2) g2.stroke(); else g2.fill();
         if (n.len < 4) { const up = info.d < S.base + 4; g2.beginPath(); if (up) { g2.moveTo(x + sp * .58, y); g2.lineTo(x + sp * .58, y - sp * 3); if (n.len < 1) g2.lineTo(x + sp * 1.45, y - sp * 1.7); } else { g2.moveTo(x - sp * .58, y); g2.lineTo(x - sp * .58, y + sp * 3); if (n.len < 1) g2.lineTo(x + sp * .3, y + sp * 1.7); } g2.stroke(); }
         if (info.acc) { g2.font = `${sp * 1.9}px serif`; g2.textAlign = 'right'; g2.fillText(info.acc, x - sp * .8, y + sp * .6); }
+        if (n.len === 1.5 || n.len === 3) { g2.beginPath(); g2.arc(x + sp * 1.15, y - (info.d % 2 === S.base % 2 ? sp * .3 : 0), 1.8, 0, 2 * Math.PI); g2.fill(); }
         if (n.finger) { g2.font = `700 ${Math.max(10, sp * 1.2)}px sans-serif`; g2.textAlign = 'center'; g2.fillStyle = '#9a93c9'; g2.fillText(n.finger, x, S.hand === 'L' ? S.bottom + sp * 2.6 : S.bottom - sp * 6.4); }
       }
     }
@@ -756,13 +806,13 @@
   $('btnMap').onclick = () => renderMap(true);
 
   ['cv', 'skb'].forEach(id => { const c = $(id); c.addEventListener('touchstart', e => e.preventDefault(), { passive: false }); c.addEventListener('contextmenu', e => e.preventDefault()); });
-  document.addEventListener('contextmenu', e => { if (e.target.tagName !== 'TEXTAREA') e.preventDefault(); }); document.addEventListener('selectstart', e => { if (e.target.tagName !== 'TEXTAREA') e.preventDefault(); });
+  document.addEventListener('contextmenu', e => { if (!/TEXTAREA|INPUT/.test(e.target.tagName)) e.preventDefault(); }); document.addEventListener('selectstart', e => { if (!/TEXTAREA|INPUT/.test(e.target.tagName)) e.preventDefault(); });
   window.addEventListener('orientationchange', () => setTimeout(() => { if (game) resize(); }, 250));
   document.addEventListener('pointerdown', () => { if (ctx && ctx.state !== 'running') ctx.resume(); }, true);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); if (!document.hidden && cloud && index) cloudSync(); });
   // ---------------- Boot ----------------
-  $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); if (cloud) cloudSync(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
+  window.__koa = { cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>
