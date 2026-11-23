@@ -7,7 +7,7 @@
 <title>Keys of Aether</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
 <style>
-  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;background:repeating-linear-gradient(rgba(0,0,0,.16) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+  body::after{content:"";position:fixed;top:0;right:0;bottom:0;left:0;pointer-events:none;z-index:99;background:repeating-linear-gradient(rgba(0,0,0,.16) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
   .sunCss{width:210px;height:210px;border-radius:50%;background:linear-gradient(#fff27a,#ff9a3c 45%,#ff2fa8);-webkit-mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 62%,transparent 62% 66%,#000 66% 72%,transparent 72% 77%,#000 77% 82%,transparent 82% 88%,#000 88% 92%,transparent 92%);mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 62%,transparent 62% 66%,#000 66% 72%,transparent 72% 77%,#000 77% 82%,transparent 82% 88%,#000 88% 92%,transparent 92%);filter:drop-shadow(0 0 30px rgba(255,63,210,.6));margin-bottom:-70px}
   .gridCss{position:absolute;left:-50%;right:-50%;bottom:0;height:42%;background:linear-gradient(#ff3fd2,#ff3fd2) top/100% 2px no-repeat,repeating-linear-gradient(90deg,rgba(46,242,255,.55) 0 2px,transparent 2px 60px),repeating-linear-gradient(0deg,rgba(46,242,255,.55) 0 2px,transparent 2px 46px);transform:perspective(260px) rotateX(62deg);transform-origin:top;opacity:.7}
   :root{--bg:#07060f;--panel:#120f24;--line:#2a2450;--ink:#ece9ff;--quiet:#9a93c9;--cyan:#2ef2ff;--pink:#ff3fd2;--violet:#8b5cff;--good:#3dff9a;--bad:#ff4d6d;--gold:#ffd24a}
@@ -53,7 +53,7 @@
   #intro h1{font-size:24px;margin:0} .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
   .card h2{font-size:12px;color:var(--quiet);margin:0 0 6px} .card p{margin:0;line-height:1.5;font-size:15px} .card .t{font-weight:700;margin-bottom:4px}
   .small{color:var(--quiet);font-size:12.5px;margin:0;line-height:1.45}
-  #play{height:100%;position:fixed;inset:0}
+  #play{height:100%;position:fixed;top:0;right:0;bottom:0;left:0}
   .hud{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;gap:8px}
   .hud .ttl{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .hud .mid{font-size:13px;color:var(--cyan);font-weight:800;min-width:74px;text-align:center}
@@ -141,6 +141,12 @@
   <div class="rowb" style="justify-content:center"><button id="btnMore" class="gold" style="display:none">Another round ▶</button><button id="btnAgain" class="ghost">Again</button><button id="btnMap">Walk on ▶</button></div>
 </div>
 
+<script>
+window.addEventListener('error', function (e) { try { var d = document.getElementById('errBar') || document.body.appendChild(document.createElement('div')); d.id = 'errBar'; d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:999;background:#3a0a2a;color:#ffd0e8;font:12px -apple-system,sans-serif;padding:8px 10px'; d.textContent = 'Something broke: ' + (e.message || 'error') + ' (line ' + (e.lineno || '?') + '). Send this line to Claude.'; } catch (x) {} });
+if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown', touchmove: 'pointermove', touchend: 'pointerup', touchcancel: 'pointercancel' };
+  Object.keys(map).forEach(function (t) { document.addEventListener(t, function (e) { for (var i = 0; i < e.changedTouches.length; i++) { var c = e.changedTouches[i], ev = document.createEvent('Event'); ev.initEvent(map[t], true, true); ev.clientX = c.clientX; ev.clientY = c.clientY; ev.pageX = c.pageX; ev.pageY = c.pageY; ev.pointerId = c.identifier; ev.pointerType = 'touch'; ev.isPrimary = i === 0; ev.buttons = t === 'touchend' || t === 'touchcancel' ? 0 : 1; c.target.dispatchEvent(ev); if (ev.defaultPrevented && e.cancelable) e.preventDefault(); } }, { passive: false, capture: true }); });
+  var P = Element.prototype; if (!P.setPointerCapture) P.setPointerCapture = function () {}; if (!P.releasePointerCapture) P.releasePointerCapture = function () {}; if (!P.hasPointerCapture) P.hasPointerCapture = function () { return false; }; })(); }
+</script>
 <script src="vendor/three.min.js"></script>
 <script src="vendor/three-post.js"></script>
 <script>
@@ -344,8 +350,8 @@
     const T = window.THREE; if (!T) return false;
     try {
       if (!M3) {
-        $('sceneWrap').innerHTML = '<div id="m3" style="position:relative;height:calc(100vh - 215px);min-height:360px;overflow:hidden;touch-action:none;border-radius:18px"><div id="m3labels" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div><div style="position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:11px;color:#c9b6ff;pointer-events:none;text-shadow:0 0 6px #000">drag to ride the grid · tap a stop</div></div>';
-        const host = $('m3'), renderer = new T.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block'; host.prepend(renderer.domElement);
+        $('sceneWrap').innerHTML = '<div id="m3" style="position:relative;height:calc(100vh - 215px);min-height:360px;overflow:hidden;touch-action:none;border-radius:18px"><div id="m3labels" style="position:absolute;top:0;right:0;bottom:0;left:0;pointer-events:none;overflow:hidden"></div><div style="position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:11px;color:#c9b6ff;pointer-events:none;text-shadow:0 0 6px #000">drag to ride the grid · tap a stop</div></div>';
+        const host = $('m3'), renderer = new T.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); renderer.domElement.style.cssText = 'position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;display:block'; host.prepend(renderer.domElement);
         const mk = (w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); return new T.CanvasTexture(c); };
         const glow = mk(64, 64, (x) => { const g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.3, 'rgba(255,255,255,.5)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64); });
         const sky = mk(4, 512, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); [[0, '#02000a'], [.26, '#0d0030'], [.4, '#3a0a78'], [.47, '#b0189a'], [.495, '#ff5aa0'], [.505, '#ffb14a'], [.512, '#1a0030'], [1, '#05000f']].forEach(([s, c]) => g.addColorStop(s, c)); x.fillStyle = g; x.fillRect(0, 0, w, h); });
@@ -353,7 +359,7 @@
         const grid = col => mk(128, 128, (x) => { x.fillStyle = '#05020f'; x.fillRect(0, 0, 128, 128); x.strokeStyle = col; x.lineWidth = 5; x.shadowColor = col; x.shadowBlur = 10; x.strokeRect(0, 0, 128, 128); });
         const gLit = grid('#2ef2ff'), gDark = grid('#5a2a9a'); [gLit, gDark].forEach(t => { t.wrapS = t.wrapT = T.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); });
         M3 = { host, renderer, glow, sky, sun, gLit, gDark, cam: new T.PerspectiveCamera(60, 1, .1, 700), camT: ci, bardT: ci, running: false, drag: null, picks: [] };
-        try { if (T.EffectComposer && T.UnrealBloomPass) { const comp = new T.EffectComposer(renderer); M3.rpass = new T.RenderPass(new T.Scene(), M3.cam); comp.addPass(M3.rpass); comp.addPass(new T.UnrealBloomPass(new T.Vector2(256, 256), .55, .5, .42)); M3.composer = comp; } } catch (e) { M3.composer = null; }
+        try { if (T.EffectComposer && T.UnrealBloomPass && renderer.capabilities.isWebGL2) { const comp = new T.EffectComposer(renderer); M3.rpass = new T.RenderPass(new T.Scene(), M3.cam); comp.addPass(M3.rpass); comp.addPass(new T.UnrealBloomPass(new T.Vector2(256, 256), .55, .5, .42)); M3.composer = comp; } } catch (e) { M3.composer = null; }
         const el = renderer.domElement;
         el.addEventListener('pointerdown', e => { M3.drag = { y: e.clientY, x: e.clientX, t: M3.camT, moved: 0 }; M3.auto = null; el.setPointerCapture && el.setPointerCapture(e.pointerId); });
         el.addEventListener('pointermove', e => { const d = M3.drag; if (!d) return; d.moved = Math.max(d.moved, Math.abs(e.clientY - d.y) + Math.abs(e.clientX - d.x)); M3.camT = Math.max(-.6, Math.min(M3.n - .4, d.t + (e.clientY - d.y) * .013)); });
