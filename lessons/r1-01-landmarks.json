@@ -11,8 +11,8 @@
   "stars3": 0.9
  },
  "id": "r1-01-landmarks",
- "title": "Two landmarks",
- "tempo": 72,
+ "title": "Landmarks, and the notes between",
+ "tempo": 76,
  "skills": [
   "reading",
   "technique"
@@ -20,7 +20,10 @@
  "introduces": {
   "pitches": [
    "C4",
-   "G4"
+   "G4",
+   "D4",
+   "E4",
+   "F4"
   ],
   "lengths": [
    1,
@@ -29,7 +32,7 @@
  },
  "technique": {
   "title": "Sit and shape",
-  "feel": "Sit so your forearms are level with the keys. Let your hand hang, then set it on the keys: the fingers stay curved, like holding a small ball."
+  "feel": "Sit so your forearms are level with the keys. Let your hand hang, then set it on the keys with one finger per white key from C to G: the fingers stay curved, like holding a small ball."
  },
  "theory": [
   {
@@ -53,6 +56,19 @@
   {
    "staff": {
     "notes": [
+     60,
+     62,
+     64,
+     65,
+     67
+    ]
+   },
+   "q": "Reading from a landmark",
+   "a": "You do not memorise every note. You know two landmarks and read everything else as steps away from them: one step above C, one step below G."
+  },
+  {
+   "staff": {
+    "notes": [
      71,
      71
     ],
@@ -65,7 +81,7 @@
    "a": "A filled notehead lasts one beat. A hollow one lasts two."
   }
  ],
- "intro": "Reading starts with landmarks, not memorised rhymes. Middle C is thumb (finger 1). Treble G is five keys up, pinky (finger 5). Eight bars: keep your eyes on the staff, not your hand.",
+ "intro": "Sixteen bars in four lines. Line 1: the two landmarks, Middle C (thumb) and Treble G (pinky). Line 2: step up from C. Line 3: step down from G. Line 4: join them. Keep your eyes on the staff, not your hand.",
  "notes": [
   {
    "pitch": 60,
@@ -100,19 +116,19 @@
    "vel": 0.7
   },
   {
-   "pitch": 67,
+   "pitch": 60,
    "start": 5,
    "len": 1,
    "hand": "R",
-   "finger": 5,
+   "finger": 1,
    "vel": 0.7
   },
   {
-   "pitch": 60,
+   "pitch": 67,
    "start": 6,
    "len": 2,
    "hand": "R",
-   "finger": 1,
+   "finger": 5,
    "vel": 0.7
   },
   {
@@ -164,96 +180,288 @@
    "vel": 0.7
   },
   {
-   "pitch": 67,
+   "pitch": 60,
    "start": 16,
    "len": 1,
    "hand": "R",
-   "finger": 5,
+   "finger": 1,
    "vel": 0.7
   },
   {
-   "pitch": 60,
+   "pitch": 62,
    "start": 17,
    "len": 1,
    "hand": "R",
-   "finger": 1,
-   "vel": 0.7
-  },
-  {
-   "pitch": 67,
-   "start": 18,
-   "len": 1,
-   "hand": "R",
-   "finger": 5,
+   "finger": 2,
    "vel": 0.7
   },
   {
    "pitch": 60,
-   "start": 19,
+   "start": 18,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 20,
    "len": 1,
    "hand": "R",
    "finger": 1,
    "vel": 0.7
   },
   {
-   "pitch": 67,
-   "start": 20,
-   "len": 2,
+   "pitch": 62,
+   "start": 21,
+   "len": 1,
    "hand": "R",
-   "finger": 5,
+   "finger": 2,
    "vel": 0.7
   },
   {
-   "pitch": 67,
+   "pitch": 64,
    "start": 22,
    "len": 2,
    "hand": "R",
-   "finger": 5,
+   "finger": 3,
    "vel": 0.7
   },
   {
-   "pitch": 60,
+   "pitch": 64,
    "start": 24,
    "len": 1,
    "hand": "R",
-   "finger": 1,
+   "finger": 3,
    "vel": 0.7
   },
   {
-   "pitch": 60,
+   "pitch": 62,
    "start": 25,
    "len": 1,
    "hand": "R",
-   "finger": 1,
-   "vel": 0.7
-  },
-  {
-   "pitch": 67,
-   "start": 26,
-   "len": 1,
-   "hand": "R",
-   "finger": 5,
-   "vel": 0.7
-  },
-  {
-   "pitch": 67,
-   "start": 27,
-   "len": 1,
-   "hand": "R",
-   "finger": 5,
+   "finger": 2,
    "vel": 0.7
   },
   {
    "pitch": 60,
+   "start": 26,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 27,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
    "start": 28,
    "len": 2,
    "hand": "R",
-   "finger": 1,
+   "finger": 3,
    "vel": 0.7
   },
   {
    "pitch": 60,
    "start": 30,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 32,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 33,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 34,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 36,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 37,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 38,
+   "len": 2,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 40,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 41,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 42,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 43,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 44,
+   "len": 2,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 46,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 48,
+   "len": 1,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 49,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 50,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 51,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 52,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 54,
+   "len": 2,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 67,
+   "start": 56,
+   "len": 1,
+   "hand": "R",
+   "finger": 5,
+   "vel": 0.7
+  },
+  {
+   "pitch": 65,
+   "start": 57,
+   "len": 1,
+   "hand": "R",
+   "finger": 4,
+   "vel": 0.7
+  },
+  {
+   "pitch": 64,
+   "start": 58,
+   "len": 1,
+   "hand": "R",
+   "finger": 3,
+   "vel": 0.7
+  },
+  {
+   "pitch": 62,
+   "start": 59,
+   "len": 1,
+   "hand": "R",
+   "finger": 2,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 60,
+   "len": 2,
+   "hand": "R",
+   "finger": 1,
+   "vel": 0.7
+  },
+  {
+   "pitch": 60,
+   "start": 62,
    "len": 2,
    "hand": "R",
    "finger": 1,

@@ -23,3 +23,8 @@ Plan: the "Master plan" tab of the Keys of Aether doc (eight regions, ten theory
 
 ## Tools
 - node tools/make-lessons.mjs, node tools/check-lessons.mjs, python3 tools/bundle.py OUT.html (single-file build for the Claude page)
+
+## 23 Nov, later: more reps
+- Stop 1 is now sixteen bars over all five notes C to G (was a short two-note lesson).
+- Endless reps: every stop whose hand stays in one position has "∞ Reps" (waits for you / in time). Each round is a new generated sixteen-bar exercise from that lesson's notes, fingering and rhythms. Reps give XP and count rounds (`save.reps`) but never change stars. Not offered on r1-13, r1-09, r1-10 (hand moves).
+- Tested in a simulated browser only (200 generated exercises per lesson pass the lesson rules). Not yet tried on the phone.

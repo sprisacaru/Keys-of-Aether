@@ -112,6 +112,7 @@
     <button id="btnPractice">Practice (waits for you)</button>
     <button id="btnPerform" class="pink">Perform (in time)</button>
   </div>
+  <div class="card" id="inReps"><h2 class="disp">Endless reps</h2><p class="small">A brand-new sixteen-bar exercise built from this lesson's notes and rhythms, different every time. Play as many rounds as you like.</p><div class="rowb" style="margin-top:10px"><button id="btnRepsW" class="gold">∞ Reps, waits for you</button><button id="btnRepsP" class="gold">∞ Reps, in time</button></div></div>
   <div class="card" id="inChal"><h2 class="disp">Challenge runs</h2><p class="small" id="inChalT"></p><div class="rowb" style="margin-top:10px"><button id="btnFast" class="gold">⚡ Fast (125% speed)</button><button id="btnBlind" class="gold">👁 Staff only (no highway)</button></div></div>
   <p class="small">Finish a lesson either way to open the next stop. Practice waits for you and earns 1 star. Perform is in time and earns up to 3. Stop if your hand or forearm feels tense or sore.</p>
 </div>
@@ -137,7 +138,7 @@
   <div class="stars" id="resStars"></div>
   <div class="big2" id="resHead"></div>
   <p id="resBody"></p>
-  <div class="rowb" style="justify-content:center"><button id="btnAgain" class="ghost">Again</button><button id="btnMap">Walk on ▶</button></div>
+  <div class="rowb" style="justify-content:center"><button id="btnMore" class="gold" style="display:none">Another round ▶</button><button id="btnAgain" class="ghost">Again</button><button id="btnMap">Walk on ▶</button></div>
 </div>
 
 <script src="vendor/three.min.js"></script>
@@ -154,7 +155,7 @@
 
   // ---------------- Save ----------------
   const KEY = 'koa_save_v1';
-  const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, shrines: {}, streak: { last: '', count: 0 }, echo: 'auto', beat: true });
+  const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, shrines: {}, streak: { last: '', count: 0 }, echo: 'auto', beat: true, reps: 0 });
   let save = blank();
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.stats) save = Object.assign(blank(), s); } catch (e) {}
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} if (cloud) { clearTimeout(cloudTimer); cloudTimer = setTimeout(() => cloudSync(), 2500); } };
@@ -164,7 +165,7 @@
   const b64e = s => btoa(unescape(encodeURIComponent(s))), b64d = s => decodeURIComponent(escape(atob(s.replace(/\s/g, ''))));
   const shared = s => { const o = Object.assign({}, s); delete o.micLag; delete o.echo; delete o.beat; return o; }; /* device settings stay on the device */
   function mergeSaves(a, b) { /* never lose progress: take the best of both */
-    const out = Object.assign(blank(), a); out.xp = Math.max(a.xp || 0, b.xp || 0); out.stats = Object.assign({}, a.stats); for (const k in b.stats || {}) out.stats[k] = Math.max(out.stats[k] || 0, b.stats[k] || 0);
+    const out = Object.assign(blank(), a); out.xp = Math.max(a.xp || 0, b.xp || 0); out.reps = Math.max(a.reps || 0, b.reps || 0); out.stats = Object.assign({}, a.stats); for (const k in b.stats || {}) out.stats[k] = Math.max(out.stats[k] || 0, b.stats[k] || 0);
     out.lessons = Object.assign({}, a.lessons); for (const id in b.lessons || {}) { const x = out.lessons[id] || {}, y = b.lessons[id], m = { stars: Math.max(x.stars || 0, y.stars || 0), best: Math.max(x.best || 0, y.best || 0) }; if (x.fast || y.fast) m.fast = true; if (x.blind || y.blind) m.blind = true; out.lessons[id] = m; }
     out.shrines = Object.assign({}, b.shrines, a.shrines); const sa = a.streak || {}, sb = b.streak || {}; out.streak = (sb.last || '') > (sa.last || '') || ((sb.last || '') === (sa.last || '') && (sb.count || 0) > (sa.count || 0)) ? sb : sa; return out; }
   const cloudApi = (method, body) => fetch('https://api.github.com/repos/' + cloud.repo + '/contents/save.json' + (method === 'GET' ? '?t=' + Date.now() : ''), { method, headers: { Authorization: 'Bearer ' + cloud.token, Accept: 'application/vnd.github+json' }, body: body ? JSON.stringify(body) : undefined });
@@ -620,12 +621,15 @@
     $('inStaff').innerHTML = (rs.length ? `<p class="small">Every note in this lesson, low to high${ls.length ? ' (right hand)' : ''}:</p>` + staffSVG({ notes: rs, key: L.key }) : '') + (ls.length ? '<p class="small">Left hand:</p>' + staffSVG({ notes: ls, key: L.key, clef: 'bass' }) : ''); $('inStaffCard').style.display = rs.length || ls.length ? 'block' : 'none';
     const can = (r.stars || 0) >= 1; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
     $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Finish this lesson once, in Practice or Perform, to unlock harder runs.';
+    $('inReps').style.display = makeReps(L) ? 'block' : 'none';
     show('intro');
   }
   $('btnBack').onclick = () => renderMap();
   $('btnListen').onclick = () => startGame('listen');
   $('btnPractice').onclick = () => startGame('wait');
   $('btnPerform').onclick = () => startGame('perform');
+  $('btnRepsW').onclick = () => startGame('wait', null, makeReps(current));
+  $('btnRepsP').onclick = () => startGame('perform', null, makeReps(current));
   $('btnFast').onclick = () => startGame('perform', 'fast');
   $('btnBlind').onclick = () => startGame('perform', 'blind');
 
@@ -639,10 +643,21 @@
     hit(n, m, q) { this.combo++; this.best = Math.max(this.best, this.combo); this.flash[m] = { t: performance.now(), bad: false }; this.fx.push({ m, t: performance.now(), q }); this.burst(m, q === 'perfect' ? '#3dff9a' : '#ffd24a'); },
     burst(m, col) { const now = performance.now(); for (let i = 0; i < 14; i++) this.parts.push({ m, t: now, a: Math.PI * (1 + Math.random()), v: 60 + Math.random() * 190, col }); } }, o); }
 
-  function startGame(mode, tier) {
-    const L = current, tempo = L.tempo * (tier === 'fast' ? 1.25 : 1), spb = 60 / tempo, bar = L.timeSig[0];
+  function fingerMap(L, hand) { const m = {}; for (const n of L.notes) { if (n.hand !== hand || n.pitch === 'any') continue; if (m[n.pitch] && m[n.pitch] !== n.finger) return null; m[n.pitch] = n.finger; } return m; }
+  function makeReps(L) {
+    if (!L || L.timeSig[0] !== 4 || L.timeSig[1] !== 4) return null; const lens = new Set(L.notes.map(n => n.len)), anyOnly = L.notes.every(n => n.pitch === 'any'), rm = fingerMap(L, 'R'), lm = fingerMap(L, 'L'); if (!anyOnly && (!rm || !lm)) return null;
+    const rp = Object.keys(rm || {}).map(Number).sort((a, b) => a - b), lp = Object.keys(lm || {}).map(Number).sort((a, b) => a - b), mel = rp.length >= 2 ? 'R' : 'L', P = mel === 'R' ? rp : lp, fm = mel === 'R' ? rm : lm; if (!anyOnly && P.length < 2) return null;
+    const pats = [[1, 1, 1, 1], [2, 2], [1, 1, 2], [2, 1, 1], [1, 2, 1], [1, 1, 1, 1]]; if (lens.has(.5)) pats.push([.5, .5, 1, 1, 1], [1, .5, .5, 2], [.5, .5, .5, .5, 2], [1, 1, .5, .5, 1], [.5, .5, 1, .5, .5, 1], [1, .5, .5, 1, 1]);
+    const BARS = 16, out = [], rnd = n => Math.floor(Math.random() * n); let i = 0, dir = 1;
+    for (let b = 0; b < BARS; b++) { const last = b === BARS - 1, pat = last ? (lens.has(4) && !anyOnly ? [4] : [2, 2]) : pats[rnd(pats.length)]; let t = b * 4;
+      pat.forEach((len, k) => { if (anyOnly) out.push({ pitch: 'any', start: t, len, hand: 'R', finger: 0, vel: .7 }); else { if (last && k === pat.length - 1) i = 0; out.push({ pitch: P[i], start: t, len, hand: mel, finger: fm[P[i]], vel: .7 }); const r = Math.random(), d = r < .68 ? 1 : r < .93 ? 2 : 0; if (Math.random() < .3) dir = -dir; if (i + dir * d < 0 || i + dir * d >= P.length) dir = -dir; i = Math.max(0, Math.min(P.length - 1, i + dir * d)); } t += len; });
+      if (mel === 'R' && lp.length && !anyOnly) { const pick = () => lp[Math.random() < .6 ? 0 : lp.length - 1]; if (lens.has(4)) { const q = last ? lp[0] : pick(); out.push({ pitch: q, start: b * 4, len: 4, hand: 'L', finger: lm[q], vel: .55 }); } else [0, 2].forEach(o => { const q = pick(); out.push({ pitch: q, start: b * 4 + o, len: 2, hand: 'L', finger: lm[q], vel: .55 }); }); } }
+    return Object.assign({}, L, { notes: out.sort((a, b) => a.start - b.start), reps: true });
+  }
+  function startGame(mode, tier, L0) {
+    const L = L0 || current, tempo = L.tempo * (tier === 'fast' ? 1.25 : 1), spb = 60 / tempo, bar = L.timeSig[0];
     const notes = L.notes.map(n => ({ ...n, state: 0 })), [lo, hi] = rangeOf(L), end = Math.max(...notes.map(n => n.start + n.len));
-    game = baseGame({ L, mode, tier, notes, lo, hi, end, spb, bar, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
+    game = baseGame({ L, mode, tier, reps: !!L.reps, notes, lo, hi, end, spb, bar, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
       onPress(m, t, src) {
         if (this.mode === 'listen' || this.done) return; const byMic = src === 'mic', lag = byMic ? micLag() : 0, beatNow = this.beat - lag / this.spb, same = p => p === 'any' || p === m || (byMic && p % 12 === m % 12), win = byMic ? 420 : GOOD;
         const stray = () => { this.flash[m] = { t: performance.now(), bad: true }; if (!byMic) { this.strays++; this.combo = 0; } };
@@ -656,7 +671,7 @@
         for (const n of this.notes) { if (n.state) continue; if (!same(n.pitch)) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
         if (bestN && bestD <= win) { if (byMic) { const raw = (this.beat - bestN.start) * this.spb; save.micLag = Math.max(0, Math.min(.6, lag * .8 + raw * .2)); } const q = bestD <= (byMic ? 150 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); if (byMic) this.notes.forEach(x => { if (!x.state && x.start === bestN.start) x.state = bestN.state; }); } else stray();
       } });
-    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode];
+    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode] + (L.reps ? ' · reps' : '');
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
   }
   function startFree() {
@@ -781,6 +796,7 @@
 
   // ---------------- Results ----------------
   function touchStreak() { const today = new Date().toLocaleDateString('en-CA'), y = new Date(Date.now() - 864e5).toLocaleDateString('en-CA'); if (save.streak.last !== today) { save.streak.count = save.streak.last === y ? save.streak.count + 1 : 1; save.streak.last = today; } }
+  let lastReps = 'wait';
   function finish() {
     const G = game; if (!G) return; cancelAnimationFrame(raf); game = null;
     if (G.mode === 'listen') { openIntro(G.L.id); return; }
@@ -788,6 +804,9 @@
     let acc, stars;
     if (G.mode === 'wait') { acc = total / (total + G.strays); stars = 1; }
     else { acc = Math.max(0, (perfect + .7 * good) / total - G.strays * .02); stars = acc >= G.L.pass.stars3 ? 3 : acc >= G.L.pass.stars2 ? 2 : acc >= .4 ? 1 : 0; }
+    $('btnMore').style.display = G.reps ? '' : 'none';
+    if (G.reps) { const gain = G.mode === 'wait' ? 12 : Math.round(12 + 36 * acc); save.xp += gain; save.reps = (save.reps || 0) + 1; G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + 1; }); touchStreak(); persist(); lastReps = G.mode; chime(true);
+      $('resStars').textContent = '∞'; $('resHead').textContent = 'Reps round ' + save.reps + ' done'; $('resBody').innerHTML = (G.mode === 'wait' ? `${total} fresh notes read, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}.` : `Accuracy ${Math.round(acc * 100)}% on music you had never seen · ${perfect} perfect, ${good} good, ${miss} missed.`) + ` +${gain} XP.<br>Every round is new, so this is real sight-reading practice.`; show('results'); return; }
     const r = save.lessons[G.L.id] || { stars: 0, best: 0 }, first = stars > r.stars, passedTier = G.tier && stars >= 2, newBadge = passedTier && !r[G.tier];
     const gain = Math.round((G.mode === 'wait' ? 15 : 20 + 60 * acc) * (G.bossy ? 2 : 1) * (G.tier ? 1.5 : 1)) + (first && !G.tier ? 25 * (stars - r.stars) : 0) + (newBadge ? 60 : 0);
     if (!G.tier) { r.stars = Math.max(r.stars, stars); r.best = Math.max(r.best, Math.round(acc * 100)); } if (passedTier) r[G.tier] = true;
@@ -803,6 +822,7 @@
     show('results');
   }
   $('btnAgain').onclick = () => openIntro(current.id);
+  $('btnMore').onclick = () => { const R = makeReps(current); if (R) startGame(lastReps, null, R); };
   $('btnMap').onclick = () => renderMap(true);
 
   ['cv', 'skb'].forEach(id => { const c = $(id); c.addEventListener('touchstart', e => e.preventDefault(), { passive: false }); c.addEventListener('contextmenu', e => e.preventDefault()); });
@@ -812,7 +832,7 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); if (!document.hidden && cloud && index) cloudSync(); });
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); if (cloud) cloudSync(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  window.__koa = { makeReps, cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>
