@@ -44,3 +44,23 @@ Plan: the "Master plan" tab of the Keys of Aether doc (eight regions, ten theory
 - 24 Nov QC (Stefan spotted): wave picture drew the two notes with zero crossings aligned, so peaks did not coincide as the text claims. Now cosine-phased so peaks meet, with dotted gold guide lines at each meeting point (every swing for an octave, every 2nd for a fifth, etc). He likes the two-column iPad lesson layout: keep it.
 - 24 Nov QC pass on lessons 1 to 3 (text vs pictures, arithmetic, task key sequences, quiz answers). Fixed: lesson 2 wrongly implied 7 stacked fifths close the loop better than 5 (gaps are ~90 and ~114 cents; 12 leaves ~23) and that 19/31/53 follow from stacking (only 53 does; 19 and 31 are real keyboards built for sweeter thirds); 'five stacked fifths' -> five notes a fifth apart; three stop intros still told the player to use Practice. Not verifiable from here: history dates against sources, iOS 12 rendering, microphone timing.
 - 24 Nov: history in lessons 2 and 3 checked against sources (Wikipedia: A440, Pythagorean hammers, Equal temperament, Glarean, Guido, Ut queant laxis, Accidental; Britannica: equal temperament, notation, Ionian mode; Norton History of Western Music ch.2; Rehding on Zhu Zaiyu; Stephen Jones blog and Yamaha on key colours; Carus organ handbook on Halberstadt). Corrections made: Stevin's date softened (1585 or later, unpublished); key colours (both schemes existed; reversed was the 1700s fashion; fixed early 1800s); equal temperament adoption (Germany/France late 1700s, England 1800s). Added sourced details: Praetorius 1619, Doni, May 1939 at the BBC, German printers' h. Not individually verified: Boethius detail, neumes dating, 19/31/53-key instruments, WTC 1722.
+
+## 24 Nov, end of day: region 1 fully built
+**Structure**
+- Lesson content now lives in `learn/r1.js` (`window.KOA_LEARN`), loaded by a script tag and inlined by `tools/bundle.py`. `index.html` reads it as `SHRINES` (name kept from the old shrine engine). `tools/check-learn.mjs` validates every lesson (fields, answer indexes, keys within the on-screen keyboard 60 to 84, pass mark, banned words, every stop has a lesson). Run it with `tools/check-lessons.mjs` before every push.
+- 11 lessons, 107 pages, 91 questions, about 15,100 words. Stop → lesson: 01 note, 02 black keys, 03 letters/C, 04 time, 05 staff (g-home), 06 major scale (f-home), 07 clefs (left-hand), 08 intervals (together), 09 three chords (three-homes), 10 Ode (boss; `also` heroic), 11 Für Elise (elise-rh; `also` elise-both).
+- Engine additions: `chords` in demos/sounds, task kind `taps`, `also` (one lesson serving two stops), `shrine.from` (return to the stop you came from).
+- All seven old shrines deleted from the code. Old save keys (`sh-*`) are simply ignored.
+- Voice: all lessons in the livelier professor voice Stefan asked for.
+
+**History sources checked (24 Nov)**: Guido's coloured lines and four-line staff, five lines by 1300s (Britannica, Catholic Encyclopedia, Haines); Pope John XIX anecdote (Guido's letter, via Chalmers); Franco of Cologne c.1260 to 1280 (Wikipedia, Britannica, ND); C = broken circle (mymusictheory, Wikipedia alla breve); bar lines from 1400s tablature (Britannica); Maelzel/Winkel 1815 and Beethoven's marks (Wikipedia, Cambridge "Measure", PLOS One); Ode: Schiller 1785, premiere 7 May 1824, Umlauf, Unger, anthem 1972/1985 (Wikipedia, EU, WETA); clefs as letters G F C, nine historical positions (Britannica, Wikipedia, Uniarts); Helmholtz 1863 (Wikipedia, Britannica); Rameau 1722 (Wikipedia, Christensen); Für Elise 1810/1867/Nohl/identity unknown (Wikipedia, Henle, Beethoven-Haus).
+Not individually sourced: English singers popularising thirds c.1400; Chopin on C major; "almost no other animal keeps a beat"; the early-entry detail in Ode to Joy; Roman inclusive counting as the origin of interval names.
+
+**Tests run**: /tmp scripts (not in repo): every lesson walked end to end at 1112x740 and 390x780 with an old save loaded, every demo and task pressed; reps generator; reset/undo; in-time play, slow run, Next stop. All pass, no page errors. Lesson pages fit one iPad-landscape screen except one page of lesson 4 (39px over).
+
+**Known debt / not done**
+- Map still contains the code that drew shrine pedestals (now never used). Wait-mode code and two hidden buttons remain for tests.
+- Test scripts live in /tmp only; should be moved into `tools/` as a real test suite.
+- Nothing has been verified on iOS 12 Safari, with the microphone, or with a MIDI cable.
+- Fonts load from Google Fonts; the game needs internet.
+- Adaptive difficulty, Forge, Trial, expression scoring, song import: not built.

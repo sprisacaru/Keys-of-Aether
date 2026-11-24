@@ -9,6 +9,9 @@ three = open('vendor/three.min.js').read()
 tag = '<script src="vendor/three.min.js"></script>\n'
 assert tag in s
 s = s.replace(tag, '<script>' + three.replace('</script', '<\\/script') + '</script>\n', 1)
+tagL = '<script src="learn/r1.js"></script>\n'
+assert tagL in s
+s = s.replace(tagL, '<script>' + open('learn/r1.js').read().replace('</script', '<\\/script') + '</script>\n', 1)
 tag2 = '<script src="vendor/three-post.js"></script>\n'
 assert tag2 in s
 s = s.replace(tag2, '<script>' + open('vendor/three-post.js').read().replace('</script', '<\\/script') + '</script>\n', 1)
