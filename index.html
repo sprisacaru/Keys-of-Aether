@@ -100,31 +100,27 @@
   </div>
   <div id="sceneWrap"></div>
   <div class="mapFoot">
-    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnCloud">Cloud save: off</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button></div>
+    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnCloud">Cloud save: off</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button><button class="ghost" id="btnReset">Reset progress</button></div>
     <p class="small" id="micNote" style="margin-top:8px"></p>
     <div id="cloudBox" style="display:none" class="card"><h2 class="disp">Cloud save</h2><p class="small">Keeps your progress in your own private GitHub repo so phone and iPad share it. The token is stored only on this device.</p>
       <input id="cloudRepo" placeholder="yourname/keys-of-aether-save" autocapitalize="off" autocorrect="off" spellcheck="false"><input id="cloudTok" type="password" placeholder="Access token (starts with github_pat_)" autocapitalize="off" autocorrect="off" spellcheck="false">
       <div class="rowb" style="margin-top:8px"><button id="btnCloudOn">Connect</button><button class="ghost" id="btnCloudNow">Sync now</button><button class="ghost" id="btnCloudOff">Disconnect</button></div><p class="small" id="cloudNote" style="margin-top:8px"></p></div>
-    <div id="backupBox" style="display:none"><textarea id="saveText"></textarea><div class="rowb" style="margin-top:8px"><button class="ghost" id="btnCopy">Copy</button><button class="ghost" id="btnRestore">Restore from text</button></div></div>
+    <div id="backupBox" style="display:none"><textarea id="saveText"></textarea><div class="rowb" style="margin-top:8px"><button class="ghost" id="btnCopy">Copy</button><button class="ghost" id="btnRestore">Restore from text</button><button class="ghost" id="btnUndoReset" style="display:none">Bring back the save from before the last reset</button></div></div>
   </div>
 </div>
 
 <div class="screen" id="intro">
   <button class="ghost" id="btnBack" style="align-self:flex-start">◀ Path</button>
   <h1 class="glow" id="inTitle"></h1>
-  <div class="card" id="inLearn" style="display:none;border-color:var(--gold)"><h2 class="disp" style="color:var(--gold)">Part 1 · Learn (about 10 min)</h2><div class="t" id="inLearnT"></div><p class="small" id="inLearnS"></p><div class="rowb" style="margin-top:10px"><button id="btnLearn" class="gold">Start the lesson ▶</button></div></div>
-  <div class="card"><h2 class="disp" id="inIdeaH">The idea</h2><p id="inIdea"></p></div>
-  <div class="card"><h2 class="disp">Find it on your piano</h2><div id="inFind"></div><p id="inFindT" style="margin-top:8px"></p></div>
-  <div class="card" id="inStaffCard"><h2 class="disp">Find it on the staff</h2><div id="inStaff"></div></div>
-  <div class="card"><h2 class="disp">Technique card</h2><div class="t" id="inTechT"></div><p id="inTech"></p></div>
-  <div class="card" id="inTheory"></div>
-  <div class="rowb">
-    <button id="btnListen" class="ghost">♪ Listen first</button>
-    <button id="btnPractice">Practice (waits for you)</button>
-    <button id="btnPerform" class="pink">Perform (in time)</button>
+  <div class="card" id="inLearn" style="border-color:var(--gold)"><h2 class="disp" style="color:var(--gold)">Part 1 · Learn</h2><div class="t" id="inLearnT"></div><p class="small" id="inLearnS"></p><div class="rowb" id="inLearnB" style="margin-top:10px"><button id="btnLearn" class="gold">Start the lesson ▶</button></div><div id="inTheory"></div></div>
+  <div class="card" style="border-color:var(--cyan)"><h2 class="disp" style="color:var(--cyan)">Part 2 · Play</h2><p id="inIdea"></p>
+    <div class="rowb" style="margin-top:12px"><button id="btnListen" class="ghost">♪ Listen first</button><button id="btnPractice">Practice (waits for you)</button><button id="btnPerform" class="pink">Perform (in time)</button></div>
+    <details id="inSetup" style="margin-top:14px"><summary class="disp" style="font-size:12px;color:var(--quiet);cursor:pointer">Where your hands go</summary>
+      <div style="margin-top:10px" id="inFind"></div><p id="inFindT" style="margin-top:8px;font-size:14px"></p><p style="margin-top:8px;font-size:14px"><b id="inTechT"></b> <span id="inTech"></span></p><div id="inStaffCard"><div id="inStaff"></div></div></details>
+    <details id="inMore" style="margin-top:12px"><summary class="disp" style="font-size:12px;color:var(--quiet);cursor:pointer">More practice: endless reps and challenge runs</summary>
+      <div id="inReps" style="margin-top:10px"><p class="small">Endless reps: a brand-new sixteen-bar exercise from this stop's notes and rhythms, different every round.</p><div class="rowb" style="margin-top:8px"><button id="btnRepsW" class="gold">∞ Reps, waits for you</button><button id="btnRepsP" class="gold">∞ Reps, in time</button></div></div>
+      <div id="inChal" style="margin-top:14px"><p class="small" id="inChalT"></p><div class="rowb" style="margin-top:8px"><button id="btnFast" class="gold">⚡ Fast (125% speed)</button><button id="btnBlind" class="gold">👁 Staff only (no highway)</button></div></div></details>
   </div>
-  <div class="card" id="inReps"><h2 class="disp">Endless reps</h2><p class="small">A brand-new sixteen-bar exercise built from this lesson's notes and rhythms, different every time. Play as many rounds as you like.</p><div class="rowb" style="margin-top:10px"><button id="btnRepsW" class="gold">∞ Reps, waits for you</button><button id="btnRepsP" class="gold">∞ Reps, in time</button></div></div>
-  <div class="card" id="inChal"><h2 class="disp">Challenge runs</h2><p class="small" id="inChalT"></p><div class="rowb" style="margin-top:10px"><button id="btnFast" class="gold">⚡ Fast (125% speed)</button><button id="btnBlind" class="gold">👁 Staff only (no highway)</button></div></div>
   <p class="small">Finish a lesson either way to open the next stop. Practice waits for you and earns 1 star. Perform is in time and earns up to 3. Stop if your hand or forearm feels tense or sore.</p>
 </div>
 
@@ -184,7 +180,8 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   try { const c = JSON.parse(localStorage.getItem(CKEY)); if (c && c.repo && c.token) cloud = c; } catch (e) {}
   const b64e = s => btoa(unescape(encodeURIComponent(s))), b64d = s => decodeURIComponent(escape(atob(s.replace(/\s/g, ''))));
   const shared = s => { const o = Object.assign({}, s); delete o.micLag; delete o.echo; delete o.beat; return o; }; /* device settings stay on the device */
-  function mergeSaves(a, b) { /* never lose progress: take the best of both */
+  function mergeSaves(a, b) { /* never lose progress: take the best of both, unless one side was deliberately reset later */
+    if ((a.resetAt || 0) !== (b.resetAt || 0)) { const w = (a.resetAt || 0) > (b.resetAt || 0) ? a : b; return Object.assign(blank(), w, { micLag: a.micLag, echo: a.echo, beat: a.beat }); }
     const out = Object.assign(blank(), a); out.xp = Math.max(a.xp || 0, b.xp || 0); out.reps = Math.max(a.reps || 0, b.reps || 0); out.stats = Object.assign({}, a.stats); for (const k in b.stats || {}) out.stats[k] = Math.max(out.stats[k] || 0, b.stats[k] || 0);
     out.lessons = Object.assign({}, a.lessons); for (const id in b.lessons || {}) { const x = out.lessons[id] || {}, y = b.lessons[id], m = { stars: Math.max(x.stars || 0, y.stars || 0), best: Math.max(x.best || 0, y.best || 0) }; if (x.fast || y.fast) m.fast = true; if (x.blind || y.blind) m.blind = true; out.lessons[id] = m; }
     out.shrines = Object.assign({}, b.shrines, a.shrines); const sa = a.streak || {}, sb = b.streak || {}; out.streak = (sb.last || '') > (sa.last || '') || ((sb.last || '') === (sa.last || '') && (sb.count || 0) > (sa.count || 0)) ? sb : sa; return out; }
@@ -352,10 +349,15 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     cloud = { repo, token }; cloudSha = null; cloudSay('Connecting…'); if (await cloudSync()) { try { localStorage.setItem(CKEY, JSON.stringify(cloud)); } catch (e) {} $('cloudTok').value = ''; cloudSay(cloudNote + ' This device is connected.'); } else { const why = cloudNote; cloud = null; try { cloud = JSON.parse(localStorage.getItem(CKEY)); } catch (e) {} cloudSay(why); } };
   $('btnCloudNow').onclick = () => { if (cloud) { cloudSay('Syncing…'); cloudSync(); } else cloudSay('Connect first.'); };
   $('btnCloudOff').onclick = () => { cloud = null; try { localStorage.removeItem(CKEY); } catch (e) {} cloudSay('Disconnected. Progress on this device is kept.'); };
-  $('btnBackup').onclick = () => { const b = $('backupBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; $('saveText').value = JSON.stringify(save); };
+  $('btnBackup').onclick = () => { const b = $('backupBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; $('saveText').value = JSON.stringify(save); let old = null; try { old = localStorage.getItem('koa_save_before_reset'); } catch (e) {} $('btnUndoReset').style.display = old ? '' : 'none'; };
+  $('btnUndoReset').onclick = () => { try { const s = JSON.parse(localStorage.getItem('koa_save_before_reset')); if (!s || !s.stats) return; save = Object.assign(blank(), s, { resetAt: Date.now() }); persist(); if (cloud) cloudSync(); $('backupBox').style.display = 'none'; renderMap(); } catch (e) {} };
   $('btnCopy').onclick = async () => { try { await navigator.clipboard.writeText($('saveText').value); $('btnCopy').textContent = 'Copied'; } catch (e) { $('saveText').select(); } };
   $('btnRestore').onclick = () => { try { const s = JSON.parse($('saveText').value); if (!s.stats) throw 0; save = Object.assign(blank(), s); persist(); renderMap(); } catch (e) { $('btnRestore').textContent = 'Not a valid save'; } };
   $('btnTest').onclick = () => { location.href = 'test.html'; };
+  { let armed = 0; $('btnReset').onclick = () => { const b = $('btnReset'), now = Date.now();
+    if (now - armed > 4000) { armed = now; b.textContent = 'Tap again to erase all progress'; b.style.borderColor = '#ff4d6d'; b.style.color = '#ff4d6d'; setTimeout(() => { if (Date.now() - armed >= 4000) { b.textContent = 'Reset progress'; b.style.borderColor = ''; b.style.color = ''; } }, 4100); return; }
+    armed = 0; try { localStorage.setItem('koa_save_before_reset', JSON.stringify(save)); } catch (e) {}
+    const keep = { micLag: save.micLag, echo: save.echo, beat: save.beat }; save = Object.assign(blank(), keep, { resetAt: now }); persist(); if (cloud) cloudSync(); b.textContent = 'Reset progress'; b.style.borderColor = ''; b.style.color = ''; $('micNote').textContent = 'Progress reset to zero' + (cloud ? ', on this device and in your cloud save' : '') + '. The old save is kept in Backup save in case you want it back.'; renderMap(); }; }
   $('btnFree').onclick = () => startFree();
 
   // ---------------- 3D neon path (Three.js, synthwave), with the flat map as fallback ----------------
@@ -706,13 +708,14 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   let current = null;
   function openIntro(id) {
     current = lessons[id]; const L = current, [lo, hi] = rangeOf(L), r = rec(id);
-    $('inTitle').textContent = L.title; $('inIdea').textContent = L.intro; { const LS = SHRINES.find(s => s.learn === id), dn = LS && save.shrines[LS.id]; $('inLearn').style.display = LS ? 'block' : 'none'; $('inIdeaH').textContent = LS ? 'Part 2 · Play (10 to 15 min)' : 'The idea'; if (LS) { $('inLearnT').textContent = LS.short + (dn ? '  ✓ passed' : ''); $('inLearnS').textContent = dn ? 'You passed this. Open it again any time to review.' : 'Do this first: the playing below is built on it.'; $('btnLearn').textContent = dn ? 'Review the lesson' : 'Start the lesson ▶'; $('btnLearn').onclick = () => openShrine(LS.id); } }
+    $('inTitle').textContent = L.title; $('inIdea').textContent = L.intro; { const LS = SHRINES.find(s => s.learn === id), dn = LS && save.shrines[LS.id]; $('inLearnB').style.display = LS ? '' : 'none'; if (!LS) { $('inLearnT').textContent = ''; $('inLearnS').textContent = 'The full lesson for this stop is not written yet. Short notes for now:'; } if (LS) { $('inLearnT').textContent = LS.short + (dn ? '  ✓ passed' : ''); $('inLearnS').textContent = dn ? 'You passed this. Open it again any time to review.' : 'About 15 minutes. Do this first: the playing is built on it.'; $('btnLearn').textContent = dn ? 'Review the lesson' : 'Start the lesson ▶'; $('btnLearn').onclick = () => openShrine(LS.id); } }
     $('inFind').innerHTML = finderSVG(lo, hi);
     const firstR = L.notes.find(n => n.hand === 'R' && n.pitch !== 'any'), firstL = L.notes.find(n => n.hand === 'L');
     $('inFindT').innerHTML = (firstR ? `The blue zone is the only part of the piano this lesson uses. <b>Middle C</b> is the white key just left of the pair of two black keys nearest the centre of your keyboard: the fourth C counting from the left end, just below the red number display on your Alesis. Right hand starts with finger ${firstR.finger} on <b>${nm(firstR.pitch, L)}</b>${firstR.pitch === 60 ? ' (Middle C)' : firstR.pitch > 60 ? `, ${whiteSteps(firstR.pitch)} white key${whiteSteps(firstR.pitch) === 1 ? '' : 's'} above Middle C` : ''}.` : firstL ? 'The blue zone is the only part of the piano this lesson uses. It sits just left of <b>Middle C</b> (the fourth C from the left end, below the red number display).' : 'This is a rhythm drill: any key works. Use Middle C, the fourth C from the left end, just below the red number display.')
       + (firstL ? ` Left hand starts with finger ${firstL.finger} on <b>${nm(firstL.pitch, L)}</b>, the ${['next', 'second', 'third'][Math.ceil((60 - firstL.pitch) / 12) - 1] || 'low'} ${nm(firstL.pitch, L)} below Middle C.` : '');
     $('inTechT').textContent = L.technique.title; $('inTech').textContent = L.technique.feel;
-    $('inTheory').innerHTML = '<h2 class="disp">Theory rune' + (L.theory.length > 1 ? 's' : '') + '</h2>' + L.theory.map(t => `<div class="t">${t.q}</div><p>${t.a}</p>${t.staff ? staffSVG(t.staff) : ''}<div style="height:10px"></div>`).join('');
+    $('inTheory').style.display = SHRINES.find(s => s.learn === id) ? 'none' : 'block'; $('inSetup').open = !(r.stars >= 1); $('inMore').open = r.stars >= 1;
+    $('inTheory').innerHTML = '<div style="height:10px"></div>' + L.theory.map(t => `<div class="t">${t.q}</div><p>${t.a}</p>${t.staff ? staffSVG(t.staff) : ''}<div style="height:10px"></div>`).join('');
     const uniq = h => [...new Set(L.notes.filter(n => n.hand === h && n.pitch !== 'any').map(n => n.pitch))].sort((a, b) => a - b), rs = uniq('R'), ls = uniq('L');
     $('inStaff').innerHTML = (rs.length ? `<p class="small">Every note in this lesson, low to high${ls.length ? ' (right hand)' : ''}:</p>` + staffSVG({ notes: rs, key: L.key }) : '') + (ls.length ? '<p class="small">Left hand:</p>' + staffSVG({ notes: ls, key: L.key, clef: 'bass' }) : ''); $('inStaffCard').style.display = rs.length || ls.length ? 'block' : 'none';
     const can = (r.stars || 0) >= 1; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
