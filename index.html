@@ -114,14 +114,14 @@
   <h1 class="glow" id="inTitle"></h1>
   <div class="card" id="inLearn" style="border-color:var(--gold)"><h2 class="disp" style="color:var(--gold)">Part 1 · Learn</h2><div class="t" id="inLearnT"></div><p class="small" id="inLearnS"></p><div class="rowb" id="inLearnB" style="margin-top:10px"><button id="btnLearn" class="gold">Start the lesson ▶</button></div><div id="inTheory"></div></div>
   <div class="card" style="border-color:var(--cyan)"><h2 class="disp" style="color:var(--cyan)">Part 2 · Play</h2><p id="inIdea"></p>
-    <div class="rowb" style="margin-top:12px"><button id="btnListen" class="ghost">♪ Listen first</button><button id="btnPractice">Practice (waits for you)</button><button id="btnPerform" class="pink">Perform (in time)</button></div>
+    <div class="rowb" style="margin-top:12px"><button id="btnListen" class="ghost">♪ Listen first</button><button id="btnPractice" style="display:none">Practice</button><button id="btnPerform" class="pink">▶ Play</button><button id="btnSlow" class="ghost">Slow run (70% speed)</button></div>
     <details id="inSetup" style="margin-top:14px"><summary class="disp" style="font-size:12px;color:var(--quiet);cursor:pointer">Where your hands go</summary>
       <div style="margin-top:10px" id="inFind"></div><p id="inFindT" style="margin-top:8px;font-size:14px"></p><p style="margin-top:8px;font-size:14px"><b id="inTechT"></b> <span id="inTech"></span></p><div id="inStaffCard"><div id="inStaff"></div></div></details>
     <details id="inMore" style="margin-top:12px"><summary class="disp" style="font-size:12px;color:var(--quiet);cursor:pointer">More practice: endless reps and challenge runs</summary>
-      <div id="inReps" style="margin-top:10px"><p class="small">Endless reps: a brand-new sixteen-bar exercise from this stop's notes and rhythms, different every round.</p><div class="rowb" style="margin-top:8px"><button id="btnRepsW" class="gold">∞ Reps, waits for you</button><button id="btnRepsP" class="gold">∞ Reps, in time</button></div></div>
+      <div id="inReps" style="margin-top:10px"><p class="small">Endless reps: a brand-new sixteen-bar exercise from this stop's notes and rhythms, different every round.</p><div class="rowb" style="margin-top:8px"><button id="btnRepsW" class="gold" style="display:none">reps w</button><button id="btnRepsP" class="gold">∞ Play a fresh round</button></div></div>
       <div id="inChal" style="margin-top:14px"><p class="small" id="inChalT"></p><div class="rowb" style="margin-top:8px"><button id="btnFast" class="gold">⚡ Fast (125% speed)</button><button id="btnBlind" class="gold">👁 Staff only (no highway)</button></div></div></details>
   </div>
-  <p class="small">Finish a lesson either way to open the next stop. Practice waits for you and earns 1 star. Perform is in time and earns up to 3. Stop if your hand or forearm feels tense or sore.</p>
+  <p class="small">Everything is in time: miss a note and it is gone. Score 40% or better to open the next stop; up to 3 stars for accuracy. A slow run can earn 1 star. Stop if your hand or forearm feels tense or sore.</p>
 </div>
 
 <div class="screen" id="shrine">
@@ -719,7 +719,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     const uniq = h => [...new Set(L.notes.filter(n => n.hand === h && n.pitch !== 'any').map(n => n.pitch))].sort((a, b) => a - b), rs = uniq('R'), ls = uniq('L');
     $('inStaff').innerHTML = (rs.length ? `<p class="small">Every note in this lesson, low to high${ls.length ? ' (right hand)' : ''}:</p>` + staffSVG({ notes: rs, key: L.key }) : '') + (ls.length ? '<p class="small">Left hand:</p>' + staffSVG({ notes: ls, key: L.key, clef: 'bass' }) : ''); $('inStaffCard').style.display = rs.length || ls.length ? 'block' : 'none';
     const can = (r.stars || 0) >= 1; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
-    $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Finish this lesson once, in Practice or Perform, to unlock harder runs.';
+    $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Clear this stop once to unlock harder runs.';
     $('inReps').style.display = makeReps(L) ? 'block' : 'none';
     show('intro');
   }
@@ -727,6 +727,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   $('btnListen').onclick = () => startGame('listen');
   $('btnPractice').onclick = () => startGame('wait');
   $('btnPerform').onclick = () => startGame('perform');
+  $('btnSlow').onclick = () => startGame('perform', 'slow');
   $('btnRepsW').onclick = () => startGame('wait', null, makeReps(current));
   $('btnRepsP').onclick = () => startGame('perform', null, makeReps(current));
   $('btnFast').onclick = () => startGame('perform', 'fast');
@@ -754,7 +755,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     return Object.assign({}, L, { notes: out.sort((a, b) => a.start - b.start), reps: true });
   }
   function startGame(mode, tier, L0) {
-    const L = L0 || current, tempo = L.tempo * (tier === 'fast' ? 1.25 : 1), spb = 60 / tempo, bar = L.timeSig[0];
+    const L = L0 || current, tempo = L.tempo * (tier === 'fast' ? 1.25 : tier === 'slow' ? .7 : 1), spb = 60 / tempo, bar = L.timeSig[0];
     const notes = L.notes.map(n => ({ ...n, state: 0 })), [lo, hi] = rangeOf(L), end = Math.max(...notes.map(n => n.start + n.len));
     game = baseGame({ L, mode, tier, reps: !!L.reps, notes, lo, hi, end, spb, bar, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
       onPress(m, t, src) {
@@ -770,7 +771,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
         for (const n of this.notes) { if (n.state) continue; if (!same(n.pitch)) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
         if (bestN && bestD <= win) { if (byMic) { const raw = (this.beat - bestN.start) * this.spb; save.micLag = Math.max(0, Math.min(.6, lag * .8 + raw * .2)); } const q = bestD <= (byMic ? 150 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); if (byMic) this.notes.forEach(x => { if (!x.state && x.start === bestN.start) x.state = bestN.state; }); } else stray();
       } });
-    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : ' · perform' })[mode] + (L.reps ? ' · reps' : '');
+    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : tier === 'slow' ? ' · slow' : '' })[mode] + (L.reps ? ' · reps' : '');
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
   }
   function startFree() {
@@ -906,18 +907,19 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     $('btnMore').style.display = G.reps ? '' : 'none'; $('btnNextStop').style.display = 'none';
     if (G.reps) { const gain = G.mode === 'wait' ? 12 : Math.round(12 + 36 * acc); save.xp += gain; save.reps = (save.reps || 0) + 1; G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + 1; }); touchStreak(); persist(); lastReps = G.mode; chime(true);
       $('resStars').textContent = '∞'; $('resHead').textContent = 'Reps round ' + save.reps + ' done'; $('resBody').innerHTML = (G.mode === 'wait' ? `${total} fresh notes read, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}.` : `Accuracy ${Math.round(acc * 100)}% on music you had never seen · ${perfect} perfect, ${good} good, ${miss} missed.`) + ` +${gain} XP.<br>Every round is new, so this is real sight-reading practice.`; show('results'); return; }
-    const r = save.lessons[G.L.id] || { stars: 0, best: 0 }, first = stars > r.stars, passedTier = G.tier && stars >= 2, newBadge = passedTier && !r[G.tier];
-    const gain = Math.round((G.mode === 'wait' ? 15 : 20 + 60 * acc) * (G.bossy ? 2 : 1) * (G.tier ? 1.5 : 1)) + (first && !G.tier ? 25 * (stars - r.stars) : 0) + (newBadge ? 60 : 0);
-    if (!G.tier) { r.stars = Math.max(r.stars, stars); r.best = Math.max(r.best, Math.round(acc * 100)); } if (passedTier) r[G.tier] = true;
+    const slow = G.tier === 'slow'; if (slow) stars = Math.min(stars, 1);
+    const r = save.lessons[G.L.id] || { stars: 0, best: 0 }, first = stars > r.stars, passedTier = G.tier && !slow && stars >= 2, newBadge = passedTier && !r[G.tier];
+    const gain = Math.round((G.mode === 'wait' ? 15 : 20 + 60 * acc) * (G.bossy ? 2 : 1) * (slow ? .6 : G.tier ? 1.5 : 1)) + (first && (!G.tier || slow) ? 25 * (stars - r.stars) : 0) + (newBadge ? 60 : 0);
+    if (!G.tier || slow) { r.stars = Math.max(r.stars, stars); if (!slow) r.best = Math.max(r.best, Math.round(acc * 100)); } if (passedTier) r[G.tier] = true;
     save.lessons[G.L.id] = r; save.xp += gain;
     G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + Math.max(1, Math.round(gain / 20)); }); if (G.tier === 'blind' && passedTier) save.stats.reading += 3;
     touchStreak();
     persist(); chime(stars >= 2 || G.mode === 'wait');
-    $('resStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars) + (passedTier ? (G.tier === 'fast' ? ' ⚡' : ' 👁') : '');
-    $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : G.L.quest ? 'Song cleared!' : 'The grid lights up') : stars === 1 ? 'Cleared. Tighten the timing for more stars' : 'Not yet. Again, a little calmer';
+    $('resStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars) + (passedTier ? (G.tier === 'fast' ? ' ⚡' : G.tier === 'slow' ? ' (slow)' : ' 👁') : '');
+    $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : G.L.quest ? 'Song cleared!' : 'The grid lights up') : stars === 1 ? (slow ? 'Cleared at slow speed. Now full speed' : 'Cleared. Tighten the timing for more stars') : 'Not yet. Again, a little calmer';
     $('resBody').innerHTML = G.mode === 'wait'
       ? `${total} notes, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}. +${gain} XP.<br>The next stop is open. Come back and Perform when you want more stars.`
-      : `Accuracy ${Math.round(acc * 100)}% · ${perfect} perfect, ${good} good, ${miss} missed · best combo ${G.best}. +${gain} XP.` + (miss > 2 ? '<br>Tip: run Practice once more and count out loud.' : stars >= 2 && !G.tier ? '<br>Want more? Try the ⚡ and 👁 challenge runs.' : '');
+      : `Accuracy ${Math.round(acc * 100)}% · ${perfect} perfect, ${good} good, ${miss} missed · best combo ${G.best}. +${gain} XP.` + (miss > 2 ? '<br>Tip: try the slow run, and count out loud.' : stars >= 2 && !G.tier ? '<br>Want more? Try the ⚡ and 👁 challenge runs.' : '');
     { const o = order(), n = o[o.indexOf(G.L.id) + 1]; $('btnNextStop').style.display = n && unlocked(n) ? '' : 'none'; }
     show('results');
   }
