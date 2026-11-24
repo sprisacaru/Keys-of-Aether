@@ -68,6 +68,16 @@
   #results{align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px}
   #results .stars{animation:pop .7s;font-size:54px;color:var(--gold);letter-spacing:6px;text-shadow:0 0 20px var(--gold)}
   #results .big2{font-size:22px;font-weight:800} #results p{color:var(--quiet);margin:0;max-width:330px;line-height:1.5}
+  @media (min-width:700px) and (min-height:541px){
+    #map{max-width:none} #m3{height:calc(100vh - 290px)!important} .top h1{font-size:26px} .chip{font-size:14px;padding:7px 13px} .stat{font-size:13px;padding:5px 10px} .mapHud{padding:14px 20px 10px} .mapFoot{padding:14px 20px 30px} .mapFoot button{font-size:14px}
+    #intro,#shrine{max-width:860px;padding:26px 28px 40px;gap:16px} #intro h1{font-size:34px} .card{padding:20px 22px} .card h2{font-size:14px} .card p{font-size:18px;line-height:1.6} .small{font-size:15px} #sv{height:230px} #skb{height:200px} button{font-size:16px;padding:13px 20px}
+    #results .stars{font-size:80px} #results .big2{font-size:30px} #results p{font-size:18px;max-width:520px} #title h1{font-size:64px} #title p{font-size:18px;max-width:480px} .hud .ttl,.hud .mid{font-size:16px}
+  }
+  @media (min-width:1000px) and (min-height:541px){
+    #map.on{display:grid;grid-template-columns:340px 1fr;grid-template-rows:auto 1fr;height:100vh;height:100dvh;overflow:hidden}
+    #map .mapHud{grid-column:1;grid-row:1;position:static} #map .top{flex-wrap:wrap} #map #chipIn{max-width:none} #map .mapFoot{grid-column:1;grid-row:2;overflow:auto} #map .mapFoot .rowb{flex-direction:column} #map .mapFoot .rowb button{width:100%;text-align:left}
+    #sceneWrap{grid-column:2;grid-row:1 / span 2;overflow:hidden;min-width:0} #m3{height:100vh!important;height:100dvh!important;min-height:0!important;border-radius:0!important}
+  }
 </style>
 </head>
 <body>
@@ -691,7 +701,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   window.addEventListener('resize', () => { if (game) resize(); });
 
   function layout() {
-    const G = game, W = cv._w, H = cv._h, free = G.mode === 'free', staffH = free ? 0 : G.two ? Math.min(190, H * (W > H ? .27 : .3)) : Math.min(120, H * .2), wide = W > H, stripH = wide ? 24 : 30, kbH = Math.max(Math.min(170, H * .27), Math.min(112, H * .34)), hitY = H - kbH, topY = staffH + stripH + 4;
+    const G = game, W = cv._w, H = cv._h, free = G.mode === 'free', staffH = free ? 0 : G.two ? Math.min(H > 700 ? 270 : 190, H * (W > H ? .27 : .3)) : Math.min(H > 700 ? 170 : 120, H * .2), wide = W > H, stripH = wide ? 24 : 30, kbH = Math.max(Math.min(H > 700 ? 230 : 170, H * .27), Math.min(112, H * .34)), hitY = H - kbH, topY = staffH + stripH + 4;
     const whites = []; for (let m = G.lo; m <= G.hi; m++) if (!isBlack(m)) whites.push(m);
     const ww = W / whites.length, keyX = m => !isBlack(m) ? (whites.indexOf(m) + .5) * ww : whites.indexOf(m - 1) * ww + ww;
     return { W, H, staffH, stripH, kbH, hitY, topY, whites, ww, keyX, bw: ww * .6 };

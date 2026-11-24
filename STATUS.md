@@ -28,3 +28,8 @@ Plan: the "Master plan" tab of the Keys of Aether doc (eight regions, ten theory
 - Stop 1 is now sixteen bars over all five notes C to G (was a short two-note lesson).
 - Endless reps: every stop whose hand stays in one position has "∞ Reps" (waits for you / in time). Each round is a new generated sixteen-bar exercise from that lesson's notes, fingering and rhythms. Reps give XP and count rounds (`save.reps`) but never change stars. Not offered on r1-13, r1-09, r1-10 (hand moves).
 - Tested in a simulated browser only (200 generated exercises per lesson pass the lesson rules). Not yet tried on the phone.
+
+## 24 Nov: iPad
+- Stefan's iPad is an A1701 (iPad Pro 10.5", 2017), currently on iOS 12; can update to iPadOS 17. The 23 Nov old-Safari fixes made the game load there.
+- Tablet layouts added: 700px+ wide gets larger type and full-width map; 1000px+ wide gets a side panel with the map filling the rest. Play screen uses a taller staff and keyboard on tall screens. Rules sit at the end of the stylesheet so they win over base rules.
+- Agreed direction (not built): each stop becomes Learn (about 10 min of real theory, all in one place) then Play (10 to 15 min). Rune shrines fold into the Learn part.
