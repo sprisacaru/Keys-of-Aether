@@ -64,3 +64,13 @@ Not individually sourced: English singers popularising thirds c.1400; Chopin on 
 - Nothing has been verified on iOS 12 Safari, with the microphone, or with a MIDI cable.
 - Fonts load from Google Fonts; the game needs internet.
 - Adaptive difficulty, Forge, Trial, expression scoring, song import: not built.
+
+## 25 Nov: Arcade, phase 1
+Stefan asked for a parallel Guitar-Hero-style mode: no lessons, just songs, scores, levelling. Decisions he made: names "Journey" and "Arcade"; the song ends if the crowd meter empties; Arcade has its own XP (separate from Journey XP); public-domain songs only for now.
+- `tools/make-arcade.mjs` → `arcade/songs.js` (`window.KOA_ARCADE`), inlined by `tools/bundle.py`. Each song is written once (melody + one chord root per bar) and arranged three ways: Easy = tune only at 70% tempo; Medium = tune + one bass note a bar at 85%; Hard = tune + root/fifth left hand at full tempo (Für Elise Hard uses its real left hand).
+- Setlist: Opening act (Ode to Joy, Frère Jacques, When the Saints); Headliners, 8 stars (Can-Can, William Tell gallop, Hall of the Mountain King); Encore, 20 stars (The Entertainer, Für Elise theme). Tunes were written from memory, not checked against scores: William Tell bars 3 to 4 and The Entertainer's second phrase are the least certain.
+- Finger numbers only where certain: right hand on the three Opening-act songs (C position), and the generated left hand (5 on the root, 1 on the fifth). Elsewhere none.
+- Engine (index.html, "ARCADE" block): `startArcade(id, d, listen)`, `arcSetup/arcHit/arcMiss/arcFrame/arcFinish`, `renderArcade`. Score 100 perfect / 70 good × streak multiplier (×2 at 10, ×3 at 20, ×4 at 30) × 2 in overdrive. Gold phrases (bars 3, 4 and 7 of every 8) hit cleanly add 25% overdrive; it switches on by itself at a bar line once ≥ 50% and lasts 8 beats per 50%. Crowd meter starts at 60%, +2.5% a hit, −5/7/9% a miss by difficulty (half for a wrong key); empty = fail. Stars from score ÷ perfect-run score: 95/80/60/40%.
+- Save: `save.arcade = { xp, songs: { id: { 0|1|2: { stars, score, fc } } }, theme }`, merged in `mergeArc`. Ranks at 0/400/1500/4500/12000 XP. Themes (CSS filter on the play canvas): Neon, Ember (10 stars), Emerald (25), Gold (first full combo). Reset progress clears Arcade too.
+- Tested with a bot only: every song × difficulty plays to a full combo, a failing run fails, preview works, Journey is unaffected. Not tested on devices. With the microphone, Medium and Hard will drop left-hand notes; the setlist says so when the mic is on.
+- Not built: copyrighted songs and import, manual overdrive trigger, leaderboards, finger numbers for the harder songs.
