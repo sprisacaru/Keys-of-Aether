@@ -259,13 +259,17 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   // ---------------- Input ----------------
   let midiName = ''; const held = {};
   const echoOn = src => src !== 'mic' && (save.echo === 'on' || (save.echo === 'auto' && src !== 'midi'));
-  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; game && game.onPress(m, performance.now(), src); shrine && shrine.onPress(m); }
-  function release(m) { delete held[m]; stopTone(m); }
+  /* Expression: how hard (vel), how long (release), and the sustain pedal. Loudness and pedal only arrive over the cable. */
+  let pedalDown = false, pedalSeen = false; const pedalHeld = [];
+  const DYN = ['pp', 'p', 'mp', 'mf', 'f', 'ff'], DYNV = [.3, .42, .55, .66, .8, .92];
+  function setPedal(on) { if (on === pedalDown) return; pedalDown = on; pedalSeen = true; if (!on) { pedalHeld.splice(0).forEach(m => { if (!held[m]) stopTone(m); }); } if (game && game.onPedal) game.onPedal(on); }
+  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; if (game) { game.cur = { src, vel }; game.onPress(m, performance.now(), src); } shrine && shrine.onPress(m); }
+  function release(m) { delete held[m]; if (pedalDown) pedalHeld.push(m); else stopTone(m); if (game && game.onRelease) game.onRelease(m); }
   async function initMidi() {
     if (!navigator.requestMIDIAccess) return;
     try {
       const acc = await navigator.requestMIDIAccess({ sysex: false });
-      const hook = () => { const names = []; acc.inputs.forEach(inp => { names.push(inp.name || 'keyboard'); inp.onmidimessage = ev => { const [st, d1, d2] = ev.data, c = st & 0xf0; if (c === 0x90 && d2 > 0) press(d1, d2 / 127, 'midi'); else if (c === 0x80 || (c === 0x90 && d2 === 0)) release(d1); }; }); midiName = names.join(', '); chipIn(); };
+      const hook = () => { const names = []; acc.inputs.forEach(inp => { names.push(inp.name || 'keyboard'); inp.onmidimessage = ev => { const [st, d1, d2] = ev.data, c = st & 0xf0; if (c === 0x90 && d2 > 0) press(d1, d2 / 127, 'midi'); else if (c === 0x80 || (c === 0x90 && d2 === 0)) release(d1); else if (c === 0xB0 && d1 === 64) setPedal(d2 >= 64); }; }); midiName = names.join(', '); chipIn(); };
       acc.onstatechange = hook; hook();
     } catch (e) {}
   }
@@ -633,7 +637,12 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   const starsBg = Array.from({ length: 70 }, (_, i) => { const R = rng(i + 3); return [R(), R(), R()]; });
 
   function baseGame(o) { return Object.assign({ beat: 0, last: performance.now(), lastClick: -99, combo: 0, best: 0, strays: 0, fx: [], parts: [], flash: {}, done: false, notes: [], bar: 4, spb: 1,
-    hit(n, m, q) { this.combo++; this.best = Math.max(this.best, this.combo); this.flash[m] = { t: performance.now(), bad: false }; this.fx.push({ m, t: performance.now(), q }); this.burst(m, q === 'perfect' ? '#3dff9a' : '#ffd24a'); if (this.arc) arcHit(this, n, q); },
+    hit(n, m, q) { this.combo++; this.best = Math.max(this.best, this.combo); this.flash[m] = { t: performance.now(), bad: false }; this.fx.push({ m, t: performance.now(), q }); this.burst(m, q === 'perfect' ? '#3dff9a' : '#ffd24a'); if (this.arc) arcHit(this, n, q);
+        const c = this.cur || {}; if (c.src && c.src !== 'mic' && n.len * this.spb >= .45) this.live[m] = n;
+        if (this.dyn && c.src === 'midi' && n.dyn != null) { this.ex.touchN++; if (Math.abs(c.vel - DYNV[n.dyn]) <= .2) { this.ex.touchOk++; n.touchOk = true; if (this.arc) arcBonus(this, 20, 'Touch'); } } },
+      onRelease(m) { const n = this.live[m]; if (!n) return; delete this.live[m]; if (pedalDown) this.sus.push(n); else this.endHold(n); },
+      endHold(n) { if (n.holdDone) return; n.holdDone = true; const ok = (this.beat - n.start) / n.len >= .7; this.ex.holdN++; n.heldOk = ok; if (ok) { this.ex.holdOk++; if (this.arc) arcBonus(this, 30, 'Held'); } },
+      onPedal(on) { if (!on) { this.sus.splice(0).forEach(n => this.endHold(n)); return; } const s = this.ped.find(x => !x.j && Math.abs(this.beat - x.a) <= .75); if (s) { s.j = 1; this.ex.pedN++; this.ex.pedOk++; if (this.arc) arcBonus(this, 50, 'Pedal'); } },
     burst(m, col) { const now = performance.now(); for (let i = 0; i < 14; i++) this.parts.push({ m, t: now, a: Math.PI * (1 + Math.random()), v: 60 + Math.random() * 190, col }); } }, o); }
 
   function fingerMap(L, hand) { const m = {}; for (const n of L.notes) { if (n.hand !== hand || n.pitch === 'any') continue; if (m[n.pitch] && m[n.pitch] !== n.finger) return null; m[n.pitch] = n.finger; } return m; }
@@ -650,7 +659,8 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   function startGame(mode, tier, L0) {
     const L = L0 || current, tempo = L.tempo * (tier === 'fast' ? 1.25 : tier === 'slow' ? .7 : 1), spb = 60 / tempo, bar = L.timeSig[0];
     const notes = L.notes.map(n => ({ ...n, state: 0 })), [lo, hi] = rangeOf(L), end = Math.max(...notes.map(n => n.start + n.len));
-    game = baseGame({ L, mode, tier, reps: !!L.reps, notes, lo, hi, end, spb, bar, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
+    if (L.dyn) { /* one loudness mark per bar: the level of the tune (the loudest right-hand note), shown only when it changes */ const bars = {}; notes.forEach(n => { if (n.hand === 'R' && n.dyn != null) { const b = Math.floor(n.start / L.timeSig[0] + 1e-6); if (!bars[b]) bars[b] = { first: n, lvl: n.dyn }; else bars[b].lvl = Math.max(bars[b].lvl, n.dyn); } }); let prev = -1; Object.keys(bars).map(Number).sort((a, b) => a - b).forEach(b => { if (bars[b].lvl !== prev) { bars[b].first.mark = DYN[bars[b].lvl]; prev = bars[b].lvl; } }); }
+    game = baseGame({ L, mode, tier, reps: !!L.reps, notes, lo, hi, end, spb, bar, dyn: !!L.dyn, live: {}, sus: [], ped: (L.pedal || []).map(s => ({ a: s[0], b: s[1], j: 0 })), ex: { holdN: 0, holdOk: 0, touchN: 0, touchOk: 0, pedN: 0, pedOk: 0 }, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
       onPress(m, t, src) {
         if (this.mode === 'listen' || this.done) return; const byMic = src === 'mic', lag = byMic ? micLag() : 0, beatNow = this.beat - lag / this.spb, same = p => p === 'any' || p === m || (byMic && p % 12 === m % 12), win = byMic ? 420 : GOOD;
         const stray = () => { this.flash[m] = { t: performance.now(), bad: true }; if (!byMic) { this.strays++; this.combo = 0; if (this.arc) arcMiss(this, null); } };
@@ -697,6 +707,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
       for (const n of G.notes) { if (n.state) continue;
         if (G.mode === 'listen' && G.beat >= n.start) { n.state = 1; const m = n.pitch === 'any' ? 72 : n.pitch; tone(m, n.hand === 'L' ? .45 : .6, n.len * G.spb * 1.1); G.hit(n, m, 'perfect'); }
         else if (G.mode === 'perform' && (G.beat - n.start) * G.spb * 1000 > (mic ? micLag() * 1000 + 430 : GOOD)) { n.state = 3; G.combo = 0; if (G.arc) arcMiss(G, n); } }
+    if (pedalSeen && G.ped && G.mode === 'perform') for (const s of G.ped) if (!s.j && G.beat > s.a + .75) { s.j = 2; G.ex.pedN++; }
       const count = G.beat < 0 ? Math.ceil(-G.beat) : 0; $('hudMid').textContent = count ? 'Ready… ' + count : (G.arc ? arcFrame(G, adv, now) : G.combo > 1 ? '×' + G.combo + ' combo' : '');
       if (!G.done && G.notes.every(n => n.state) && G.beat > G.end + (G.mode === 'wait' ? 0 : .5)) { G.done = true; setTimeout(() => { if (game === G) finish(); }, 600); }
     } else { G.beat += dt * 112 / 60; if (save.beat) drums(G, G.beat, 4); }
@@ -775,8 +786,12 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
         if (info.acc) { g2.font = `${sp * 1.9}px serif`; g2.textAlign = 'right'; g2.fillText(info.acc, x - sp * .8, y + sp * .6); }
         if (n.len === 1.5 || n.len === 3) { g2.beginPath(); g2.arc(x + sp * 1.15, y - (info.d % 2 === S.base % 2 ? sp * .3 : 0), 1.8, 0, 2 * Math.PI); g2.fill(); }
         if (n.finger) { g2.font = `700 ${Math.max(10, sp * 1.2)}px sans-serif`; g2.textAlign = 'center'; g2.fillStyle = '#9a93c9'; g2.fillText(n.finger, x, S.hand === 'L' ? S.bottom + sp * 2.6 : S.bottom - sp * 6.4); }
+        if (n.mark) { g2.font = `italic 700 ${Math.max(12, sp * 1.9)}px Georgia, serif`; g2.textAlign = 'center'; g2.fillStyle = '#ff9be6'; g2.fillText(n.mark, x, S.bottom + sp * 2.7); }
       }
     }
+    if (G.ped && G.ped.length) { const py = h - 5; g2.lineWidth = 2; g2.font = 'italic 700 11px Georgia, serif'; g2.textAlign = 'left';
+      for (const s of G.ped) { const xa = headX + (s.a - G.beat) * pxBeat, xb = headX + (s.b - G.beat) * pxBeat; if (xb < 52 || xa > W) continue; const c = s.j === 1 ? '#3dff9a' : s.j === 2 ? '#ff4d6d' : '#ffd24a'; g2.strokeStyle = c; g2.fillStyle = c; g2.beginPath(); g2.moveTo(Math.max(52, xa), py - 6); g2.lineTo(Math.max(52, xa), py); g2.lineTo(xb, py); g2.lineTo(xb, py - 6); g2.stroke(); if (xa >= 52) g2.fillText('Ped', xa + 4, py - 3); }
+      g2.fillStyle = pedalDown ? '#3dff9a' : '#6a648f'; g2.font = '700 10px sans-serif'; g2.fillText(pedalDown ? '● PEDAL' : pedalSeen ? '○ pedal' : '', 6, h - 4); }
     g2.strokeStyle = '#2ef2ff'; g2.lineWidth = 2; g2.beginPath(); g2.moveTo(headX, 6); g2.lineTo(headX, h - 6); g2.stroke();
   }
 
@@ -811,6 +826,8 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   function arcHit(G, n, q) { const a = G.arc; a.streak++; a.best = Math.max(a.best, a.streak); a.mult = Math.min(4, 1 + Math.floor(a.streak / 10)); a.score += (q === 'perfect' ? 100 : 70) * a.mult * (a.on ? 2 : 1); a.meter = Math.min(1, a.meter + (a.on ? .05 : .025));
     if (a.streak % 10 === 0 && a.streak <= 30) { a.pop = '×' + a.mult + ' multiplier'; a.popT = performance.now(); }
     if (n.sp != null && !a.broken[n.sp]) { a.got[n.sp] = (a.got[n.sp] || 0) + 1; if (a.got[n.sp] === a.size[n.sp]) { a.power = Math.min(1, a.power + .25); a.pop = 'Phrase clean: overdrive +'; a.popT = performance.now(); tone(96, .25, .25); } } }
+  function arcBonus(G, pts, label) { const a = G.arc; a.score += pts * a.mult * (a.on ? 2 : 1); a.pop = label; a.popT = performance.now(); }
+  function exLine(G) { const e = G.ex, out = []; if (e.holdN) out.push(`held ${e.holdOk} of ${e.holdN} long notes`); if (e.touchN) out.push(`touch ${e.touchOk} of ${e.touchN}`); if (e.pedN) out.push(`pedal ${e.pedOk} of ${e.pedN}`); return out.length ? 'Expression: ' + out.join(' · ') : ''; }
   function arcMiss(G, n) { const a = G.arc; if (a.failed) return; a.streak = 0; a.mult = 1; a.misses++; a.meter -= n ? a.lose : a.lose * .5; if (n && n.sp != null) a.broken[n.sp] = 1;
     if (a.meter <= 0) { a.meter = 0; a.failed = true; G.done = true; chime(false); setTimeout(() => { if (game === G) finish(); }, 500); } }
   function arcFrame(G, adv, now) { const a = G.arc;
@@ -828,17 +845,17 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     const news = []; TIERS.forEach((t, i) => { if (before.stars < t.need && arcStars() >= t.need) news.push('New tier unlocked: ' + t.name); }); THEMES.forEach(t => { if (!before.themes.includes(t.id) && themeOpen(t)) news.push('New highway theme: ' + t.name); }); if (arcRank()[1] !== before.rank) news.push('New rank: ' + arcRank()[1]);
     if (!a.failed && a.score > (old.score || 0) && old.score) news.push('New high score');
     $('arStars').innerHTML = starsH(stars); $('arHead').textContent = a.failed ? 'The crowd walked out' : fc ? 'FULL COMBO' : ['', 'You got through it', 'Decent set', 'The crowd is with you', 'Huge', 'Legendary'][stars]; $('arScore').textContent = a.score.toLocaleString();
-    $('arBody').innerHTML = `${song.title} · ${DIFF[d]}<br>${hit} of ${total} notes · best streak ${a.best}` + (a.failed ? `<br>You got ${Math.round(Math.max(0, Math.min(1, G.beat / G.end)) * 100)}% of the way through. Miss fewer in a row and the crowd stays.` : '') + `<br>+${gain} arcade XP` + (news.length ? '<br><b style="color:#ffd24a">' + news.join('<br>') + '</b>' : '');
+    $('arBody').innerHTML = `${song.title} · ${DIFF[d]}<br>${hit} of ${total} notes · best streak ${a.best}` + (a.failed ? `<br>You got ${Math.round(Math.max(0, Math.min(1, G.beat / G.end)) * 100)}% of the way through. Miss fewer in a row and the crowd stays.` : '') + (exLine(G) ? '<br>' + exLine(G) : '') + `<br>+${gain} arcade XP` + (news.length ? '<br><b style="color:#ffd24a">' + news.join('<br>') + '</b>' : '');
     $('arAgain').onclick = () => startArcade(id, d); const nx = $('arNext'); nx.style.display = !a.failed && stars >= 3 && d < 2 ? '' : 'none'; nx.textContent = 'Try ' + DIFF[Math.min(2, d + 1)] + ' ▶'; nx.onclick = () => startArcade(id, d + 1);
     if (!a.failed) chime(true); show('arcRes'); window.scrollTo(0, 0);
   }
-  function startArcade(id, d, listen) { const s = ARC.find(x => x.id === id), lv = s.levels[d]; current = null; startGame(listen ? 'listen' : 'perform', null, { id: 'arc-' + id, title: s.title + ' · ' + DIFF[d], tempo: lv.tempo, timeSig: s.timeSig, key: lv.key || s.key, notes: lv.notes, skills: [], arcade: { id, d } }); }
+  function startArcade(id, d, listen) { const s = ARC.find(x => x.id === id), lv = s.levels[d]; current = null; startGame(listen ? 'listen' : 'perform', null, { id: 'arc-' + id, title: s.title + ' · ' + DIFF[d], tempo: lv.tempo, timeSig: s.timeSig, key: lv.key || s.key, dyn: !!s.dyn, pedal: lv.pedal || [], notes: lv.notes, skills: [], arcade: { id, d } }); }
   function renderArcade() {
     const S = arcSave(), tot = arcStars(), rk = arcRank(), nextR = RANKS.find(r => r[0] > S.xp); $('arcRank').textContent = `${rk[1]} · ${S.xp} XP · ${tot} ★`;
     $('arcTop').innerHTML = `<button class="ghost" id="arcMic">${$('btnMic').textContent}</button>` + THEMES.map(t => `<button class="${S.theme === t.id ? 'gold' : 'ghost'}" data-theme="${t.id}" ${themeOpen(t) ? '' : 'disabled style="opacity:.4"'}>${themeOpen(t) ? '' : '🔒 '}${t.name}</button>`).join('');
     $('arcNote').textContent = (nextR ? `Next rank, ${nextR[1]}, at ${nextR[0]} XP. ` : '') + 'On a real piano score, Hard is every note the composer wrote, in the original key and at a real tempo; Easy and Medium are cut-down versions of the same music. Arrangements are tunes that were never piano pieces. Everything is in time. Hit streaks to multiply your score, play the gold phrases cleanly to charge overdrive (it switches on by itself and doubles your points), and keep the crowd meter off the floor.' + (mic ? ' On the microphone, Medium and Hard will miss notes you played: they need the cable.' : '');
     $('arcList').innerHTML = TIERS.map((t, ti) => { const open = tot >= t.need;
-      return `<div class="tierH"><h2 class="disp">${t.name}</h2><span class="small">${open ? '' : '🔒 ' + (t.need - tot) + ' more ★ to unlock'}</span></div><div class="tierSongs">` + ARC.filter(s => s.tier === ti).map(s => `<div class="card song${open ? '' : ' locked'}"><div class="t">${s.title}</div><div class="small"><b style="color:${s.real ? '#3dff9a' : '#a98bff'}">${s.real ? 'Real piano score' : 'Arrangement'}</b> · ${s.by}, ${s.year} · ${s.blurb}</div><div class="lv">` + [0, 1, 2].map(d => { const r = arcRec(s.id, d); return `<button ${open ? '' : 'disabled'} class="${d === 2 ? 'pink' : d === 1 ? '' : 'ghost'}" data-song="${s.id}" data-d="${d}">${DIFF[d]}${r.fc ? ' ✦' : ''}<span style="display:block;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.8">${s.real ? ['top line' + (s.levels[0].key && s.levels[0].key !== s.key ? ', easy key' : ''), 'tune + bass', 'as written'][d] : ['tune only', 'tune + bass', 'both hands'][d]}</span><small>${starsH(r.stars || 0)}</small>${r.score ? r.score.toLocaleString() : '&nbsp;'}</button>`; }).join('') + `</div>${open ? `<button class="ghost" data-listen="${s.id}" style="margin-top:8px;font-size:12px;padding:6px 10px">♪ Listen</button>` : ''}</div>`).join('') + '</div>'; }).join('');
+      return `<div class="tierH"><h2 class="disp">${t.name}</h2><span class="small">${open ? '' : '🔒 ' + (t.need - tot) + ' more ★ to unlock'}</span></div><div class="tierSongs">` + ARC.filter(s => s.tier === ti).map(s => `<div class="card song${open ? '' : ' locked'}"><div class="t">${s.title}</div><div class="small"><b style="color:${s.real ? '#3dff9a' : '#a98bff'}">${s.real ? 'Real piano score' : 'Arrangement'}</b> · ${s.by}, ${s.year} · ${s.blurb}${s.dyn || (s.levels[2].pedal || []).length ? ' <i>Has ' + [s.dyn ? 'loud/soft marks' : '', (s.levels[2].pedal || []).length ? (s.pedalFrom === 'bar' ? 'suggested pedalling' : 'pedal marks') : ''].filter(Boolean).join(' and ') + '.</i>' : ''}</div><div class="lv">` + [0, 1, 2].map(d => { const r = arcRec(s.id, d); return `<button ${open ? '' : 'disabled'} class="${d === 2 ? 'pink' : d === 1 ? '' : 'ghost'}" data-song="${s.id}" data-d="${d}">${DIFF[d]}${r.fc ? ' ✦' : ''}<span style="display:block;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.8">${s.real ? ['top line' + (s.levels[0].key && s.levels[0].key !== s.key ? ', easy key' : ''), 'tune + bass', 'as written'][d] : ['tune only', 'tune + bass', 'both hands'][d]}</span><small>${starsH(r.stars || 0)}</small>${r.score ? r.score.toLocaleString() : '&nbsp;'}</button>`; }).join('') + `</div>${open ? `<button class="ghost" data-listen="${s.id}" style="margin-top:8px;font-size:12px;padding:6px 10px">♪ Listen</button>` : ''}</div>`).join('') + '</div>'; }).join('');
     show('arcade'); window.scrollTo(0, 0);
   }
   $('arcList').onclick = e => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.dataset.listen) startArcade(b.dataset.listen, 0, true); else if (b.dataset.song) startArcade(b.dataset.song, +b.dataset.d); };
@@ -848,6 +865,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
 
   function finish() {
     const G = game; if (!G) return; cancelAnimationFrame(raf); game = null;
+    if (G.endHold) { Object.keys(G.live || {}).forEach(m => G.endHold(G.live[m])); (G.sus || []).forEach(n => G.endHold(n)); }
     if (G.L.arcade) { G.arc ? arcFinish(G) : renderArcade(); return; }
     if (G.mode === 'listen') { openIntro(G.L.id); return; }
     const total = G.notes.length, perfect = G.notes.filter(n => n.state === 1).length, good = G.notes.filter(n => n.state === 2).length, miss = total - perfect - good;
@@ -871,6 +889,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
       ? `${total} notes, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}. +${gain} XP.<br>The next stop is open. Come back and Perform when you want more stars.`
       : `Accuracy ${Math.round(acc * 100)}% · ${perfect} perfect, ${good} good, ${miss} missed · best combo ${G.best}. +${gain} XP.` + (miss > 2 ? '<br>Tip: try the slow run, and count out loud.' : stars >= 2 && !G.tier ? '<br>Want more? Try the ⚡ and 👁 challenge runs.' : '');
     { const o = order(), n = o[o.indexOf(G.L.id) + 1]; $('btnNextStop').style.display = n && unlocked(n) ? '' : 'none'; }
+    if (exLine(G)) $('resBody').innerHTML += '<br>' + exLine(G);
     show('results');
   }
   $('btnAgain').onclick = () => openIntro(current.id);
@@ -885,7 +904,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); if (!document.hidden && cloud && index) cloudSync(); });
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); if (cloud) cloudSync(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { makeReps, startArcade, renderArcade, get arcade() { return ARC; }, shrineState: () => shrine && ({ quiz: shrine.quiz, do: !shrine.quiz && shrine.S.pages[shrine.step].do || null, quizAll: shrine.S.quiz }), cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  window.__koa = { makeReps, setPedal, release, startArcade, renderArcade, get arcade() { return ARC; }, shrineState: () => shrine && ({ quiz: shrine.quiz, do: !shrine.quiz && shrine.S.pages[shrine.step].do || null, quizAll: shrine.S.quiz }), cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>
