@@ -26,6 +26,11 @@
   .screen.on{display:flex}
   button{font:inherit;font-weight:700;letter-spacing:1px;color:var(--ink);background:rgba(46,242,255,.08);border:1px solid var(--cyan);border-radius:10px;padding:11px 16px;cursor:pointer}
   .steps{display:flex;gap:8px;margin:4px 0 12px} .steps button{flex:1;text-align:left;padding:10px 12px;border-color:var(--line);background:none;color:var(--quiet)} .steps button b{display:block;font-size:10px;letter-spacing:2px;opacity:.8} .steps button.on{border-color:var(--cyan);color:var(--ink);background:rgba(46,242,255,.08)} .steps button.done b{color:var(--good)} .steps button:disabled{opacity:.4}
+  @keyframes starPop{0%{transform:scale(0) rotate(-40deg);opacity:0}60%{transform:scale(1.7) rotate(8deg);opacity:1}100%{transform:scale(1)}} .starPop{display:inline-block;opacity:0;animation:starPop .45s cubic-bezier(.2,1.4,.4,1) forwards;text-shadow:0 0 18px var(--gold)}
+  #confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50}
+  .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:4px 0 10px} .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink))}
+  #hub .card{margin-top:12px} #hub .grid2 .card{margin-top:0}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px} .badge{border:1px solid var(--line);border-radius:10px;padding:8px 10px} .badge.off{opacity:.38} .gl dt{font-weight:700;margin-top:12px;color:var(--ink)} .gl dd{margin:2px 0 0;color:#cfc9f2}
   button:active{transform:scale(.97)} button.pink{border-color:var(--pink);background:rgba(255,63,210,.1)} button.gold{border-color:var(--gold);background:rgba(255,210,74,.1)} button.ghost{border-color:var(--line);background:none;color:var(--quiet)}
   button.big{font-size:17px;padding:15px 26px;box-shadow:0 0 22px rgba(46,242,255,.3)}
   .glow{background:linear-gradient(180deg,#fff27a 10%,#ff9a3c 45%,#ff3fd2 55%,#2ef2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -107,7 +112,8 @@
 <div class="screen" id="map">
   <div class="mapHud">
     <div class="top"><h1 class="glow">Keys of Aether</h1><span class="chip" id="chipIn">Touch keys</span></div>
-    <div class="rowb" style="margin-top:8px"><button class="ghost" id="btnMenu">◀ Menu</button><button class="ghost" id="btnToArc">★ Arcade</button></div>
+    <div class="rowb" style="margin-top:8px"><button class="ghost" id="btnMenu">◀ Menu</button><button class="ghost" id="btnToArc">★ Arcade</button><button class="ghost" id="btnHub">☰ Backstage</button></div>
+    <div class="small" id="daily" style="margin-top:8px"></div>
     <div class="top" style="margin-top:8px"><span class="chip">LV <b id="lv">1</b> · <span id="xp">0</span> XP</span><span class="chip" id="streak">Day streak 0</span></div>
     <div class="xpbar"><div class="xpfill" id="xpfill"></div></div>
     <div class="stats" id="stats"></div>
@@ -165,7 +171,7 @@
 </div>
 
 <div class="screen" id="arcade">
-  <div class="top" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="rowb"><button class="ghost" id="arcBack">◀ Menu</button><button class="ghost" id="arcToJ">▶ Journey</button></span><div class="chip" id="arcRank"></div></div>
+  <div class="top" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="rowb"><button class="ghost" id="arcBack">◀ Menu</button><button class="ghost" id="arcToJ">▶ Journey</button><button class="ghost" id="arcHub">☰ Backstage</button></span><div class="chip" id="arcRank"></div></div>
   <h1 class="disp glow" style="margin:0">Arcade</h1>
   <div class="rowb" id="arcTop"></div>
   <p class="small" id="arcNote"></p>
@@ -180,12 +186,19 @@
   <div class="rowb" style="justify-content:center"><button id="arAgain" class="pink">Again</button><button id="arNext" class="gold" style="display:none"></button><button id="arList" class="ghost">Setlist</button></div>
 </div>
 
+<div class="screen" id="hub" style="padding:16px 18px 30px">
+  <div class="rowb"><button class="ghost" id="hubBack">◀ Back</button></div>
+  <h1 class="glow" style="margin:6px 0">Backstage</h1>
+  <div class="steps" id="hubTabs"><button data-tab="card"><b>YOU</b>Player card</button><button data-tab="shop"><b>SPEND XP</b>Shop</button><button data-tab="gloss"><b>WORDS</b>Glossary</button></div>
+  <div id="hubBody"></div>
+</div>
+
 <div class="screen" id="results">
   <div class="stars" id="resStars"></div>
   <div class="big2" id="resHead"></div>
   <p id="resBody"></p>
   <p id="resCoach" style="color:var(--gold);font-style:italic;max-width:640px;margin:10px auto 0"></p>
-  <div class="rowb" style="justify-content:center"><button id="btnMore" class="gold" style="display:none">Another round ▶</button><button id="btnHear" class="pink" style="display:none">♪ Hear it back</button><button id="btnAgain" class="ghost">Again</button><button id="btnMap" class="ghost">Path</button><button id="btnNextStop" class="gold" style="display:none">Next stop ▶</button></div>
+  <div class="rowb" style="justify-content:center"><button id="btnMore" class="gold" style="display:none">Another round ▶</button><button id="btnHear" style="display:none">♪ Hear it back</button><button id="btnAgain" class="ghost">Again</button><button id="btnMap" class="ghost">Path</button><button id="btnNextStop" class="pink" style="display:none">Next stop ▶</button></div>
 </div>
 
 <script>
@@ -199,6 +212,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
 </script>
 <script src="learn/r1.js"></script>
 <script src="learn/feel-r1.js"></script>
+<script src="learn/glossary.js"></script>
 <script src="arcade/songs.js"></script>
 <script src="vendor/three.min.js"></script>
 <script src="vendor/three-post.js"></script>
@@ -209,12 +223,12 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   const NAMES = ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'], NAMESF = ['C','D♭','D','E♭','E','F','G♭','G','A♭','A','B♭','B'];
   const isBlack = m => [1,3,6,8,10].includes(m % 12);
   const FLAT_KEYS = ['F', 'Bb', 'Eb', 'Ab', 'Db'];
-  const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); if (id !== 'map') window.scrollTo(0, 0); };
+  const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); if (id !== 'map') window.scrollTo(0, 0); if (id === 'results' || id === 'arcRes') setTimeout(() => celebrate(id), 30); };
   const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 
   // ---------------- Save ----------------
   const KEY = 'koa_save_v1';
-  const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, shrines: {}, streak: { last: '', count: 0 }, echo: 'auto', beat: true, reps: 0 });
+  const blank = () => ({ xp: 0, stats: { technique: 0, reading: 0, ear: 0, theory: 0, rhythm: 0 }, lessons: {}, shrines: {}, streak: { last: '', count: 0 }, echo: 'auto', beat: true, reps: 0, owned: {}, sound: 'grand', daily: null });
   let save = blank();
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.stats) save = Object.assign(blank(), s); } catch (e) {}
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} if (cloud) { clearTimeout(cloudTimer); cloudTimer = setTimeout(() => cloudSync(), 2500); } };
@@ -229,7 +243,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     if ((a.resetAt || 0) !== (b.resetAt || 0)) { const w = (a.resetAt || 0) > (b.resetAt || 0) ? a : b; return Object.assign(blank(), w, { micLag: a.micLag, echo: a.echo, beat: a.beat }); }
     const out = Object.assign(blank(), a); out.xp = Math.max(a.xp || 0, b.xp || 0); out.reps = Math.max(a.reps || 0, b.reps || 0); out.arcade = mergeArc(a.arcade, b.arcade); out.stats = Object.assign({}, a.stats); for (const k in b.stats || {}) out.stats[k] = Math.max(out.stats[k] || 0, b.stats[k] || 0);
     out.lessons = Object.assign({}, a.lessons); for (const id in b.lessons || {}) { const x = out.lessons[id] || {}, y = b.lessons[id], m = { stars: Math.max(x.stars || 0, y.stars || 0), best: Math.max(x.best || 0, y.best || 0) }; if (x.fast || y.fast) m.fast = true; if (x.blind || y.blind) m.blind = true; out.lessons[id] = m; }
-    out.shrines = Object.assign({}, b.shrines, a.shrines); const sa = a.streak || {}, sb = b.streak || {}; out.streak = (sb.last || '') > (sa.last || '') || ((sb.last || '') === (sa.last || '') && (sb.count || 0) > (sa.count || 0)) ? sb : sa; return out; }
+    out.shrines = Object.assign({}, b.shrines, a.shrines); out.owned = Object.assign({}, b.owned, a.owned); { const da = a.daily, db = b.daily; out.daily = !da ? db || null : !db || da.d > db.d ? da : db.d > da.d ? db : { d: da.d, r: da.r || db.r, a: da.a || db.a, f: da.f || db.f, c: da.c || db.c }; } const sa = a.streak || {}, sb = b.streak || {}; out.streak = (sb.last || '') > (sa.last || '') || ((sb.last || '') === (sa.last || '') && (sb.count || 0) > (sa.count || 0)) ? sb : sa; return out; }
   const cloudApi = (method, body) => fetch('https://api.github.com/repos/' + cloud.repo + '/contents/save.json' + (method === 'GET' ? '?t=' + Date.now() : ''), { method, headers: { Authorization: 'Bearer ' + cloud.token, Accept: 'application/vnd.github+json' }, body: body ? JSON.stringify(body) : undefined });
   const cloudSay = t => { cloudNote = t; const el = $('cloudNote'); if (el) el.textContent = t; const b = $('btnCloud'); if (b) b.textContent = 'Cloud save: ' + (cloud ? 'on' : 'off'); };
   async function cloudSync(tries) {
@@ -248,13 +262,14 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   // ---------------- Audio ----------------
   let ctx = null, master = null; const voices = {};
   function initAudio() { try { const AC = window.AudioContext || window.webkitAudioContext; ctx = new AC(); const comp = ctx.createDynamicsCompressor(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(comp); comp.connect(ctx.destination); ctx.resume(); } catch (e) {} }
+  const SND = { grand: { p: [[1, 'triangle', 1], [2, 'sine', .35], [3, 'sine', .12]], k: 1 }, epiano: { p: [[1, 'sine', 1], [2, 'sine', .16], [4, 'sine', .1], [7, 'sine', .03]], k: 1.2 }, synth: { p: [[1, 'sawtooth', .55], [1.005, 'sawtooth', .35], [2, 'square', .08]], k: .9 }, musicbox: { p: [[2, 'sine', 1], [6, 'sine', .22], [10.8, 'sine', .08]], k: .55 } };
   function tone(m, vel, dur) {
     if (!ctx) return; stopTone(m, true);
     const f = 440 * Math.pow(2, (m - 69) / 12), now = ctx.currentTime, v = 0.15 + 0.5 * vel;
     const g = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * (4 + 8 * vel));
-    const oscs = [[1, 'triangle', 1], [2, 'sine', .35], [3, 'sine', .12]].map(([k, type, a]) => { const o = ctx.createOscillator(), og = ctx.createGain(); o.type = type; o.frequency.value = f * k; og.gain.value = a; o.connect(og); og.connect(lp); o.start(now); return o; });
+    const snd = SND[save.sound] || SND.grand, oscs = snd.p.map(([k, type, a]) => { const o = ctx.createOscillator(), og = ctx.createGain(); o.type = type; o.frequency.value = f * k; og.gain.value = a; o.connect(og); og.connect(lp); o.start(now); return o; });
     lp.connect(g); g.connect(master);
-    const decay = dur || Math.max(.8, 3 - (m - 40) * .03);
+    const decay = (dur || Math.max(.8, 3 - (m - 40) * .03)) * snd.k;
     g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(v, now + .006); g.gain.exponentialRampToValueAtTime(v * .35, now + Math.min(.25, decay * .5)); g.gain.exponentialRampToValueAtTime(.0008, now + decay);
     oscs.forEach(o => o.stop(now + decay + .05)); voices[m] = { g, oscs };
   }
@@ -329,7 +344,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   let lastBard = null;
   function renderMap(walk) {
     const lv = 1 + Math.floor(save.xp / 200); $('lv').textContent = lv; $('xp').textContent = save.xp; $('xpfill').style.width = (save.xp % 200) / 2 + '%';
-    $('streak').textContent = 'Day streak ' + save.streak.count; { const open = starsOf(bossId()) >= 1 && !!trialBase(), tr = rec('trial-r1'); $('btnTrial').style.display = open ? '' : 'none'; $('btnTrial').textContent = '👁 Reading trial' + (tr.stars ? ' ' + '★'.repeat(tr.stars) : ''); }
+    $('streak').textContent = 'Day streak ' + save.streak.count; dailyDraw(); { const open = starsOf(bossId()) >= 1 && !!trialBase(), tr = rec('trial-r1'); $('btnTrial').style.display = open ? '' : 'none'; $('btnTrial').textContent = '👁 Reading trial' + (tr.stars ? ' ' + '★'.repeat(tr.stars) : ''); }
     $('stats').innerHTML = Object.entries(save.stats).map(([k, v]) => `<span class="stat">${k[0].toUpperCase() + k.slice(1)} <b>${v}</b></span>`).join('');
     $('btnSound').textContent = 'Game piano on my keys: ' + save.echo; beatLbl(); $('btnCloud').textContent = 'Cloud save: ' + (cloud ? 'on' : 'off');
     const o = order(), n = o.length, STEP = 138, Hh = n * STEP + 330, W = 390;
@@ -655,13 +670,13 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     const done = !!save.shrines['feel-' + id]; $('feelAfter').style.display = done ? 'block' : 'none'; $('feelVerdict').textContent = '';
     const song = F.arc && (window.KOA_ARCADE || { songs: [] }).songs.find(x => x.id === F.arc); $('feelArc').innerHTML = song ? `<button class="ghost" id="feelArcB">★ The real score is in the Arcade: ${song.title}</button>` : ''; if (song) $('feelArcB').onclick = () => { feelStop(); renderArcade(); };
     $('feelA').onclick = () => feelRun(feelPhrase(L, feelShaped === 'A'), $('feelA')); $('feelB').onclick = () => feelRun(feelPhrase(L, feelShaped === 'B'), $('feelB'));
-    const pick = p => { const right = p === feelShaped; $('feelVerdict').textContent = right ? `Player ${p} it is. Here is what ${p} was doing that the other one was not.` : `You picked the level one, which is a fair taste: it is cleaner. But listen to Player ${feelShaped} once more with this in mind.`; $('feelAfter').style.display = 'block'; if (!save.shrines['feel-' + id]) { save.shrines['feel-' + id] = true; save.stats.feeling = (save.stats.feeling || 0) + 1; save.xp += 20; persist(); } stepShow(1); };
+    const pick = p => { const right = p === feelShaped; $('feelVerdict').textContent = right ? `Player ${p} it is. Here is what ${p} was doing that the other one was not.` : `You picked the level one, which is a fair taste: it is cleaner. But listen to Player ${feelShaped} once more with this in mind.`; $('feelAfter').style.display = 'block'; if (!save.shrines['feel-' + id]) { save.shrines['feel-' + id] = true; save.stats.feeling = (save.stats.feeling || 0) + 1; save.xp += 20; persist(); dailyMark('f'); } stepShow(1); };
     $('feelPA').onclick = () => pick('A'); $('feelPB').onclick = () => pick('B');
   }
   let stepAt = 0;
   function stepState(id) { const LS = SHRINES.find(x => x.learn === id || (x.also || []).includes(id)), cleared = starsOf(id) >= 1, d0 = !LS || !!save.shrines[LS.id] || cleared, d1 = !FEEL[id] || !!save.shrines['feel-' + id] || cleared; return { done: [d0, d1, cleared], open: [true, d0, d0 && d1], has: [true, !!FEEL[id], true] }; }
   function stepShow(k) { const st = stepState(current.id); if (!st.open[k] || !st.has[k]) return; stepAt = k; feelStop(); ['inLearn', 'inFeel', 'inPlay'].forEach((c, i) => { $(c).style.display = i === k ? '' : 'none'; });
-    [...$('inSteps').children].forEach((b, i) => { b.className = (i === k ? 'on ' : '') + (st.done[i] ? 'done' : ''); b.disabled = !st.open[i]; b.style.display = st.has[i] ? '' : 'none'; b.innerHTML = `<b>PART ${i + 1} ${st.done[i] ? '✓' : st.open[i] ? '' : '🔒'}</b>${['Learn', 'Feel', 'Play'][i]}<span class="small" style="display:block;font-weight:400;text-transform:none;letter-spacing:0">${[st.done[0] ? 'lesson passed' : 'the lesson · +120 XP', st.done[1] ? 'done' : st.open[1] ? 'two players, your take · +20 XP' : 'pass the lesson first', st.done[2] ? '★'.repeat(starsOf(current.id)) + ' cleared' : st.open[2] ? 'the piece, in time · XP by accuracy' : 'do Feel first'][i]}</span>`; }); window.scrollTo(0, 0); }
+    [...$('inSteps').children].forEach((b, i) => { b.className = (i === k ? 'on ' : '') + (st.done[i] ? 'done' : ''); b.disabled = !st.open[i]; b.style.display = st.has[i] ? '' : 'none'; b.innerHTML = `<b>PART ${i + 1} ${st.done[i] ? '✓' : st.open[i] ? '' : '🔒'}</b>${['Learn', 'Feel', 'Play'][i]}<span class="small" style="display:block;font-weight:400;text-transform:none;letter-spacing:0">${[st.done[0] ? 'lesson passed' : 'the lesson · +120 XP', st.done[1] ? 'done' : st.open[1] ? 'two players, your take · +20 XP' : 'pass the lesson first', st.done[2] ? mastery(current.id).icon + ' ' + mastery(current.id).name + ' · ' + mastery(current.id).next : st.open[2] ? 'the piece, in time · XP by accuracy' : 'do Feel first'][i]}</span>`; }); window.scrollTo(0, 0); }
   function stepInit(id) { const st = stepState(id); stepShow(st.done[2] ? 2 : !st.done[0] ? 0 : !st.done[1] && st.has[1] ? 1 : 2); }
   $('inSteps').onclick = e => { const b = e.target.closest('button'); if (b && !b.disabled) stepShow(+b.dataset.step); };
   $('feelNext').onclick = () => stepShow(2);
@@ -728,12 +743,6 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : tier === 'slow' ? ' · slow' : tier === 'take' ? ' · your take, not scored' : '' })[mode] + (L.reps ? ' · reps' : '');
     if (mode === 'perform' && !L.arcade) game.rec = [];
     arcSetup(L.arcade && mode === 'perform' ? game : null);
-    show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
-  }
-  function startFree() {
-    current = null; arcSetup(null);
-    game = baseGame({ mode: 'free', lo: 48, hi: 72, end: 1e9, trail: [], onPress(m) { this.combo++; this.flash[m] = { t: performance.now(), bad: false }; this.burst(m, isBlack(m) ? '#ff3fd2' : '#2ef2ff'); this.trail.push({ m, t: performance.now() }); } });
-    $('hudTitle').textContent = 'Free play · jam over the beat'; $('hudMid').textContent = '';
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
   }
   $('btnQuit').onclick = () => { cancelAnimationFrame(raf); const arc = game && game.L && game.L.arcade, back = game && game.mode !== 'free' && current; game = null; arc ? renderArcade() : back ? openIntro(current.id) : renderMap(); };
@@ -856,22 +865,22 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('pointerleave', up);
 
   // ---------------- Results ----------------
-  function touchStreak() { const today = new Date().toLocaleDateString('en-CA'), y = new Date(Date.now() - 864e5).toLocaleDateString('en-CA'); if (save.streak.last !== today) { save.streak.count = save.streak.last === y ? save.streak.count + 1 : 1; save.streak.last = today; } }
+  function touchStreak() { const today = new Date().toLocaleDateString('en-CA'), y = new Date(Date.now() - 864e5).toLocaleDateString('en-CA'); const y2 = new Date(Date.now() - 2 * 864e5).toLocaleDateString('en-CA'), g = save.streak.grace, graceOk = !g || (Date.now() - new Date(g).getTime()) / 864e5 >= 7; if (save.streak.last !== today) { if (save.streak.last === y) save.streak.count++; else if (save.streak.last === y2 && graceOk) { save.streak.count++; save.streak.grace = today; } else save.streak.count = 1; save.streak.last = today; } }
   let lastReps = 'wait';
 
   /* ================= ARCADE: songs, score, stars. No lessons here. ================= */
   const ARC = (window.KOA_ARCADE || { songs: [] }).songs, DIFF = ['Easy', 'Medium', 'Hard'], TIERS = [{ name: 'Opening act', need: 0 }, { name: 'Headliners', need: 8 }, { name: 'Encore', need: 20 }];
   const RANKS = [[0, 'Busker'], [400, 'Opening act'], [1500, 'Headliner'], [4500, 'Arena act'], [12000, 'Legend']];
-  const THEMES = [{ id: 'neon', name: 'Neon', f: '', need: 0 }, { id: 'ember', name: 'Ember', f: 'hue-rotate(150deg) saturate(1.15)', need: 10 }, { id: 'emerald', name: 'Emerald', f: 'hue-rotate(-80deg)', need: 25 }, { id: 'gold', name: 'Gold', f: 'sepia(.75) saturate(2.4) hue-rotate(-12deg)', fc: true }];
+  const THEMES = [{ id: 'neon', name: 'Neon', f: '', need: 0 }, { id: 'ember', name: 'Ember', f: 'hue-rotate(150deg) saturate(1.15)', need: 10 }, { id: 'emerald', name: 'Emerald', f: 'hue-rotate(-80deg)', need: 25 }, { id: 'gold', name: 'Gold', f: 'sepia(.75) saturate(2.4) hue-rotate(-12deg)', fc: true }, { id: 'ice', name: 'Ice', f: 'hue-rotate(40deg) saturate(.7) brightness(1.1)', price: 400 }, { id: 'sunset', name: 'Sunset', f: 'hue-rotate(110deg) saturate(1.4)', price: 600 }, { id: 'noir', name: 'Noir', f: 'grayscale(1) contrast(1.15)', price: 800 }];
   const arcSave = () => save.arcade || (save.arcade = { xp: 0, songs: {}, theme: 'neon' });
   const arcRec = (id, d) => (arcSave().songs[id] || {})[d] || { stars: 0, score: 0 };
   const arcStars = () => Object.values(arcSave().songs).reduce((a, s) => a + Object.values(s).reduce((b, r) => b + (r.stars || 0), 0), 0);
   const arcAnyFC = () => Object.values(arcSave().songs).some(s => Object.values(s).some(r => r.fc));
   const arcRank = () => RANKS.filter(r => arcSave().xp >= r[0]).pop();
-  const themeOpen = t => t.fc ? arcAnyFC() : arcStars() >= t.need;
+  const themeOpen = t => t.price ? !!(save.owned || {})[t.id] : t.fc ? arcAnyFC() : arcStars() >= t.need;
   const stars5 = n => '★'.repeat(n) + '☆'.repeat(5 - n), starsH = n => '★'.repeat(n) + '<span style="opacity:.25">' + '★'.repeat(5 - n) + '</span>';
   function arcSetup(G) {
-    const th = THEMES.find(t => t.id === arcSave().theme) || THEMES[0]; $('cv').style.filter = G ? th.f : ''; $('cv').style.webkitFilter = G ? th.f : ''; $('arcHud').style.display = G ? 'flex' : 'none'; if (!G) return;
+    const th = THEMES.find(t => t.id === arcSave().theme) || THEMES[0]; $('cv').style.filter = th.f; $('cv').style.webkitFilter = th.f; $('arcHud').style.display = G ? 'flex' : 'none'; if (!G) return;
     let ideal = 0; G.notes.forEach((n, i) => { ideal += 100 * Math.min(4, 1 + Math.floor(i / 10)); }); const size = {}; G.notes.forEach(n => { if (n.sp != null) size[n.sp] = (size[n.sp] || 0) + 1; });
     G.arc = { score: 0, streak: 0, best: 0, mult: 1, meter: .6, power: 0, on: false, ideal, size, got: {}, broken: {}, misses: 0, lose: [.05, .07, .09][G.L.arcade.d], pop: '', popT: 0, failed: false };
   }
@@ -893,7 +902,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     const stars = a.failed ? 0 : r >= .95 ? 5 : r >= .8 ? 4 : r >= .6 ? 3 : r >= .4 ? 2 : 1, fc = !a.failed && hit === total && a.misses === 0;
     const before = { stars: arcStars(), rank: arcRank()[1], themes: THEMES.filter(themeOpen).map(t => t.id) }, old = arcRec(id, d);
     const gain = a.failed ? Math.round(a.score / 2000) : Math.round(a.score / 500 * [1, 1.5, 2.5][d]) + Math.max(0, stars - (old.stars || 0)) * 20;
-    (S.songs[id] = S.songs[id] || {})[d] = { stars: Math.max(old.stars || 0, stars), score: Math.max(old.score || 0, a.failed ? 0 : a.score), fc: !!(old.fc || fc) }; S.xp += gain; touchStreak(); persist();
+    (S.songs[id] = S.songs[id] || {})[d] = { stars: Math.max(old.stars || 0, stars), score: Math.max(old.score || 0, a.failed ? 0 : a.score), fc: !!(old.fc || fc) }; S.xp += gain; touchStreak(); persist(); if (!a.failed) dailyMark('a');
     const news = []; TIERS.forEach((t, i) => { if (before.stars < t.need && arcStars() >= t.need) news.push('New tier unlocked: ' + t.name); }); THEMES.forEach(t => { if (!before.themes.includes(t.id) && themeOpen(t)) news.push('New highway theme: ' + t.name); }); if (arcRank()[1] !== before.rank) news.push('New rank: ' + arcRank()[1]);
     if (!a.failed && a.score > (old.score || 0) && old.score) news.push('New high score');
     $('arStars').innerHTML = starsH(stars); $('arHead').textContent = a.failed ? 'The crowd walked out' : fc ? 'FULL COMBO' : ['', 'You got through it', 'Decent set', 'The crowd is with you', 'Huge', 'Legendary'][stars]; $('arScore').textContent = a.score.toLocaleString();
@@ -923,16 +932,16 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     if (G.mode === 'listen') { openIntro(G.L.id); return; }
     const total = G.notes.length, perfect = G.notes.filter(n => n.state === 1).length, good = G.notes.filter(n => n.state === 2).length, miss = total - perfect - good;
     moreFn = null; coachAfter(G, false);
-    if (G.tier === 'take') { save.stats.feeling = (save.stats.feeling || 0) + 1; touchStreak(); persist(); coachAfter(G, true); $('btnMore').style.display = 'none'; $('btnNextStop').style.display = 'none';
+    if (G.tier === 'take') { save.stats.feeling = (save.stats.feeling || 0) + 1; touchStreak(); persist(); dailyMark('f'); coachAfter(G, true); $('btnMore').style.display = 'none'; $('btnNextStop').style.display = 'none';
       $('resStars').textContent = '♪'; $('resHead').textContent = 'Your take'; $('resBody').innerHTML = 'Nobody was counting. Now press <b>Hear it back</b> and listen the way you listened to the two players: where does it lean, where does it rest, and is the last note an arrival?' + (exLine(G) ? '<br>' + exLine(G) : ''); show('results'); return; }
     let acc, stars;
     if (G.mode === 'wait') { acc = total / (total + G.strays); stars = 1; }
     else { acc = Math.max(0, (perfect + .7 * good) / total - G.strays * .02); stars = acc >= G.L.pass.stars3 ? 3 : acc >= G.L.pass.stars2 ? 2 : acc >= .4 ? 1 : 0; }
     $('btnMore').style.display = G.reps ? '' : 'none'; $('btnNextStop').style.display = 'none';
-    if (G.L.trial) { const st = acc >= .9 ? 3 : acc >= .8 ? 2 : acc >= .65 ? 1 : 0, r = save.lessons['trial-r1'] || { stars: 0, best: 0 }, firstPass = st >= 1 && !r.stars, gain = Math.round(30 + 70 * acc) + (firstPass ? 100 : 0); r.stars = Math.max(r.stars, st); r.best = Math.max(r.best, Math.round(acc * 100)); save.lessons['trial-r1'] = r; save.xp += gain; save.stats.reading = (save.stats.reading || 0) + (st ? 4 : 1); touchStreak(); persist(); chime(st >= 1); moreFn = startTrial; $('btnMore').style.display = '';
+    if (G.L.trial) { const st = acc >= .9 ? 3 : acc >= .8 ? 2 : acc >= .65 ? 1 : 0, r = save.lessons['trial-r1'] || { stars: 0, best: 0 }, firstPass = st >= 1 && !r.stars, gain = Math.round(30 + 70 * acc) + (firstPass ? 100 : 0); r.stars = Math.max(r.stars, st); r.best = Math.max(r.best, Math.round(acc * 100)); save.lessons['trial-r1'] = r; save.xp += gain; save.stats.reading = (save.stats.reading || 0) + (st ? 4 : 1); touchStreak(); persist(); dailyMark('r'); chime(st >= 1); moreFn = startTrial; $('btnMore').style.display = '';
       $('resStars').textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + ' 👁'; $('resHead').textContent = st ? 'You can read music' : 'Not yet. The page will still be there tomorrow';
       $('resBody').innerHTML = `Accuracy ${Math.round(acc * 100)}% on a piece that did not exist until you pressed the button, with no falling notes · ${perfect} perfect, ${good} good, ${miss} missed. +${gain} XP.<br>` + (st ? 'That was reading: eyes on the staff, hands finding the keys. Every round is a new piece, so this never becomes memory.' : 'Pass mark is 65%. Look one note ahead of the one you are playing, and keep going after a slip.'); show('results'); return; }
-    if (G.reps) { const gain = G.mode === 'wait' ? 12 : Math.round(12 + 36 * acc); save.xp += gain; save.reps = (save.reps || 0) + 1; G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + 1; }); touchStreak(); persist(); lastReps = G.mode; chime(true);
+    if (G.reps) { const gain = G.mode === 'wait' ? 12 : Math.round(12 + 36 * acc); save.xp += gain; save.reps = (save.reps || 0) + 1; G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + 1; }); touchStreak(); persist(); dailyMark('r'); lastReps = G.mode; chime(true);
       $('resStars').textContent = '∞'; $('resHead').textContent = 'Reps round ' + save.reps + ' done'; $('resBody').innerHTML = (G.mode === 'wait' ? `${total} fresh notes read, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}.` : `Accuracy ${Math.round(acc * 100)}% on music you had never seen · ${perfect} perfect, ${good} good, ${miss} missed.`) + ` +${gain} XP.<br>Every round is new, so this is real sight-reading practice.`; show('results'); return; }
     const slow = G.tier === 'slow'; if (slow) stars = Math.min(stars, 1);
     const r = save.lessons[G.L.id] || { stars: 0, best: 0 }, first = stars > r.stars, passedTier = G.tier && !slow && stars >= 2, newBadge = passedTier && !r[G.tier];
@@ -941,7 +950,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     save.lessons[G.L.id] = r; save.xp += gain;
     G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + Math.max(1, Math.round(gain / 20)); }); if (G.tier === 'blind' && passedTier) save.stats.reading += 3;
     touchStreak();
-    persist(); chime(stars >= 2 || G.mode === 'wait');
+    persist(); if (G.tier === 'blind' && stars >= 1) dailyMark('r'); chime(stars >= 2 || G.mode === 'wait');
     $('resStars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars) + (passedTier ? (G.tier === 'fast' ? ' ⚡' : G.tier === 'slow' ? ' (slow)' : ' 👁') : '');
     $('resHead').textContent = G.mode === 'wait' ? 'Practice complete' : stars >= 2 ? (G.tier ? 'Challenge passed!' : G.L.boss ? 'The Silence breaks!' : G.L.heroic ? 'Heroic clear!' : G.L.quest ? 'Song cleared!' : 'The grid lights up') : stars === 1 ? (slow ? 'Cleared at slow speed. Now full speed' : 'Cleared. Tighten the timing for more stars') : 'Not yet. Again, a little calmer';
     $('resBody').innerHTML = G.mode === 'wait'
@@ -964,7 +973,44 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); if (!document.hidden && cloud && index) cloudSync(); });
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); if (cloud) cloudSync(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { makeReps, setPedal, release, startArcade, renderArcade, get arcade() { return ARC; }, feelPhrase, startTrial, get take() { return lastTake; }, shrineState: () => shrine && ({ quiz: shrine.quiz, do: !shrine.quiz && shrine.S.pages[shrine.step].do || null, quizAll: shrine.S.quiz }), cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  // ---------------- Backstage: player card, shop, glossary, daily setlist, mastery, celebration ----------------
+  const GLOSS = window.KOA_GLOSS || [], today = () => new Date().toLocaleDateString('en-CA');
+  const SHOP = [...THEMES.filter(t => t.price).map(t => ({ id: t.id, kind: 'Highway theme', name: t.name, price: t.price, d: 'Recolours the note highway in Journey and Arcade.' })),
+    { id: 'snd-epiano', snd: 'epiano', kind: 'Piano sound', name: 'Electric piano', price: 500, d: 'Round and bell-like, the sound of seventies soul.' }, { id: 'snd-musicbox', snd: 'musicbox', kind: 'Piano sound', name: 'Music box', price: 700, d: 'High, glassy and short. Für Elise as a jewellery box plays it.' }, { id: 'snd-synth', snd: 'synth', kind: 'Piano sound', name: 'Synth lead', price: 900, d: 'Two detuned saw waves. Very 1984.' },
+    { id: 'song-allofme', kind: 'Song slot', name: 'All of Me · John Legend', price: 3000, soon: true, d: 'A goal song. Opens when song import is built: you bring your own purchased sheet-music file and the game turns it into a stop and an Arcade song.' }, { id: 'song-firestone', kind: 'Song slot', name: 'Firestone · Kygo', price: 3000, soon: true, d: 'Encore song. Same route: your own file, through import.' }, { id: 'song-nuvole', kind: 'Song slot', name: 'Nuvole Bianche · Einaudi', price: 3000, soon: true, d: 'Encore song. Same route: your own file, through import.' }];
+  const totalXp = () => save.xp + arcSave().xp, spent = () => SHOP.reduce((t, it) => t + ((save.owned || {})[it.id] ? it.price : 0), 0), wallet = () => totalXp() - spent();
+  function mastery(id) { const r = rec(id), LS = SHRINES.find(x => x.learn === id || (x.also || []).includes(id)), l = !LS || !!save.shrines[LS.id], f = !FEEL[id] || !!save.shrines['feel-' + id]; const lvl = !(r.stars >= 1) ? 0 : r.stars < 3 ? 1 : !(r.fast && r.blind) ? 2 : !(l && f) ? 3 : 4;
+    return { lvl, icon: ['', '🥉', '🥈', '🥇', '👑'][lvl], name: ['Not cleared', 'Bronze', 'Silver', 'Gold', 'Crown'][lvl], next: ['clear it for Bronze', 'three stars for Silver', 'pass ⚡ fast and 👁 staff only for Gold', 'finish Learn and Feel for the Crown', 'fully mastered'][lvl] }; }
+  function dailyGet() { if (!save.daily || save.daily.d !== today()) save.daily = { d: today(), r: 0, a: 0, f: 0, c: 0 }; return save.daily; }
+  function dailyMark(k) { const D = dailyGet(); if (D[k]) return; D[k] = 1; if (D.r && D.a && D.f && !D.c) { D.c = 1; save.xp += 150; } persist(); }
+  const dailyHtml = () => { const D = dailyGet(), b = (k, t) => `<span style="white-space:nowrap">${D[k] ? '☑' : '☐'} ${t}</span>`; return `<b>Today's setlist</b> ${b('r', 'Read: a reps round or staff-only run')} · ${b('f', 'Feel: a take or a two-players pick')} · ${b('a', 'Arcade: finish a song')}${D.c ? ' · <b style="color:var(--gold)">done, +150 XP</b>' : ' · all three: +150 XP'}`; };
+  function dailyDraw() { const el = $('daily'); if (el) el.innerHTML = dailyHtml(); }
+  function badges() { const o = order(), cleared = o.filter(id => starsOf(id) >= 1).length, passed = SHRINES.filter(S => save.shrines[S.id]).length, feels = o.filter(id => save.shrines['feel-' + id]).length, A = arcSave(), fc = arcAnyFC(), crowns = o.filter(id => mastery(id).lvl === 4).length;
+    return [['First lesson', 'Pass any lesson', passed >= 1], ['Scholar', 'Pass every lesson in region 1', passed >= SHRINES.length && SHRINES.length > 0], ['First light', 'Clear your first stop', cleared >= 1], ['The Silence breaks', 'Beat the region 1 boss', starsOf(bossId()) >= 1], ['Region 1 complete', 'Clear every stop', cleared >= o.length], ['Reader', 'Pass the reading trial', starsOf('trial-r1') >= 1], ['From the soul', 'Do Feel on five stops', feels >= 5], ['On stage', 'Earn 8 Arcade stars', arcStars() >= 8], ['Flawless', 'Full combo on any Arcade song', fc], ['Crowned', 'Earn a Crown on any stop', crowns >= 1], ['Regular', 'Seven-day streak', save.streak.count >= 7], ['Level 10', 'Reach level 10', 1 + Math.floor(save.xp / 200) >= 10]]; }
+  let hubFrom = 'map', hubTab = 'card';
+  function hubDraw() { [...$('hubTabs').children].forEach(b => { b.className = b.dataset.tab === hubTab ? 'on' : ''; }); const o = order(), el = $('hubBody'), pct = (a, b) => b ? Math.round(100 * a / b) : 0, bar = (t, a, b, note) => `<div class="small"><b style="color:var(--ink)">${t}</b> · ${a} of ${b} · ${note}</div><div class="bar"><i style="width:${pct(a, b)}%"></i></div>`;
+    if (hubTab === 'card') { const B = badges(), rk = arcRank(), reads = o.filter(id => rec(id).blind).length + (starsOf('trial-r1') >= 1 ? 1 : 0);
+      el.innerHTML = `<div class="card"><h2 class="disp">Level ${1 + Math.floor(save.xp / 200)} · ${rk[1]}</h2><p>Journey ${save.xp} XP · Arcade ${arcSave().xp} XP · <b style="color:var(--gold)">${wallet()} XP to spend</b> · day streak ${save.streak.count}</p><p class="small" style="margin-top:8px">${dailyHtml()}</p></div>
+        <div class="card"><h2 class="disp">The four goals · region 1 of 7</h2>${bar('Play the piano', o.filter(id => starsOf(id) >= 1).length, o.length, 'stops cleared')}${bar('Read sheet music', reads, o.length + 1, 'staff-only runs passed, plus the reading trial')}${bar('Understand the why', SHRINES.filter(S => save.shrines[S.id]).length, SHRINES.length, 'lessons passed')}${bar('Feel it', o.filter(id => save.shrines['feel-' + id]).length, o.length, 'Feel parts done')}<p class="small">The finish line is the end of region 7: explain why the piano is the way it is, read a score, and play Für Elise complete and All of Me in full.</p></div>
+        <div class="card"><h2 class="disp">Badges · ${B.filter(b => b[2]).length} of ${B.length}</h2><div class="grid2">${B.map(b => `<div class="badge${b[2] ? '' : ' off'}"><b>${b[2] ? '🏅' : '🔒'} ${b[0]}</b><div class="small">${b[1]}</div></div>`).join('')}</div></div>
+        <div class="card"><h2 class="disp">Mastery</h2><div class="grid2">${o.map(id => { const m = mastery(id); return `<div class="badge${m.lvl ? '' : ' off'}"><b>${m.icon || '·'} ${lessons[id].title.replace(/^(BOSS|HEROIC|SONG) · /, '')}</b><div class="small">${m.name} · ${m.next}</div></div>`; }).join('')}</div></div>`; }
+    if (hubTab === 'shop') { const S = arcSave(); el.innerHTML = `<div class="card"><p><b style="color:var(--gold)">${wallet()} XP to spend.</b> Spending never lowers your level or rank: the shop counts everything you have ever earned, minus what you have bought.</p></div><div class="grid2">${SHOP.map(it => { const own = !!(save.owned || {})[it.id], using = own && (it.snd ? save.sound === it.snd : S.theme === it.id); return `<div class="card" style="margin:0"><div class="small">${it.kind}</div><div class="t">${it.name}</div><p class="small">${it.d}</p><div class="rowb" style="margin-top:8px">${it.soon ? `<button disabled style="opacity:.4">🔒 ${it.price} XP · with song import</button>` : own ? `<button data-use="${it.id}" class="${using ? 'gold' : ''}">${using ? 'In use ✓' : 'Use'}</button>` : `<button data-buy="${it.id}" ${wallet() >= it.price ? 'class="pink"' : 'disabled style="opacity:.4"'}>${it.price} XP</button>`}</div></div>`; }).join('')}</div><div class="card"><div class="rowb"><button data-use="default-sound" class="${(save.sound || 'grand') === 'grand' ? 'gold' : ''}">Piano sound: Grand (free)</button><button data-use="default-theme" class="${(S.theme || 'neon') === 'neon' ? 'gold' : ''}">Highway: Neon (free)</button></div><p class="small" style="margin-top:8px">Ember, Emerald and Gold highway themes are earned with Arcade stars, on the Arcade screen.</p></div>`; }
+    if (hubTab === 'gloss') { const open = t => t.g === 'game' || !!save.shrines[t.after], mine = GLOSS.filter(t => !t.g && open(t)), locked = GLOSS.filter(t => !open(t)).length, dl = L => '<dl class="gl">' + L.map(t => `<dt>${t.t}</dt><dd>${t.d}</dd>`).join('') + '</dl>';
+      el.innerHTML = `<div class="card"><h2 class="disp">Music words you have learned · ${mine.length}</h2>${mine.length ? dl(mine) : '<p class="small">None yet. Each lesson you pass adds its words here.</p>'}${locked ? `<p class="small" style="margin-top:12px">🔒 ${locked} more waiting in lessons you have not passed yet.</p>` : ''}</div><div class="card"><h2 class="disp">How the game talks</h2>${dl(GLOSS.filter(t => t.g === 'game'))}</div>`; }
+  }
+  function openHub(from, tab) { hubFrom = from; hubTab = tab || 'card'; hubDraw(); show('hub'); }
+  $('hubTabs').onclick = e => { const b = e.target.closest('button'); if (b) { hubTab = b.dataset.tab; hubDraw(); window.scrollTo(0, 0); } };
+  $('hubBody').onclick = e => { const b = e.target.closest('button'); if (!b || b.disabled) return; const S = arcSave();
+    if (b.dataset.buy) { const it = SHOP.find(x => x.id === b.dataset.buy); if (!it || it.soon || wallet() < it.price) return; save.owned = save.owned || {}; save.owned[it.id] = true; if (it.snd) save.sound = it.snd; else S.theme = it.id; persist(); chime(true); confetti(); }
+    if (b.dataset.use) { const id = b.dataset.use, it = SHOP.find(x => x.id === id); if (id === 'default-sound') save.sound = 'grand'; else if (id === 'default-theme') S.theme = 'neon'; else if (it && it.snd) save.sound = it.snd; else if (it) S.theme = it.id; persist(); if (!ctx) initAudio(); [60, 64, 67].forEach((m, i) => setTimeout(() => tone(m, .6, .8), i * 140)); }
+    hubDraw(); };
+  $('hubBack').onclick = () => hubFrom === 'arcade' ? renderArcade() : renderMap();
+  $('btnHub').onclick = () => openHub('map'); $('arcHub').onclick = () => openHub('arcade');
+  function confetti() { let c = $('confetti'); if (!c) { c = document.createElement('canvas'); c.id = 'confetti'; document.body.appendChild(c); } const W = c.width = window.innerWidth, H = c.height = window.innerHeight, x = c.getContext('2d'), cols = ['#2ef2ff', '#ff3fd2', '#ffd24a', '#3dff9a', '#8b5cff'], P = Array.from({ length: 110 }, () => ({ x: W / 2 + (Math.random() - .5) * W * .3, y: H * .32, vx: (Math.random() - .5) * 13, vy: -Math.random() * 13 - 3, s: 4 + Math.random() * 6, r: Math.random() * 6, c: cols[Math.floor(Math.random() * 5)] })), t0 = performance.now(); c.style.display = '';
+    (function step(now) { const t = (now - t0) / 1000; x.clearRect(0, 0, W, H); if (t > 2.4) { c.style.display = 'none'; return; } P.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .42; p.vx *= .99; p.r += .2; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.globalAlpha = Math.max(0, 1 - t / 2.4); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); }); requestAnimationFrame(step); })(t0); }
+  function celebrate(screen) { const el = $(screen === 'arcRes' ? 'arStars' : 'resStars'), tn = el.firstChild; if (!tn || tn.nodeType !== 3) return; const txt = tn.nodeValue, n = (txt.match(/★/g) || []).length; if (!n) return; let k = 0; const frag = document.createElement('span'); frag.innerHTML = [...txt].map(ch => ch === '★' ? `<span class="starPop" style="animation-delay:${(k++ * .28).toFixed(2)}s">★</span>` : ch).join(''); el.replaceChild(frag, tn);
+    for (let i = 0; i < n; i++) setTimeout(() => tone(76 + [0, 4, 7, 12, 16][i % 5], .55, .5), 280 * i + 120); const big = screen === 'arcRes' ? n >= 3 : n >= 2; if (big) setTimeout(confetti, 280 * (n - 1) + 200); }
+  window.__koa = { openHub, mastery, wallet, dailyGet, confetti, makeReps, setPedal, release, startArcade, renderArcade, get arcade() { return ARC; }, feelPhrase, startTrial, get take() { return lastTake; }, shrineState: () => shrine && ({ quiz: shrine.quiz, do: !shrine.quiz && shrine.S.pages[shrine.step].do || null, quizAll: shrine.S.quiz }), cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>

@@ -106,3 +106,14 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 - `tools/check-learn.mjs` also checks the Feel data. Browser tests now live in `tools/tests/` (Playwright + Chrome, run against the bundle).
 - Not verified on a device. The shaped performance is rule-based (swell to the phrase peak, softer left hand, slight slowing and a late soft last note).
 - Master plan doc rewritten as one document with regions 2 to 7 sketched.
+
+## 27 Nov, later: Backstage, shop, glossary, celebration
+
+- Backstage screen (`#hub`, from the map and the Arcade): player card (level, rank, XP to spend, streak, the four goals as bars, badges, mastery per stop), shop, glossary.
+- Shop: spendable XP = Journey XP + Arcade XP minus the price of what is owned (`save.owned`), so level and rank never drop and merging two devices is safe. Sells three highway themes (Ice, Sunset, Noir; applied in Journey and Arcade) and three piano sounds (`SND`, `save.sound`). Song slots (All of Me, Firestone, Nuvole Bianche) are listed but locked until song import exists.
+- Glossary (`learn/glossary.js`, `window.KOA_GLOSS`): game terms always shown; music terms unlock when their lesson is passed.
+- Daily setlist (`save.daily`): Read, Feel, Arcade; +150 XP for all three. Streak forgives one missed day a week.
+- Mastery per stop (derived, not stored): Bronze cleared, Silver three stars, Gold fast + staff only, Crown with Learn and Feel done.
+- Badges are derived from the save, not stored.
+- Results screens: stars pop in one at a time with a rising chime, confetti on a good result.
+- Removed the free-play starter. Still not built from the list: boss with stakes and map recolouring, collectible cards, ghost run, Arcade setlists.
