@@ -12,6 +12,9 @@ s = s.replace(tag, '<script>' + three.replace('</script', '<\\/script') + '</scr
 tagL = '<script src="learn/r1.js"></script>\n'
 assert tagL in s
 s = s.replace(tagL, '<script>' + open('learn/r1.js').read().replace('</script', '<\\/script') + '</script>\n', 1)
+tagF = '<script src="learn/feel-r1.js"></script>\n'
+assert tagF in s
+s = s.replace(tagF, '<script>' + open('learn/feel-r1.js').read().replace('</script', '<\\/script') + '</script>\n', 1)
 tagA = '<script src="arcade/songs.js"></script>\n'
 assert tagA in s
 s = s.replace(tagA, '<script>' + open('arcade/songs.js').read().replace('</script', '<\\/script') + '</script>\n', 1)

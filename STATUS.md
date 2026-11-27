@@ -94,3 +94,15 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 - New Learn lesson 12 "Loud, soft, long, and the pedal" on the Heroic stop (Cristofori 1700 / Maffei 1711 / three surviving pianos / Broadwood's 1783 pedal patent checked against the Met Museum essay, Wikipedia, Britannica and a Chopin Institute paper).
 - Tested only with simulated MIDI and pedal events. Needs the cable and a sustain pedal to try for real; velocity thresholds are guesses until then.
 - Next for expression: loud/soft and pedal marks written into Journey pieces from region 2; crescendo/diminuendo hairpins; real pedal and dynamic marks parsed from the LilyPond sources; half-pedal.
+
+## 27 Nov: Feel, three-step stops, reading trial, navigation
+
+- Every stop is now three steps, shown one at a time behind a step bar: Learn (+120 XP) unlocks Feel (+20 XP) unlocks Play. A stop already cleared has all three open.
+- Feel (`learn/feel-r1.js`, `window.KOA_FEEL`): the opening of the piece played level and played shaped (`feelPhrase`), pick one, the teacher explains; "Record my take" is an unscored run (tier `take`); every Journey run is recorded and can be heard back from the results screen; one real piece to listen to per stop; link to the real score in the Arcade.
+- Teacher's line before the piece (Play card) and after it (results).
+- Reading trial: button on the map once the boss is cleared. Fresh generated piece, staff only, no finger numbers. Saved as `save.lessons['trial-r1']`. Pass at 65%.
+- Arcade cards name the Journey lesson that explains the piece. Difficulty buttons share one style.
+- Map has Menu and Arcade buttons; Arcade has Menu and Journey. Free play button removed (the `free` game mode code is still there, unused).
+- `tools/check-learn.mjs` also checks the Feel data. Browser tests now live in `tools/tests/` (Playwright + Chrome, run against the bundle).
+- Not verified on a device. The shaped performance is rule-based (swell to the phrase peak, softer left hand, slight slowing and a late soft last note).
+- Master plan doc rewritten as one document with regions 2 to 7 sketched.

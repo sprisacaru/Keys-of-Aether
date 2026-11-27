@@ -30,5 +30,12 @@ for (const L of win.KOA_LEARN) {
     for (const s of q.sounds || []) if (!s.label || !(s.notes || s.chords || s.pulse)) err(L, w + ' sound needs a label and notes, chords or pulse'); });
 }
 for (const id of lessonIds) if (![...win.KOA_LEARN].some(L => L.learn === id || (L.also || []).includes(id))) console.log('note: stop has no lesson:', id);
+// Feel: every stop needs the two-players question, the teacher's lines and a piece to listen to
+const FEEL = win.KOA_FEEL || {}, arcIds = new Set((() => { const w = {}; try { new Function('window', fs.readFileSync('arcade/songs.js', 'utf8'))(w); } catch (e) {} return ((w.KOA_ARCADE || {}).songs || []).map(s => s.id); })());
+for (const id of lessonIds) { const F = FEEL[id]; if (!F) { errs.push(`feel: stop ${id} has no Feel part`); continue; }
+  for (const k of ['ask', 'tell', 'before', 'after']) { if (typeof F[k] !== 'string' || F[k].length < 30) errs.push(`feel ${id}: missing or thin ${k}`); else if (/—|genuinely|honestly|\$\{/.test(F[k])) errs.push(`feel ${id}: banned text in ${k}`); }
+  if (!F.listen || !F.listen.piece || !F.listen.what) errs.push(`feel ${id}: no listening piece`); if (F.arc && !arcIds.has(F.arc)) errs.push(`feel ${id}: unknown arcade song ${F.arc}`); }
+for (const k of Object.keys(FEEL)) if (k !== '_arcade' && !lessonIds.has(k)) errs.push(`feel: unknown stop ${k}`);
+for (const [song, stop] of Object.entries(FEEL._arcade || {})) { if (!arcIds.has(song)) errs.push(`feel: _arcade names unknown song ${song}`); if (!lessonIds.has(stop)) errs.push(`feel: _arcade names unknown stop ${stop}`); }
 if (errs.length) { console.log(errs.join('\n')); process.exit(1); }
 console.log(`All ${win.KOA_LEARN.length} lessons pass: ${pages} pages, ${qs} questions, about ${Math.round(words / 100) * 100} words`);

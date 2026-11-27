@@ -25,6 +25,7 @@
   .screen{display:none;min-height:100%;flex-direction:column}
   .screen.on{display:flex}
   button{font:inherit;font-weight:700;letter-spacing:1px;color:var(--ink);background:rgba(46,242,255,.08);border:1px solid var(--cyan);border-radius:10px;padding:11px 16px;cursor:pointer}
+  .steps{display:flex;gap:8px;margin:4px 0 12px} .steps button{flex:1;text-align:left;padding:10px 12px;border-color:var(--line);background:none;color:var(--quiet)} .steps button b{display:block;font-size:10px;letter-spacing:2px;opacity:.8} .steps button.on{border-color:var(--cyan);color:var(--ink);background:rgba(46,242,255,.08)} .steps button.done b{color:var(--good)} .steps button:disabled{opacity:.4}
   button:active{transform:scale(.97)} button.pink{border-color:var(--pink);background:rgba(255,63,210,.1)} button.gold{border-color:var(--gold);background:rgba(255,210,74,.1)} button.ghost{border-color:var(--line);background:none;color:var(--quiet)}
   button.big{font-size:17px;padding:15px 26px;box-shadow:0 0 22px rgba(46,242,255,.3)}
   .glow{background:linear-gradient(180deg,#fff27a 10%,#ff9a3c 45%,#ff3fd2 55%,#2ef2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -80,7 +81,7 @@
   }
   @media (min-width:1000px) and (min-height:541px){
     #intro.on{display:grid;grid-template-columns:1fr 1.25fr;column-gap:22px;row-gap:14px;align-content:start;max-width:none;padding:18px 26px 24px}
-    #intro>#btnBack,#intro>h1,#intro>p{grid-column:1 / -1} #intro>#btnBack{justify-self:start} #intro>.card{align-self:start} #intro h1{font-size:28px}
+    #intro>#btnBack,#intro>h1,#intro>p{grid-column:1 / -1} #intro>#btnBack{justify-self:start} #intro>.card{align-self:start;grid-column:1 / -1} #intro>.steps{grid-column:1 / -1} #intro h1{font-size:28px}
     #shrine.on{display:grid;grid-template-columns:1.15fr 1fr;column-gap:24px;row-gap:10px;grid-auto-rows:min-content;align-content:start;max-width:none;padding:14px 26px 18px}
     #shrine>.top,#shrine>h1{grid-column:1 / -1} #shrine>.card{grid-column:1;grid-row:3 / span 7;max-height:calc(100vh - 130px);overflow:auto;-webkit-overflow-scrolling:touch} #shrine>#shStaff,#shrine>#sv,#shrine>#shDemo,#shrine>#skb,#shrine>#shFb,#shrine>#shNav{grid-column:2}
     #shrine .card p{font-size:17px;line-height:1.55} #sv{height:190px} #skb{height:180px}
@@ -106,13 +107,14 @@
 <div class="screen" id="map">
   <div class="mapHud">
     <div class="top"><h1 class="glow">Keys of Aether</h1><span class="chip" id="chipIn">Touch keys</span></div>
+    <div class="rowb" style="margin-top:8px"><button class="ghost" id="btnMenu">◀ Menu</button><button class="ghost" id="btnToArc">★ Arcade</button></div>
     <div class="top" style="margin-top:8px"><span class="chip">LV <b id="lv">1</b> · <span id="xp">0</span> XP</span><span class="chip" id="streak">Day streak 0</span></div>
     <div class="xpbar"><div class="xpfill" id="xpfill"></div></div>
     <div class="stats" id="stats"></div>
   </div>
   <div id="sceneWrap"></div>
   <div class="mapFoot">
-    <div class="rowb"><button class="gold" id="btnFree">♪ Free play</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnCloud">Cloud save: off</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button><button class="ghost" id="btnReset">Reset progress</button></div>
+    <div class="rowb"><button class="gold" id="btnTrial" style="display:none">👁 Reading trial</button><button class="ghost" id="btnMic">Microphone: off</button><button class="ghost" id="btnBeat">Drum beat: on</button><button class="ghost" id="btnSound">Game piano on my keys: auto</button><button class="ghost" id="btnCloud">Cloud save: off</button><button class="ghost" id="btnBackup">Backup save</button><button class="ghost" id="btnTest">Connection test</button><button class="ghost" id="btnReset">Reset progress</button></div>
     <p class="small" id="micNote" style="margin-top:8px"></p>
     <div id="cloudBox" style="display:none" class="card"><h2 class="disp">Cloud save</h2><p class="small">Keeps your progress in your own private GitHub repo so phone and iPad share it. The token is stored only on this device.</p>
       <input id="cloudRepo" placeholder="yourname/keys-of-aether-save" autocapitalize="off" autocorrect="off" spellcheck="false"><input id="cloudTok" type="password" placeholder="Access token (starts with github_pat_)" autocapitalize="off" autocorrect="off" spellcheck="false">
@@ -124,8 +126,16 @@
 <div class="screen" id="intro">
   <button class="ghost" id="btnBack" style="align-self:flex-start">◀ Path</button>
   <h1 class="glow" id="inTitle"></h1>
-  <div class="card" id="inLearn" style="border-color:var(--gold)"><h2 class="disp" style="color:var(--gold)">Part 1 · Learn</h2><div class="t" id="inLearnT"></div><p class="small" id="inLearnS"></p><div class="rowb" id="inLearnB" style="margin-top:10px"><button id="btnLearn" class="gold">Start the lesson ▶</button></div><div id="inTheory"></div></div>
-  <div class="card" style="border-color:var(--cyan)"><h2 class="disp" style="color:var(--cyan)">Part 2 · Play</h2><p id="inIdea"></p>
+  <div class="steps" id="inSteps"><button data-step="0"></button><button data-step="1"></button><button data-step="2"></button></div>
+  <div class="card" id="inLearn" style="border-color:var(--gold)"><h2 class="disp" style="color:var(--gold)">Part 1 · Learn</h2><div class="t" id="inLearnT"></div><p class="small" id="inLearnS"></p><div class="rowb" id="inLearnB" style="margin-top:10px"><button id="btnLearn" class="pink">Start the lesson ▶</button></div><div id="inTheory"></div></div>
+  <div class="card" id="inFeel" style="border-color:var(--pink)"><h2 class="disp" style="color:var(--pink)">Part 2 · Feel</h2><p id="feelAsk"></p>
+    <div class="rowb" style="margin-top:10px"><button id="feelA" class="ghost">▶ Player A</button><button id="feelB" class="ghost">▶ Player B</button></div>
+    <p class="small" style="margin-top:12px">Same notes, same speed. Which one would you rather listen to?</p>
+    <div class="rowb" style="margin-top:6px"><button id="feelPA">A</button><button id="feelPB">B</button></div>
+    <div id="feelAfter" style="display:none"><p id="feelVerdict" style="margin-top:12px;color:var(--gold)"></p><p id="feelTell"></p>
+      <div class="t" style="margin-top:14px">Your take</div><p class="small">Play the piece once with nobody keeping score. It is recorded, and you can hear it back afterwards, which is the fastest way there is to improve.</p><div class="rowb" style="margin-top:6px"><button id="btnTake">● Record my take</button></div>
+      <div class="t" style="margin-top:14px">Go and listen</div><p id="feelListen"></p><div class="rowb" id="feelArc" style="margin-top:8px"></div><div class="rowb" style="margin-top:14px"><button id="feelNext" class="pink">On to Part 3 · Play ▶</button></div></div></div>
+<div class="card" id="inPlay" style="border-color:var(--cyan)"><h2 class="disp" style="color:var(--cyan)">Part 3 · Play</h2><p id="inCoach" style="color:var(--gold);font-style:italic"></p><p id="inIdea"></p>
     <div class="rowb" style="margin-top:12px"><button id="btnListen" class="ghost">♪ Listen first</button><button id="btnPractice" style="display:none">Practice</button><button id="btnPerform" class="pink">▶ Play</button><button id="btnSlow" class="ghost">Slow run (70% speed)</button></div>
     <details id="inSetup" style="margin-top:14px"><summary class="disp" style="font-size:12px;color:var(--quiet);cursor:pointer">Where your hands go</summary>
       <div style="margin-top:10px" id="inFind"></div><p id="inFindT" style="margin-top:8px;font-size:14px"></p><p style="margin-top:8px;font-size:14px"><b id="inTechT"></b> <span id="inTech"></span></p><div id="inStaffCard"><div id="inStaff"></div></div></details>
@@ -155,7 +165,7 @@
 </div>
 
 <div class="screen" id="arcade">
-  <div class="top" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><button class="ghost" id="arcBack">◀ Title</button><div class="chip" id="arcRank"></div></div>
+  <div class="top" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="rowb"><button class="ghost" id="arcBack">◀ Menu</button><button class="ghost" id="arcToJ">▶ Journey</button></span><div class="chip" id="arcRank"></div></div>
   <h1 class="disp glow" style="margin:0">Arcade</h1>
   <div class="rowb" id="arcTop"></div>
   <p class="small" id="arcNote"></p>
@@ -174,7 +184,8 @@
   <div class="stars" id="resStars"></div>
   <div class="big2" id="resHead"></div>
   <p id="resBody"></p>
-  <div class="rowb" style="justify-content:center"><button id="btnMore" class="gold" style="display:none">Another round ▶</button><button id="btnAgain" class="ghost">Again</button><button id="btnMap" class="ghost">Path</button><button id="btnNextStop" class="gold" style="display:none">Next stop ▶</button></div>
+  <p id="resCoach" style="color:var(--gold);font-style:italic;max-width:640px;margin:10px auto 0"></p>
+  <div class="rowb" style="justify-content:center"><button id="btnMore" class="gold" style="display:none">Another round ▶</button><button id="btnHear" class="pink" style="display:none">♪ Hear it back</button><button id="btnAgain" class="ghost">Again</button><button id="btnMap" class="ghost">Path</button><button id="btnNextStop" class="gold" style="display:none">Next stop ▶</button></div>
 </div>
 
 <script>
@@ -187,6 +198,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   var P = Element.prototype; if (!P.setPointerCapture) P.setPointerCapture = function () {}; if (!P.releasePointerCapture) P.releasePointerCapture = function () {}; if (!P.hasPointerCapture) P.hasPointerCapture = function () { return false; }; })(); }
 </script>
 <script src="learn/r1.js"></script>
+<script src="learn/feel-r1.js"></script>
 <script src="arcade/songs.js"></script>
 <script src="vendor/three.min.js"></script>
 <script src="vendor/three-post.js"></script>
@@ -263,8 +275,8 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   let pedalDown = false, pedalSeen = false; const pedalHeld = [];
   const DYN = ['pp', 'p', 'mp', 'mf', 'f', 'ff'], DYNV = [.3, .42, .55, .66, .8, .92];
   function setPedal(on) { if (on === pedalDown) return; pedalDown = on; pedalSeen = true; if (!on) { pedalHeld.splice(0).forEach(m => { if (!held[m]) stopTone(m); }); } if (game && game.onPedal) game.onPedal(on); }
-  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; if (game) { game.cur = { src, vel }; game.onPress(m, performance.now(), src); } shrine && shrine.onPress(m); }
-  function release(m) { delete held[m]; if (pedalDown) pedalHeld.push(m); else stopTone(m); if (game && game.onRelease) game.onRelease(m); }
+  function press(m, vel, src) { if (echoOn(src)) tone(m, vel); held[m] = true; if (game && game.rec) game.rec.push({ m, vel: vel || .6, t: performance.now(), off: 0 }); if (game) { game.cur = { src, vel }; game.onPress(m, performance.now(), src); } shrine && shrine.onPress(m); }
+  function release(m) { delete held[m]; if (game && game.rec) { for (let i = game.rec.length - 1; i >= 0; i--) if (game.rec[i].m === m) { if (!game.rec[i].off) game.rec[i].off = performance.now(); break; } } if (pedalDown) pedalHeld.push(m); else stopTone(m); if (game && game.onRelease) game.onRelease(m); }
   async function initMidi() {
     if (!navigator.requestMIDIAccess) return;
     try {
@@ -317,7 +329,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   let lastBard = null;
   function renderMap(walk) {
     const lv = 1 + Math.floor(save.xp / 200); $('lv').textContent = lv; $('xp').textContent = save.xp; $('xpfill').style.width = (save.xp % 200) / 2 + '%';
-    $('streak').textContent = 'Day streak ' + save.streak.count;
+    $('streak').textContent = 'Day streak ' + save.streak.count; { const open = starsOf(bossId()) >= 1 && !!trialBase(), tr = rec('trial-r1'); $('btnTrial').style.display = open ? '' : 'none'; $('btnTrial').textContent = '👁 Reading trial' + (tr.stars ? ' ' + '★'.repeat(tr.stars) : ''); }
     $('stats').innerHTML = Object.entries(save.stats).map(([k, v]) => `<span class="stat">${k[0].toUpperCase() + k.slice(1)} <b>${v}</b></span>`).join('');
     $('btnSound').textContent = 'Game piano on my keys: ' + save.echo; beatLbl(); $('btnCloud').textContent = 'Cloud save: ' + (cloud ? 'on' : 'off');
     const o = order(), n = o.length, STEP = 138, Hh = n * STEP + 330, W = 390;
@@ -396,7 +408,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     if (now - armed > 4000) { armed = now; b.textContent = 'Tap again to erase all progress'; b.style.borderColor = '#ff4d6d'; b.style.color = '#ff4d6d'; setTimeout(() => { if (Date.now() - armed >= 4000) { b.textContent = 'Reset progress'; b.style.borderColor = ''; b.style.color = ''; } }, 4100); return; }
     armed = 0; try { localStorage.setItem('koa_save_before_reset', JSON.stringify(save)); } catch (e) {}
     const keep = { micLag: save.micLag, echo: save.echo, beat: save.beat }; save = Object.assign(blank(), keep, { resetAt: now }); persist(); if (cloud) cloudSync(); b.textContent = 'Reset progress'; b.style.borderColor = ''; b.style.color = ''; $('micNote').textContent = 'Progress reset to zero' + (cloud ? ', on this device and in your cloud save' : '') + '. The old save is kept in Backup save in case you want it back.'; renderMap(); }; }
-  $('btnFree').onclick = () => startFree();
+  $('btnMenu').onclick = () => show('title'); $('btnToArc').onclick = () => { if (ARC.length) renderArcade(); };
 
   // ---------------- 3D neon path (Three.js, synthwave), with the flat map as fallback ----------------
   let M3 = null;
@@ -618,9 +630,48 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     const can = (r.stars || 0) >= 1; $('btnFast').disabled = $('btnBlind').disabled = !can; $('btnFast').style.opacity = $('btnBlind').style.opacity = can ? 1 : .35;
     $('inChalT').textContent = can ? 'You cleared this. Now push it: each challenge run you pass earns a badge and bonus XP.' + (r.fast ? ' ⚡ done.' : '') + (r.blind ? ' 👁 done.' : '') : 'Clear this stop once to unlock harder runs.';
     $('inReps').style.display = makeReps(L) ? 'block' : 'none';
+    feelOpen(id); stepInit(id);
     show('intro');
   }
-  $('btnBack').onclick = () => renderMap();
+  // ---------------- Feel: the same phrase played two ways, your own take, and the teacher's voice ----------------
+  const FEEL = window.KOA_FEEL || {};
+  let feelT = [], feelShaped = 'A', lastTake = null, moreFn = null;
+  function feelStop() { feelT.forEach(clearTimeout); feelT = []; ['feelA', 'feelB', 'btnHear'].forEach(id => { const b = $(id); if (b && b.dataset.lbl) b.textContent = b.dataset.lbl; }); }
+  function feelRun(evs, btn) { /* evs: [{at (s), m, vel, dur}] */ const was = btn.dataset.on === '1'; feelStop(); ['feelA', 'feelB', 'btnHear'].forEach(id => { $(id).dataset.on = ''; }); if (was) return;
+    if (!ctx) initAudio(); if (ctx && ctx.state === 'suspended') ctx.resume(); btn.dataset.lbl = btn.dataset.lbl || btn.textContent; btn.dataset.on = '1'; btn.textContent = '■ Stop';
+    let end = 0; evs.forEach(e => { feelT.push(setTimeout(() => tone(e.m, e.vel, e.dur), e.at * 1000)); end = Math.max(end, e.at + Math.min(e.dur, 1.2)); });
+    feelT.push(setTimeout(() => { btn.dataset.on = ''; feelStop(); }, end * 1000 + 300)); }
+  function feelPhrase(L, shaped) { /* the opening of the piece, either dead level and strict, or shaped the way a musician would */
+    const bar = L.timeSig[0], spb = 60 / L.tempo, nb = 8 * bar * spb <= 17 ? 8 : 4, lim = nb * bar, ns = L.notes.filter(n => n.start < lim - 1e-6), hasR = ns.some(n => n.hand === 'R'), mel = n => !hasR || n.hand === 'R';
+    const lastStart = Math.max(...ns.map(n => n.start)), warp = b => { const s0 = lim - bar; return 0.15 + (b <= s0 || !shaped ? b * spb : s0 * spb + (b - s0) * spb * (1 + .3 * (b - s0) / bar)); };
+    const peaks = {}; if (shaped) for (let p = 0; p * 4 * bar < lim; p++) { const a = p * 4 * bar, z = Math.min(lim, a + 4 * bar), m = ns.filter(n => mel(n) && n.pitch !== 'any' && n.start >= a && n.start < z); let pk = .6; if (m.length) { const top = m.reduce((x, y) => y.pitch > x.pitch ? y : x), x = (top.start - a) / (z - a); if (x >= .25 && x <= .85) pk = x; } peaks[p] = pk; }
+    return ns.map(n => { const m = n.pitch === 'any' ? 72 : n.pitch, len = n.len * spb; if (!shaped) return { at: warp(n.start), m, vel: .55, dur: Math.max(.3, len * .8) };
+      const p = Math.floor(n.start / (4 * bar) + 1e-6), a = p * 4 * bar, z = Math.min(lim, a + 4 * bar), x = (n.start - a) / (z - a), pk = peaks[p], sh = x <= pk ? x / pk : 1 - (x - pk) / (1 - pk), last = n.start === lastStart;
+      let vel = .36 + .36 * sh; if (n.pitch === 'any') { const inBar = n.start % bar; vel = inBar < 1e-6 ? .82 : Math.abs(inBar - Math.round(inBar)) < 1e-6 ? .5 : .32; } else if (!mel(n)) vel *= .6; if (last) vel *= .7;
+      return { at: warp(n.start) + (last ? .09 : 0), m, vel, dur: last ? Math.max(2.2, len * 1.5) : Math.max(.45, len * 1.25) }; });
+  }
+  function feelOpen(id) { const F = FEEL[id], L = lessons[id]; feelStop(); $('inFeel').style.display = F ? '' : 'none'; $('inCoach').textContent = F ? F.before : ''; $('inCoach').style.display = F ? '' : 'none'; if (!F) return;
+    feelShaped = Math.random() < .5 ? 'A' : 'B'; $('feelAsk').textContent = F.ask; $('feelTell').textContent = F.tell; $('feelListen').innerHTML = `<b>${F.listen.piece}.</b> ${F.listen.what}`;
+    const done = !!save.shrines['feel-' + id]; $('feelAfter').style.display = done ? 'block' : 'none'; $('feelVerdict').textContent = '';
+    const song = F.arc && (window.KOA_ARCADE || { songs: [] }).songs.find(x => x.id === F.arc); $('feelArc').innerHTML = song ? `<button class="ghost" id="feelArcB">★ The real score is in the Arcade: ${song.title}</button>` : ''; if (song) $('feelArcB').onclick = () => { feelStop(); renderArcade(); };
+    $('feelA').onclick = () => feelRun(feelPhrase(L, feelShaped === 'A'), $('feelA')); $('feelB').onclick = () => feelRun(feelPhrase(L, feelShaped === 'B'), $('feelB'));
+    const pick = p => { const right = p === feelShaped; $('feelVerdict').textContent = right ? `Player ${p} it is. Here is what ${p} was doing that the other one was not.` : `You picked the level one, which is a fair taste: it is cleaner. But listen to Player ${feelShaped} once more with this in mind.`; $('feelAfter').style.display = 'block'; if (!save.shrines['feel-' + id]) { save.shrines['feel-' + id] = true; save.stats.feeling = (save.stats.feeling || 0) + 1; save.xp += 20; persist(); } stepShow(1); };
+    $('feelPA').onclick = () => pick('A'); $('feelPB').onclick = () => pick('B');
+  }
+  let stepAt = 0;
+  function stepState(id) { const LS = SHRINES.find(x => x.learn === id || (x.also || []).includes(id)), cleared = starsOf(id) >= 1, d0 = !LS || !!save.shrines[LS.id] || cleared, d1 = !FEEL[id] || !!save.shrines['feel-' + id] || cleared; return { done: [d0, d1, cleared], open: [true, d0, d0 && d1], has: [true, !!FEEL[id], true] }; }
+  function stepShow(k) { const st = stepState(current.id); if (!st.open[k] || !st.has[k]) return; stepAt = k; feelStop(); ['inLearn', 'inFeel', 'inPlay'].forEach((c, i) => { $(c).style.display = i === k ? '' : 'none'; });
+    [...$('inSteps').children].forEach((b, i) => { b.className = (i === k ? 'on ' : '') + (st.done[i] ? 'done' : ''); b.disabled = !st.open[i]; b.style.display = st.has[i] ? '' : 'none'; b.innerHTML = `<b>PART ${i + 1} ${st.done[i] ? '✓' : st.open[i] ? '' : '🔒'}</b>${['Learn', 'Feel', 'Play'][i]}<span class="small" style="display:block;font-weight:400;text-transform:none;letter-spacing:0">${[st.done[0] ? 'lesson passed' : 'the lesson · +120 XP', st.done[1] ? 'done' : st.open[1] ? 'two players, your take · +20 XP' : 'pass the lesson first', st.done[2] ? '★'.repeat(starsOf(current.id)) + ' cleared' : st.open[2] ? 'the piece, in time · XP by accuracy' : 'do Feel first'][i]}</span>`; }); window.scrollTo(0, 0); }
+  function stepInit(id) { const st = stepState(id); stepShow(st.done[2] ? 2 : !st.done[0] ? 0 : !st.done[1] && st.has[1] ? 1 : 2); }
+  $('inSteps').onclick = e => { const b = e.target.closest('button'); if (b && !b.disabled) stepShow(+b.dataset.step); };
+  $('feelNext').onclick = () => stepShow(2);
+  $('btnTake').onclick = () => { feelStop(); startGame('perform', 'take'); };
+  $('btnHear').onclick = () => { if (!lastTake || !lastTake.length) return; const t0 = lastTake[0].t; feelRun(lastTake.map(e => ({ at: .15 + (e.t - t0) / 1000, m: e.m, vel: e.vel, dur: Math.max(.5, Math.min(4, ((e.off || e.t + 900) - e.t) / 1000 * 1.25 + .25)) })), $('btnHear')); };
+  function coachAfter(G, show) { const F = G && G.L && FEEL[G.L.id]; $('resCoach').textContent = show && F ? F.after : ''; lastTake = G && G.rec && G.rec.length > 1 ? G.rec : null; $('btnHear').style.display = lastTake ? '' : 'none'; }
+  const trialBase = () => ['r1-13-three-homes', 'r1-12-together', 'r1-03-five'].map(id => lessons[id]).find(L => L && makeReps(L));
+  function startTrial() { const B = trialBase(); if (!B) return; current = B; const R = makeReps(B); R.notes.forEach(n => { n.finger = 0; }); startGame('perform', 'blind', Object.assign(R, { id: 'trial-r1', title: 'Region 1 reading trial', trial: true, reps: false })); }
+  $('btnTrial').onclick = () => startTrial();
+  $('btnBack').onclick = () => { feelStop(); renderMap(); };
   $('btnListen').onclick = () => startGame('listen');
   $('btnPractice').onclick = () => startGame('wait');
   $('btnPerform').onclick = () => startGame('perform');
@@ -657,7 +708,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     return Object.assign({}, L, { notes: out.sort((a, b) => a.start - b.start), reps: true });
   }
   function startGame(mode, tier, L0) {
-    const L = L0 || current, tempo = L.tempo * (tier === 'fast' ? 1.25 : tier === 'slow' ? .7 : 1), spb = 60 / tempo, bar = L.timeSig[0];
+    feelStop(); const L = L0 || current, tempo = L.tempo * (tier === 'fast' ? 1.25 : tier === 'slow' ? .7 : 1), spb = 60 / tempo, bar = L.timeSig[0];
     const notes = L.notes.map(n => ({ ...n, state: 0 })), [lo, hi] = rangeOf(L), end = Math.max(...notes.map(n => n.start + n.len));
     if (L.dyn) { /* one loudness mark per bar: the level of the tune (the loudest right-hand note), shown only when it changes */ const bars = {}; notes.forEach(n => { if (n.hand === 'R' && n.dyn != null) { const b = Math.floor(n.start / L.timeSig[0] + 1e-6); if (!bars[b]) bars[b] = { first: n, lvl: n.dyn }; else bars[b].lvl = Math.max(bars[b].lvl, n.dyn); } }); let prev = -1; Object.keys(bars).map(Number).sort((a, b) => a - b).forEach(b => { if (bars[b].lvl !== prev) { bars[b].first.mark = DYN[bars[b].lvl]; prev = bars[b].lvl; } }); }
     game = baseGame({ L, mode, tier, reps: !!L.reps, notes, lo, hi, end, spb, bar, dyn: !!L.dyn, live: {}, sus: [], ped: (L.pedal || []).map(s => ({ a: s[0], b: s[1], j: 0 })), ex: { holdN: 0, holdOk: 0, touchN: 0, touchOk: 0, pedN: 0, pedOk: 0 }, beat: -bar - 0.001, two: notes.some(n => n.hand === 'L'), bossy: !!(L.boss || L.heroic),
@@ -674,7 +725,8 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
         for (const n of this.notes) { if (n.state) continue; if (!same(n.pitch)) continue; const d = Math.abs(n.start - beatNow) * this.spb * 1000; if (d < bestD) { bestD = d; bestN = n; } }
         if (bestN && bestD <= win) { if (byMic) { const raw = (this.beat - bestN.start) * this.spb; save.micLag = Math.max(0, Math.min(.6, lag * .8 + raw * .2)); } const q = bestD <= (byMic ? 150 : PERFECT) ? 'perfect' : 'good'; bestN.state = q === 'perfect' ? 1 : 2; this.hit(bestN, bestN.pitch === 'any' ? m : bestN.pitch, q); if (byMic) this.notes.forEach(x => { if (!x.state && x.start === bestN.start) x.state = bestN.state; }); } else stray();
       } });
-    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : tier === 'slow' ? ' · slow' : '' })[mode] + (L.reps ? ' · reps' : '');
+    $('hudTitle').textContent = L.title.replace(/^(BOSS|HEROIC|SONG) · /, '') + ({ wait: ' · practice', listen: ' · listen', perform: tier === 'fast' ? ' · ⚡ fast' : tier === 'blind' ? ' · 👁 staff only' : tier === 'slow' ? ' · slow' : tier === 'take' ? ' · your take, not scored' : '' })[mode] + (L.reps ? ' · reps' : '');
+    if (mode === 'perform' && !L.arcade) game.rec = [];
     arcSetup(L.arcade && mode === 'perform' ? game : null);
     show('play'); resize(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
   }
@@ -850,17 +902,18 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     if (!a.failed) chime(true); show('arcRes'); window.scrollTo(0, 0);
   }
   function startArcade(id, d, listen) { const s = ARC.find(x => x.id === id), lv = s.levels[d]; current = null; startGame(listen ? 'listen' : 'perform', null, { id: 'arc-' + id, title: s.title + ' · ' + DIFF[d], tempo: lv.tempo, timeSig: s.timeSig, key: lv.key || s.key, dyn: !!s.dyn, pedal: lv.pedal || [], notes: lv.notes, skills: [], arcade: { id, d } }); }
+  function arcWhy(id) { const stop = ((window.KOA_FEEL || {})._arcade || {})[id], LS = stop && SHRINES.find(x => x.learn === stop || (x.also || []).includes(stop)); return LS ? ` <span style="color:var(--gold)">Why it works: Journey lesson “${LS.title}”.</span>` : ''; }
   function renderArcade() {
     const S = arcSave(), tot = arcStars(), rk = arcRank(), nextR = RANKS.find(r => r[0] > S.xp); $('arcRank').textContent = `${rk[1]} · ${S.xp} XP · ${tot} ★`;
     $('arcTop').innerHTML = `<button class="ghost" id="arcMic">${$('btnMic').textContent}</button>` + THEMES.map(t => `<button class="${S.theme === t.id ? 'gold' : 'ghost'}" data-theme="${t.id}" ${themeOpen(t) ? '' : 'disabled style="opacity:.4"'}>${themeOpen(t) ? '' : '🔒 '}${t.name}</button>`).join('');
     $('arcNote').textContent = (nextR ? `Next rank, ${nextR[1]}, at ${nextR[0]} XP. ` : '') + 'On a real piano score, Hard is every note the composer wrote, in the original key and at a real tempo; Easy and Medium are cut-down versions of the same music. Arrangements are tunes that were never piano pieces. Everything is in time. Hit streaks to multiply your score, play the gold phrases cleanly to charge overdrive (it switches on by itself and doubles your points), and keep the crowd meter off the floor.' + (mic ? ' On the microphone, Medium and Hard will miss notes you played: they need the cable.' : '');
     $('arcList').innerHTML = TIERS.map((t, ti) => { const open = tot >= t.need;
-      return `<div class="tierH"><h2 class="disp">${t.name}</h2><span class="small">${open ? '' : '🔒 ' + (t.need - tot) + ' more ★ to unlock'}</span></div><div class="tierSongs">` + ARC.filter(s => s.tier === ti).map(s => `<div class="card song${open ? '' : ' locked'}"><div class="t">${s.title}</div><div class="small"><b style="color:${s.real ? '#3dff9a' : '#a98bff'}">${s.real ? 'Real piano score' : 'Arrangement'}</b> · ${s.by}, ${s.year} · ${s.blurb}${s.dyn || (s.levels[2].pedal || []).length ? ' <i>Has ' + [s.dyn ? 'loud/soft marks' : '', (s.levels[2].pedal || []).length ? (s.pedalFrom === 'bar' ? 'suggested pedalling' : 'pedal marks') : ''].filter(Boolean).join(' and ') + '.</i>' : ''}</div><div class="lv">` + [0, 1, 2].map(d => { const r = arcRec(s.id, d); return `<button ${open ? '' : 'disabled'} class="${d === 2 ? 'pink' : d === 1 ? '' : 'ghost'}" data-song="${s.id}" data-d="${d}">${DIFF[d]}${r.fc ? ' ✦' : ''}<span style="display:block;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.8">${s.real ? ['top line' + (s.levels[0].key && s.levels[0].key !== s.key ? ', easy key' : ''), 'tune + bass', 'as written'][d] : ['tune only', 'tune + bass', 'both hands'][d]}</span><small>${starsH(r.stars || 0)}</small>${r.score ? r.score.toLocaleString() : '&nbsp;'}</button>`; }).join('') + `</div>${open ? `<button class="ghost" data-listen="${s.id}" style="margin-top:8px;font-size:12px;padding:6px 10px">♪ Listen</button>` : ''}</div>`).join('') + '</div>'; }).join('');
+      return `<div class="tierH"><h2 class="disp">${t.name}</h2><span class="small">${open ? '' : '🔒 ' + (t.need - tot) + ' more ★ to unlock'}</span></div><div class="tierSongs">` + ARC.filter(s => s.tier === ti).map(s => `<div class="card song${open ? '' : ' locked'}"><div class="t">${s.title}</div><div class="small"><b style="color:${s.real ? '#3dff9a' : '#a98bff'}">${s.real ? 'Real piano score' : 'Arrangement'}</b> · ${s.by}, ${s.year} · ${s.blurb}${arcWhy(s.id)}${s.dyn || (s.levels[2].pedal || []).length ? ' <i>Has ' + [s.dyn ? 'loud/soft marks' : '', (s.levels[2].pedal || []).length ? (s.pedalFrom === 'bar' ? 'suggested pedalling' : 'pedal marks') : ''].filter(Boolean).join(' and ') + '.</i>' : ''}</div><div class="lv">` + [0, 1, 2].map(d => { const r = arcRec(s.id, d); return `<button ${open ? '' : 'disabled'} data-song="${s.id}" data-d="${d}">${DIFF[d]}${r.fc ? ' ✦' : ''}<span style="display:block;font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.8">${s.real ? ['top line' + (s.levels[0].key && s.levels[0].key !== s.key ? ', easy key' : ''), 'tune + bass', 'as written'][d] : ['tune only', 'tune + bass', 'both hands'][d]}</span><small>${starsH(r.stars || 0)}</small>${r.score ? r.score.toLocaleString() : '&nbsp;'}</button>`; }).join('') + `</div>${open ? `<button class="ghost" data-listen="${s.id}" style="margin-top:8px;font-size:12px;padding:6px 10px">♪ Listen</button>` : ''}</div>`).join('') + '</div>'; }).join('');
     show('arcade'); window.scrollTo(0, 0);
   }
   $('arcList').onclick = e => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.dataset.listen) startArcade(b.dataset.listen, 0, true); else if (b.dataset.song) startArcade(b.dataset.song, +b.dataset.d); };
   $('arcTop').onclick = async e => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.id === 'arcMic') { await $('btnMic').onclick(); renderArcade(); } else if (b.dataset.theme) { arcSave().theme = b.dataset.theme; persist(); renderArcade(); } };
-  $('arcBack').onclick = () => show('title'); $('arList').onclick = () => renderArcade();
+  $('arcBack').onclick = () => show('title'); $('arcToJ').onclick = () => $('btnStart').click(); $('arList').onclick = () => renderArcade();
   $('btnArcade').onclick = () => { initAudio(); initMidi(); if (!ARC.length) { $('titleNote').textContent = 'Arcade songs did not load.'; return; } renderArcade(); if (cloud) cloudSync(); };
 
   function finish() {
@@ -869,10 +922,16 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
     if (G.L.arcade) { G.arc ? arcFinish(G) : renderArcade(); return; }
     if (G.mode === 'listen') { openIntro(G.L.id); return; }
     const total = G.notes.length, perfect = G.notes.filter(n => n.state === 1).length, good = G.notes.filter(n => n.state === 2).length, miss = total - perfect - good;
+    moreFn = null; coachAfter(G, false);
+    if (G.tier === 'take') { save.stats.feeling = (save.stats.feeling || 0) + 1; touchStreak(); persist(); coachAfter(G, true); $('btnMore').style.display = 'none'; $('btnNextStop').style.display = 'none';
+      $('resStars').textContent = '♪'; $('resHead').textContent = 'Your take'; $('resBody').innerHTML = 'Nobody was counting. Now press <b>Hear it back</b> and listen the way you listened to the two players: where does it lean, where does it rest, and is the last note an arrival?' + (exLine(G) ? '<br>' + exLine(G) : ''); show('results'); return; }
     let acc, stars;
     if (G.mode === 'wait') { acc = total / (total + G.strays); stars = 1; }
     else { acc = Math.max(0, (perfect + .7 * good) / total - G.strays * .02); stars = acc >= G.L.pass.stars3 ? 3 : acc >= G.L.pass.stars2 ? 2 : acc >= .4 ? 1 : 0; }
     $('btnMore').style.display = G.reps ? '' : 'none'; $('btnNextStop').style.display = 'none';
+    if (G.L.trial) { const st = acc >= .9 ? 3 : acc >= .8 ? 2 : acc >= .65 ? 1 : 0, r = save.lessons['trial-r1'] || { stars: 0, best: 0 }, firstPass = st >= 1 && !r.stars, gain = Math.round(30 + 70 * acc) + (firstPass ? 100 : 0); r.stars = Math.max(r.stars, st); r.best = Math.max(r.best, Math.round(acc * 100)); save.lessons['trial-r1'] = r; save.xp += gain; save.stats.reading = (save.stats.reading || 0) + (st ? 4 : 1); touchStreak(); persist(); chime(st >= 1); moreFn = startTrial; $('btnMore').style.display = '';
+      $('resStars').textContent = '★'.repeat(st) + '☆'.repeat(3 - st) + ' 👁'; $('resHead').textContent = st ? 'You can read music' : 'Not yet. The page will still be there tomorrow';
+      $('resBody').innerHTML = `Accuracy ${Math.round(acc * 100)}% on a piece that did not exist until you pressed the button, with no falling notes · ${perfect} perfect, ${good} good, ${miss} missed. +${gain} XP.<br>` + (st ? 'That was reading: eyes on the staff, hands finding the keys. Every round is a new piece, so this never becomes memory.' : 'Pass mark is 65%. Look one note ahead of the one you are playing, and keep going after a slip.'); show('results'); return; }
     if (G.reps) { const gain = G.mode === 'wait' ? 12 : Math.round(12 + 36 * acc); save.xp += gain; save.reps = (save.reps || 0) + 1; G.L.skills.forEach(s => { save.stats[s] = (save.stats[s] || 0) + 1; }); touchStreak(); persist(); lastReps = G.mode; chime(true);
       $('resStars').textContent = '∞'; $('resHead').textContent = 'Reps round ' + save.reps + ' done'; $('resBody').innerHTML = (G.mode === 'wait' ? `${total} fresh notes read, ${G.strays} wrong key${G.strays === 1 ? '' : 's'}.` : `Accuracy ${Math.round(acc * 100)}% on music you had never seen · ${perfect} perfect, ${good} good, ${miss} missed.`) + ` +${gain} XP.<br>Every round is new, so this is real sight-reading practice.`; show('results'); return; }
     const slow = G.tier === 'slow'; if (slow) stars = Math.min(stars, 1);
@@ -890,12 +949,13 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
       : `Accuracy ${Math.round(acc * 100)}% · ${perfect} perfect, ${good} good, ${miss} missed · best combo ${G.best}. +${gain} XP.` + (miss > 2 ? '<br>Tip: try the slow run, and count out loud.' : stars >= 2 && !G.tier ? '<br>Want more? Try the ⚡ and 👁 challenge runs.' : '');
     { const o = order(), n = o[o.indexOf(G.L.id) + 1]; $('btnNextStop').style.display = n && unlocked(n) ? '' : 'none'; }
     if (exLine(G)) $('resBody').innerHTML += '<br>' + exLine(G);
+    coachAfter(G, G.mode !== 'wait');
     show('results');
   }
-  $('btnAgain').onclick = () => openIntro(current.id);
-  $('btnMore').onclick = () => { const R = makeReps(current); if (R) startGame(lastReps, null, R); };
-  $('btnMap').onclick = () => renderMap(true);
-  $('btnNextStop').onclick = () => { const o = order(), n = o[o.indexOf(current.id) + 1]; if (n && unlocked(n)) openIntro(n); else renderMap(true); };
+  $('btnAgain').onclick = () => { feelStop(); openIntro(current.id); };
+  $('btnMore').onclick = () => { if (moreFn) return moreFn(); const R = makeReps(current); if (R) startGame(lastReps, null, R); };
+  $('btnMap').onclick = () => { feelStop(); renderMap(true); };
+  $('btnNextStop').onclick = () => { feelStop(); const o = order(), n = o[o.indexOf(current.id) + 1]; if (n && unlocked(n)) openIntro(n); else renderMap(true); };
 
   ['cv', 'skb'].forEach(id => { const c = $(id); c.addEventListener('touchstart', e => e.preventDefault(), { passive: false }); c.addEventListener('contextmenu', e => e.preventDefault()); });
   document.addEventListener('contextmenu', e => { if (!/TEXTAREA|INPUT/.test(e.target.tagName)) e.preventDefault(); }); document.addEventListener('selectstart', e => { if (!/TEXTAREA|INPUT/.test(e.target.tagName)) e.preventDefault(); });
@@ -904,7 +964,7 @@ if (!window.PointerEvent) { (function () { var map = { touchstart: 'pointerdown'
   document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); if (!document.hidden && cloud && index) cloudSync(); });
   // ---------------- Boot ----------------
   $('btnStart').onclick = async () => { initAudio(); initMidi(); try { await loadLessons(); renderMap(); if (cloud) cloudSync(); } catch (e) { $('titleNote').textContent = 'Could not load lessons: ' + e.message; } };
-  window.__koa = { makeReps, setPedal, release, startArcade, renderArcade, get arcade() { return ARC; }, shrineState: () => shrine && ({ quiz: shrine.quiz, do: !shrine.quiz && shrine.S.pages[shrine.step].do || null, quizAll: shrine.S.quiz }), cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
+  window.__koa = { makeReps, setPedal, release, startArcade, renderArcade, get arcade() { return ARC; }, feelPhrase, startTrial, get take() { return lastTake; }, shrineState: () => shrine && ({ quiz: shrine.quiz, do: !shrine.quiz && shrine.S.pages[shrine.step].do || null, quizAll: shrine.S.quiz }), cloudSync, mergeSaves, get cloud() { return cloud; }, startMic, get mic() { return mic; }, get m3() { return M3; }, openShrine, answer, get shrine() { return shrine; }, get game() { return game; }, press, release, lessons, startGame, startFree, openIntro, renderMap, get save() { return save; } };
 })();
 </script>
 </body>
