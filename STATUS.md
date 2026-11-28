@@ -130,3 +130,8 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 ## 27 Nov, night: map colours in as you go
 
 - Removed the whole-map grey filter. The 3D map's own lit/dark split now shows: ground grid, path and trees are coloured up to the stop you are on and dark beyond it. Sky and sun brighten with progress. The boss moment (toast, Ode motif, confetti, brief fade-in) is kept.
+
+## 27 Nov, late: black-and-white map with a moving colour edge; Ravel as the summit
+
+- Map: everything ahead of you is greyscale (grid, path, trees, locked stops, neutral fog). Colour is a second layer (grid, path ribbon, tree wireframes) cut off by a clipping plane (`M3.clip`) that follows the traveller in `loop3D`, so the colour edge travels with the walk animation. Sky, sun and mountains are grey with a coloured layer fading in with progress (`prog`, full at the boss).
+- Ravel, Une barque sur l'océan: added as "The summit" in the shop (locked) and on the player card. No Mutopia source found; needs a public-domain engraving to become an Arcade score.
