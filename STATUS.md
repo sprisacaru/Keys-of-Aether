@@ -126,3 +126,7 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 - Backstage > Cards: one idea card per lesson passed (the lesson's takeaway), and a listening log (tick a piece for 10 XP, `save.shrines['heard-<stop>']`).
 - Arcade ghost: best run's score every 4 beats is stored (`ghost` on the song record, merged with the higher score); HUD shows "vs your best".
 - Arcade setlists: "Play a set" picks three unlocked songs; crowd meter carries over; encore if the meter ends at 80% and a fourth song is unlocked; bonus XP for finishing.
+
+## 27 Nov, night: map colours in as you go
+
+- Removed the whole-map grey filter. The 3D map's own lit/dark split now shows: ground grid, path and trees are coloured up to the stop you are on and dark beyond it. Sky and sun brighten with progress. The boss moment (toast, Ode motif, confetti, brief fade-in) is kept.
