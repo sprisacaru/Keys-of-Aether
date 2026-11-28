@@ -141,3 +141,10 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 - Removed the hidden wait-mode buttons and their handlers, old "rune" wording, and the always-zero Ear stat on the map panel.
 - Known leftovers, harmless: internal `wait` and `free` branches in the game engine, and two no-op loops that used to draw shrines on the map.
 - Game layer status: built = player card, shop (themes, sounds), glossary, daily setlist, mastery, badges, celebration, boss stakes, map colour, idea cards, listening log, ghost run, setlists, Guitar Hero highway. Not built = needle crowd meter and multiplier dial, composer/instrument story cards, map skins, song slots (need import), adaptive difficulty.
+
+## 28 Nov: slow-then-fast ladder
+
+- Arcade has four rungs per song, built in the game from the existing easy and full charts (`arcLv`): Easy = right hand, slow (the old Easy); Medium = right hand at full tempo; Hard = both hands at 65% tempo; Expert = both hands, full tempo (the old Hard). The old "tune plus bass" middle chart is no longer used.
+- Arcade save is version 2 (`arcMig`): old Hard records move to Expert; old Easy and Medium records stay where they were. Merging migrates both sides first.
+- Journey Play card leads with "① Slow run (70%)" until it has been passed once (`slow` flag on the lesson record), then "② Full speed" becomes the highlighted button.
+- Glossary: Slow practice; Easy, Medium, Hard, Expert.
