@@ -148,3 +148,7 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 - Arcade save is version 2 (`arcMig`): old Hard records move to Expert; old Easy and Medium records stay where they were. Merging migrates both sides first.
 - Journey Play card leads with "① Slow run (70%)" until it has been passed once (`slow` flag on the lesson record), then "② Full speed" becomes the highlighted button.
 - Glossary: Slow practice; Easy, Medium, Hard, Expert.
+
+## 28 Nov: setlists removed
+
+- "Play a set" removed from the Arcade at Stefan's request (buttons, `setStart`, `setAfter`, `setRun`).
