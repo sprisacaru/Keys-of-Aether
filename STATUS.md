@@ -117,3 +117,12 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 - Badges are derived from the save, not stored.
 - Results screens: stars pop in one at a time with a rising chime, confetti on a good result.
 - Removed the free-play starter. Still not built from the list: boss with stakes and map recolouring, collectible cards, ghost run, Arcade setlists.
+
+## 27 Nov, evening: Guitar Hero look, boss stakes, map colour, cards, ghost, setlists
+
+- Highway redrawn: dark fretboard with chrome rails, white fret lines per beat (thick at bar lines), round gems with a white centre and a thin sustain tail for long notes, star-shaped gems in gold phrases, ring targets on the strike line for every key the piece uses, flame on each hit, "25 NOTE STREAK!" callouts, highway turns blue with glowing rails in overdrive.
+- Boss and heroic stops (normal run only): three lives and a meter (`game.stakes`, `stakeMiss`). Empty meter costs a life; no lives ends the run with no stars. Slow run and challenge runs have no stakes.
+- Map starts grey and regains colour as stops are cleared (`mapColour`, CSS filter on `#sceneWrap`); beating the boss restores full colour with a toast, the Ode motif and confetti, once (`save.shrines['colour-r1']`). After that the map plays the motif quietly, at most every two minutes.
+- Backstage > Cards: one idea card per lesson passed (the lesson's takeaway), and a listening log (tick a piece for 10 XP, `save.shrines['heard-<stop>']`).
+- Arcade ghost: best run's score every 4 beats is stored (`ghost` on the song record, merged with the higher score); HUD shows "vs your best".
+- Arcade setlists: "Play a set" picks three unlocked songs; crowd meter carries over; encore if the meter ends at 80% and a fourth song is unlocked; bonus XP for finishing.
