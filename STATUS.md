@@ -135,3 +135,9 @@ Stefan asked for the sustain pedal, loudness and realism, in the Arcade and in t
 
 - Map: everything ahead of you is greyscale (grid, path, trees, locked stops, neutral fog). Colour is a second layer (grid, path ribbon, tree wireframes) cut off by a clipping plane (`M3.clip`) that follows the traveller in `loop3D`, so the colour edge travels with the walk animation. Sky, sun and mountains are grey with a coloured layer fading in with progress (`prog`, full at the boss).
 - Ravel, Une barque sur l'océan: added as "The summit" in the shop (locked) and on the player card. No Mutopia source found; needs a public-domain engraving to become an Arcade score.
+
+## 27 Nov, cleanup pass
+
+- Removed the hidden wait-mode buttons and their handlers, old "rune" wording, and the always-zero Ear stat on the map panel.
+- Known leftovers, harmless: internal `wait` and `free` branches in the game engine, and two no-op loops that used to draw shrines on the map.
+- Game layer status: built = player card, shop (themes, sounds), glossary, daily setlist, mastery, badges, celebration, boss stakes, map colour, idea cards, listening log, ghost run, setlists, Guitar Hero highway. Not built = needle crowd meter and multiplier dial, composer/instrument story cards, map skins, song slots (need import), adaptive difficulty.
